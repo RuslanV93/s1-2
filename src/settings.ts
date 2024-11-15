@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 
 config();
 const SETTINGS = {
-  PORT: process.env.PORT || 3004,
+  PORT: process.env.PORT || 5000,
   PATH: {
     DEFAULT: '/',
     TESTING: '/testing',

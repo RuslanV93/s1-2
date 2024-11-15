@@ -10,8 +10,8 @@ import {
   nameValidator,
   webSiteUrlValidator,
 } from '../../validators/FieldsValidators';
-import { objectContainValidator } from '../../validators/objectContainValidator';
 import { authValidatorMiddleware } from '../../validators/authValidator';
+import { findObjectById } from '../../helpers/findById';
 
 export const blogsRouter = Router();
 
@@ -34,16 +34,11 @@ blogsRouter.post(
   inputValidationMiddleware,
   blogsController.addNewBlog,
 );
-blogsRouter.delete(
-  '/:id',
-  authValidatorMiddleware,
-  objectContainValidator,
-  blogsController.deleteBlog,
-);
+blogsRouter.delete('/:id', authValidatorMiddleware, blogsController.deleteBlog);
 blogsRouter.put(
   '/:id',
   authValidatorMiddleware,
-  objectContainValidator,
+  findObjectById,
   nameValidator,
   descriptionValidator,
   webSiteUrlValidator,

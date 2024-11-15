@@ -1,6 +1,11 @@
 import { DBType } from '../types/db.type';
 
 export const db: DBType = {
+  posts: [],
+  blogs: [],
+};
+
+export const dbTest: DBType = {
   posts: [
     {
       id: '1',

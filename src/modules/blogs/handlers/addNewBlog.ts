@@ -3,6 +3,7 @@ import { blogsRepository } from '../repositories/blogsRepository';
 import { BlogType } from '../../../types/db.type';
 import { getUniqueId } from '../../../helpers/getUniqueId';
 import { db } from '../../../db/db';
+import SETTINGS from '../../../settings';
 
 export const addNewBlog = (req: Request, res: Response) => {
   const newBlog: BlogType = {
@@ -14,7 +15,7 @@ export const addNewBlog = (req: Request, res: Response) => {
 
   const newAddedBlog = blogsRepository.addNewBlog(newBlog);
   if (!newAddedBlog) {
-    res.sendStatus(400);
+    res.sendStatus(SETTINGS.STATUSES.BAD_REQUEST_400);
   }
-  res.status(201).send(newAddedBlog);
+  res.status(SETTINGS.STATUSES.CREATED_201).send(newAddedBlog);
 };

@@ -1,16 +1,11 @@
 import { db } from '../../../db/db';
-import { PostType } from '../../../types/db.type';
-
-export type NewPostType = {
-  id: string;
-  title: string;
-  shortDescription: string;
-  content: string;
-  blogId: string;
-  blogName?: string;
-};
+import { NewPostType, PostType } from '../../../types/db.type';
 
 export const postsRepository = {
+  findPostIndex(id: string) {
+    return db.posts.findIndex((post) => post.id === id);
+  },
+
   getPosts: (): Array<PostType> => {
     return db.posts;
   },
@@ -22,5 +17,12 @@ export const postsRepository = {
   addNewPost: (newPost: NewPostType): PostType | undefined => {
     db.posts = [...db.posts, newPost];
     return db.posts.find((post) => post.id === newPost.id);
+  },
+  deletePostById(id: string) {
+    db.posts = db.posts.filter((post) => post.id !== id);
+  },
+  updatePostById(id: string, updatedPost: PostType) {
+    const postIndex = this.findPostIndex(id);
+    db.posts[postIndex] = { ...db.posts[postIndex], ...updatedPost };
   },
 };

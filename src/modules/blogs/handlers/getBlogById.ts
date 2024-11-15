@@ -1,6 +1,7 @@
 import { Response, Request, NextFunction } from 'express';
 import { blogsRepository } from '../repositories/blogsRepository';
 import { BlogType } from '../../../types/db.type';
+import SETTINGS from '../../../settings';
 
 export const getBlogById = (
   req: Request,
@@ -11,8 +12,8 @@ export const getBlogById = (
 
   const blog: BlogType = blogsRepository.getBlogById(id);
   if (!blog) {
-    res.sendStatus(404);
+    res.sendStatus(SETTINGS.STATUSES.NOT_FOUNT_404);
   }
-  res.status(200).send(blog);
+  res.status(SETTINGS.STATUSES.OK_200).send(blog);
   next();
 };

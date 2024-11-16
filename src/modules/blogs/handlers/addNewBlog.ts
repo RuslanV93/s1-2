@@ -2,12 +2,16 @@ import { Request, Response } from 'express';
 import { blogsRepository } from '../repositories/blogsRepository';
 import { BlogType } from '../../../types/db.type';
 import { getUniqueId } from '../../../helpers/getUniqueId';
-import { db } from '../../../db/db';
-import SETTINGS from '../../../settings';
 
-export const addNewBlog = (req: Request, res: Response) => {
+import { blogRequestTypeBody } from '../types/blogsRequestResponseTypes';
+import { STATUSES } from '../../../variables/statusVariables';
+
+export const addNewBlog = (
+  req: Request<{}, {}, blogRequestTypeBody>,
+  res: Response,
+) => {
   const newBlog: BlogType = {
-    id: getUniqueId(db.blogs),
+    id: getUniqueId(),
     name: req.body.name,
     description: req.body.description,
     websiteUrl: req.body.websiteUrl,
@@ -15,7 +19,7 @@ export const addNewBlog = (req: Request, res: Response) => {
 
   const newAddedBlog = blogsRepository.addNewBlog(newBlog);
   if (!newAddedBlog) {
-    res.sendStatus(SETTINGS.STATUSES.BAD_REQUEST_400);
+    res.sendStatus(STATUSES.BAD_REQUEST_400);
   }
-  res.status(SETTINGS.STATUSES.CREATED_201).send(newAddedBlog);
+  res.status(STATUSES.CREATED_201).send(newAddedBlog);
 };

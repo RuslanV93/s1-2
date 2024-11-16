@@ -1,24 +1,36 @@
 import { Request, Response } from 'express';
 import { postsRepository } from '../repositories/postsRepository';
 import { getUniqueId } from '../../../helpers/getUniqueId';
-import { db } from '../../../db/db';
-import { NewPostType } from '../../../types/db.type';
-import SETTINGS from '../../../settings';
 
-export const addNewPost = (req: Request, res: Response) => {
+import {
+  NewPostType,
+  postRequestTypeWithBody,
+} from '../types/postsRequestResponseTypes';
+import { blogsRepository } from '../../blogs/repositories/blogsRepository';
+import { STATUSES } from '../../../variables/statusVariables';
+
+export const addNewPost = (
+  req: Request<{}, {}, postRequestTypeWithBody>,
+  res: Response,
+) => {
   const newPost: NewPostType = {
-    id: getUniqueId(db.posts),
+    id: getUniqueId(),
     title: req.body.title,
     shortDescription: req.body.shortDescription,
     content: req.body.content,
     blogId: req.body.blogId,
-    blogName: req.body.blogName || new Date().toISOString(),
+    blogName: postsRepository.getBlogNameById(req.body.blogId),
   };
-
+  const existingBlogToAddNewPost = blogsRepository.getBlogById(newPost.blogId);
+  if (!existingBlogToAddNewPost) {
+    res
+      .status(STATUSES.BAD_REQUEST_400)
+      .send('Blog not found. Incorrect blog ID');
+  }
   const newAddedPost = postsRepository.addNewPost(newPost);
   if (!newAddedPost) {
-    res.sendStatus(SETTINGS.STATUSES.BAD_REQUEST_400);
+    res.sendStatus(STATUSES.BAD_REQUEST_400);
     return;
   }
-  res.status(SETTINGS.STATUSES.CREATED_201).send(newAddedPost);
+  res.status(STATUSES.CREATED_201).send(newAddedPost);
 };

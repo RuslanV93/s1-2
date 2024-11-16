@@ -1,9 +1,15 @@
 import { db } from '../../../db/db';
-import { NewPostType, PostType } from '../../../types/db.type';
+import { PostType } from '../../../types/db.type';
+import { NewPostType } from '../types/postsRequestResponseTypes';
 
 export const postsRepository = {
   findPostIndex(id: string) {
     return db.posts.findIndex((post) => post.id === id);
+  },
+  getBlogNameById(id: string) {
+    const [blog] = db.blogs.filter((blog) => blog.id === id);
+    console.log(blog);
+    return blog.name;
   },
 
   getPosts: (): Array<PostType> => {
@@ -21,8 +27,8 @@ export const postsRepository = {
   deletePostById(id: string) {
     db.posts = db.posts.filter((post) => post.id !== id);
   },
-  updatePostById(id: string, updatedPost: PostType) {
-    const postIndex = this.findPostIndex(id);
+  updatePostById(updatedPost: PostType) {
+    const postIndex = this.findPostIndex(updatedPost.id);
     db.posts[postIndex] = { ...db.posts[postIndex], ...updatedPost };
   },
 };

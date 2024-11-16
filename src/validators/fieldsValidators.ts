@@ -1,7 +1,8 @@
 import { body, ValidationError, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import { blogByIdExists } from './blogExistsCustomValidator';
-import SETTINGS from '../settings';
+
+import { STATUSES } from '../variables/statusVariables';
 
 type ValidationErrorCustom = {
   message: string;
@@ -23,27 +24,27 @@ const postFields = {
 
 export const nameValidator = body(blogFields.name)
   .notEmpty()
-  .withMessage('name is required')
+  .withMessage('Name is required')
   .isString()
   .trim()
   .isLength({ min: 1, max: 15 })
-  .withMessage('name length must be between 1 and 15 characters');
+  .withMessage('Name length must be between 1 and 15 characters');
 
 export const descriptionValidator = body(blogFields.description)
   .notEmpty()
-  .withMessage('desc is required')
+  .withMessage('Description is required')
   .isString()
   .trim()
   .isLength({ min: 1, max: 500 })
-  .withMessage('desc length must bee between 1 and 15 characters');
+  .withMessage('Description length must bee between 1 and 15 characters');
 
 export const webSiteUrlValidator = body(blogFields.websiteUrl)
   .notEmpty()
-  .withMessage('website url is required')
+  .withMessage('Website url is required')
   .isString()
   .trim()
   .isLength({ min: 3, max: 100 })
-  .withMessage('website url length must be between 1 and 100 characters')
+  .withMessage('Website url length must be between 1 and 100 characters')
   .matches(
     /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
   )
@@ -53,37 +54,37 @@ export const webSiteUrlValidator = body(blogFields.websiteUrl)
 
 export const titleValidator = body(postFields.title)
   .notEmpty()
-  .withMessage('title is required')
+  .withMessage('Title is required')
   .isString()
   .trim()
   .isLength({ min: 1, max: 30 })
-  .withMessage('title length must be between 1 and 30 chars');
+  .withMessage('Title length must be between 1 and 30 chars');
 
 export const shortDescriptionValidator = body(postFields.shortDescription)
   .notEmpty()
-  .withMessage('short description is required')
+  .withMessage('Short description is required')
   .isString()
-  .withMessage('description must be string')
+  .withMessage('Description must be string')
   .trim()
   .isLength({ min: 1, max: 100 })
-  .withMessage('description must be between 1 and 100 chars');
+  .withMessage('Description must be between 1 and 100 chars');
 
 export const contentValidator = body(postFields.content)
   .notEmpty()
-  .withMessage('content is required')
+  .withMessage('Content is required')
   .isString()
   .trim()
   .isLength({ min: 1, max: 1000 })
-  .withMessage('content must be between 1 and 1000 characters');
+  .withMessage('Content must be between 1 and 1000 characters');
 
 export const blogIdValidator = [
   body(postFields.blogId)
     .notEmpty()
-    .withMessage('blog ID is required')
+    .withMessage('Blog ID is required')
     .isString()
     .trim()
     .isLength({ min: 1 })
-    .withMessage('blog ID is required'),
+    .withMessage('Blog ID is required'),
   blogByIdExists(),
 ];
 
@@ -103,9 +104,7 @@ export const inputValidationMiddleware = (
     .array({ onlyFirstError: true });
 
   if (errors.length > 0) {
-    res
-      .status(SETTINGS.STATUSES.BAD_REQUEST_400)
-      .send({ errorsMessages: errors });
+    res.status(STATUSES.BAD_REQUEST_400).send({ errorsMessages: errors });
     return;
   }
   next();

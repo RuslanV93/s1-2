@@ -19,8 +19,8 @@ export const blogsRepository = {
   deleteBlogById(id: string) {
     db.blogs = db.blogs.filter((blog) => blog.id !== id);
   },
-  updateBlogById(id: string, updatedBlog: BlogType) {
-    const blogIndex = this.findBlogIndex(id);
+  updateBlogById(updatedBlog: BlogType) {
+    const blogIndex = this.findBlogIndex(updatedBlog.id);
     db.blogs[blogIndex] = { ...db.blogs[blogIndex], ...updatedBlog };
   },
 };

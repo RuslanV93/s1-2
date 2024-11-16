@@ -5,16 +5,13 @@ import { addNewPost } from './handlers/addNewPost';
 import { deletePost } from './handlers/deletePost';
 import { updatePost } from './handlers/updatePost';
 import { authValidatorMiddleware } from '../../validators/authValidator';
-
 import {
   blogIdValidator,
   contentValidator,
   inputValidationMiddleware,
   shortDescriptionValidator,
   titleValidator,
-} from '../../validators/FieldsValidators';
-import { blogByIdExists } from '../../validators/blogExistsCustomValidator';
-import { findObjectById } from '../../helpers/findById';
+} from '../../validators/fieldsValidators';
 
 export const postsRouter = Router();
 export const postsController = {
@@ -38,16 +35,10 @@ postsRouter.post(
   inputValidationMiddleware,
   postsController.addNewPost,
 );
-postsRouter.delete(
-  '/:id',
-  authValidatorMiddleware,
-  findObjectById,
-  postsController.deletePost,
-);
+postsRouter.delete('/:id', authValidatorMiddleware, postsController.deletePost);
 postsRouter.put(
   '/:id',
   authValidatorMiddleware,
-  findObjectById,
   titleValidator,
   shortDescriptionValidator,
   contentValidator,

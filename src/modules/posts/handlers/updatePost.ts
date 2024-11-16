@@ -1,9 +1,16 @@
-import { NewPostType } from '../../../types/db.type';
 import { Request, Response } from 'express';
 import { postsRepository } from '../repositories/postsRepository';
-import SETTINGS from '../../../settings';
+
+import {
+  NewPostType,
+  postRequestTypeWithBody,
+  postRequestTypeWithParams,
+} from '../types/postsRequestResponseTypes';
+import { blogsRepository } from '../../blogs/repositories/blogsRepository';
+import { STATUSES } from '../../../variables/statusVariables';
+
 export const updatePost = (
-  req: Request<{ id: string }, {}, NewPostType>,
+  req: Request<postRequestTypeWithParams, {}, postRequestTypeWithBody>,
   res: Response,
 ) => {
   const updatedPost: NewPostType = {
@@ -12,7 +19,21 @@ export const updatePost = (
     shortDescription: req.body.shortDescription,
     content: req.body.content,
     blogId: req.body.blogId,
+    blogName:
+      req.body.blogName || postsRepository.getBlogNameById(req.body.blogId),
   };
-  postsRepository.updatePostById(req.params.id, updatedPost);
-  res.sendStatus(SETTINGS.STATUSES.NO_CONTENT_204);
+  const blogForUpdate = blogsRepository.getBlogById(updatedPost.blogId);
+  if (!blogForUpdate) {
+    res
+      .status(STATUSES.BAD_REQUEST_400)
+      .send('Blog not exists. Incorrect blog ID');
+  }
+  const postForUpdate = postsRepository.getPostById(req.params.id);
+  if (!postForUpdate) {
+    res
+      .status(STATUSES.NOT_FOUNT_404)
+      .send('Post not found. Incorrect post ID');
+  }
+  postsRepository.updatePostById(updatedPost);
+  res.sendStatus(STATUSES.NO_CONTENT_204);
 };

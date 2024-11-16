@@ -9,9 +9,8 @@ import {
   inputValidationMiddleware,
   nameValidator,
   webSiteUrlValidator,
-} from '../../validators/FieldsValidators';
+} from '../../validators/fieldsValidators';
 import { authValidatorMiddleware } from '../../validators/authValidator';
-import { findObjectById } from '../../helpers/findById';
 
 export const blogsRouter = Router();
 
@@ -38,7 +37,6 @@ blogsRouter.delete('/:id', authValidatorMiddleware, blogsController.deleteBlog);
 blogsRouter.put(
   '/:id',
   authValidatorMiddleware,
-  findObjectById,
   nameValidator,
   descriptionValidator,
   webSiteUrlValidator,

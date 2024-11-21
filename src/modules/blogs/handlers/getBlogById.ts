@@ -18,7 +18,6 @@ export const getBlogById = async (
     await blogsRepository.getBlogById(id);
 
   if (blog) {
-    console.log(blog);
     res.status(STATUSES.OK_200).send(responseObjectWithId(blog));
     return;
   }

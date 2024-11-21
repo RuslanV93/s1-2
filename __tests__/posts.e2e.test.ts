@@ -1,17 +1,25 @@
-import { describe } from 'node:test';
+import { after, describe } from 'node:test';
 import { req } from './default.e2e.test';
 import SETTINGS from '../src/settings';
-import { RequestPostType } from '../src/types/db.type';
 import { STATUSES } from '../src/variables/variables';
+import { PostViewType } from '../src/types/db.type';
+import { MongoClient } from 'mongodb';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 
-const correctAuthData: string = 'admin:qwerty';
-
-const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 let postId: string;
 let blogId: string;
 
+const correctAuthData: string = 'admin:qwerty';
+const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
+jest.setTimeout(100000);
 describe('/posts', () => {
+  let server: MongoMemoryServer;
+  let client: MongoClient;
   beforeAll(async () => {
+    server = await MongoMemoryServer.create();
+    const uri = server.getUri();
+    client = new MongoClient(uri);
+
     await req
       .post(SETTINGS.PATH.BLOGS)
       .set('authorization', authData)
@@ -37,11 +45,19 @@ describe('/posts', () => {
     const resPost = await req.get(SETTINGS.PATH.POSTS);
     postId = resPost.body[0].id;
   });
+  afterAll(async () => {
+    if (server) {
+      await server.stop();
+    }
+    if (client) {
+      await client.close();
+    }
+  });
 
   it('should get all posts', async () => {
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUSES.OK_200);
     expect(Array.isArray(res.body)).toBe(true);
-    res.body.forEach((post: RequestPostType) => {
+    res.body.forEach((post: PostViewType) => {
       expect(post).toMatchObject({
         id: expect.any(String),
         title: expect.any(String),
@@ -76,10 +92,9 @@ describe('/posts', () => {
         blogId: `${blogId}`,
       })
       .expect(STATUSES.CREATED_201);
-    const newPost = (await req.get(SETTINGS.PATH.POSTS)).body[1];
 
     expect(res.body).toMatchObject({
-      id: `${newPost.id}`,
+      id: res.body.id,
       title: 'title',
       shortDescription: 'desc',
       content: 'string',

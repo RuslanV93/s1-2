@@ -32,7 +32,6 @@ export const postsRepository = {
       .find({ _id: new ObjectId(id) })
       .toArray();
     if (postById) {
-      console.log(postById);
       return postById;
     }
     return null;

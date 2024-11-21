@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import SETTINGS from '../settings';
-import { STATUSES } from '../variables/statusVariables';
+
+import { STATUSES } from '../variables/variables';
 
 export const authValidatorMiddleware = (
   req: Request<{}, {}, {}, { authorization: string }>,

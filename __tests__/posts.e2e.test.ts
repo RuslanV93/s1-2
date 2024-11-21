@@ -1,11 +1,14 @@
 import { describe } from 'node:test';
 import { req } from './default.e2e.test';
 import SETTINGS from '../src/settings';
-import { PostType } from '../src/types/db.type';
+import { RequestPostType } from '../src/types/db.type';
+import { STATUSES } from '../src/variables/variables';
 
 const correctAuthData: string = 'admin:qwerty';
 
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
+let postId: string;
+let blogId: string;
 
 describe('/posts', () => {
   beforeAll(async () => {
@@ -17,7 +20,10 @@ describe('/posts', () => {
         description: 'asd',
         websiteUrl: 'https://gFBG5yy0Pb59.com',
       })
-      .expect(SETTINGS.STATUSES.CREATED_201);
+      .expect(STATUSES.CREATED_201);
+    const resBlog = await req.get(SETTINGS.PATH.BLOGS);
+    blogId = resBlog.body[0].id;
+
     await req
       .post(SETTINGS.PATH.POSTS)
       .set('authorization', authData)
@@ -25,17 +31,17 @@ describe('/posts', () => {
         title: 'title',
         shortDescription: 'desc',
         content: 'string',
-        blogId: '1',
+        blogId: `${blogId}`,
       })
-      .expect(SETTINGS.STATUSES.CREATED_201);
+      .expect(STATUSES.CREATED_201);
+    const resPost = await req.get(SETTINGS.PATH.POSTS);
+    postId = resPost.body[0].id;
   });
 
   it('should get all posts', async () => {
-    const res = await req
-      .get(SETTINGS.PATH.POSTS)
-      .expect(SETTINGS.STATUSES.OK_200);
+    const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUSES.OK_200);
     expect(Array.isArray(res.body)).toBe(true);
-    res.body.forEach((post: PostType) => {
+    res.body.forEach((post: RequestPostType) => {
       expect(post).toMatchObject({
         id: expect.any(String),
         title: expect.any(String),
@@ -48,14 +54,14 @@ describe('/posts', () => {
   });
   it('should get post by id', async () => {
     const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/1`)
-      .expect(SETTINGS.STATUSES.OK_200);
+      .get(`${SETTINGS.PATH.POSTS}/${postId}`)
+      .expect(STATUSES.OK_200);
     expect(res.body).toMatchObject({
-      id: '1',
+      id: `${postId}`,
       title: 'title',
       shortDescription: 'desc',
       content: 'string',
-      blogId: '1',
+      blogId: `${blogId}`,
       blogName: expect.any(String),
     });
   });
@@ -67,23 +73,25 @@ describe('/posts', () => {
         title: 'title',
         shortDescription: 'desc',
         content: 'string',
-        blogId: '1',
+        blogId: `${blogId}`,
       })
-      .expect(SETTINGS.STATUSES.CREATED_201);
+      .expect(STATUSES.CREATED_201);
+    const newPost = (await req.get(SETTINGS.PATH.POSTS)).body[1];
+
     expect(res.body).toMatchObject({
-      id: '2',
+      id: `${newPost.id}`,
       title: 'title',
       shortDescription: 'desc',
       content: 'string',
-      blogId: '1',
+      blogId: `${blogId}`,
       blogName: expect.any(String),
     });
   });
   it('should delete post by id', async () => {
     await req
-      .delete(`${SETTINGS.PATH.POSTS}/2`)
+      .delete(`${SETTINGS.PATH.POSTS}/` + postId)
       .set('authorization', authData)
-      .expect(SETTINGS.STATUSES.NO_CONTENT_204);
-    await req.delete(`${SETTINGS.PATH.POSTS}/1`).expect(401);
+      .expect(STATUSES.NO_CONTENT_204);
+    await req.delete(`${SETTINGS.PATH.POSTS}/${postId}`).expect(401);
   });
 });

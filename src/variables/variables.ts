@@ -6,3 +6,9 @@ export const STATUSES = {
   OK_200: 200,
   NO_CONTENT_204: 204,
 };
+
+export const BLOGGERS_PLATFORM = {
+  dbName: 'bloggers-platform',
+  posts: 'posts',
+  blogs: 'blogs',
+};

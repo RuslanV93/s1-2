@@ -1,25 +1,28 @@
 import { Request, Response } from 'express';
 import { blogsRepository } from '../repositories/blogsRepository';
-import { BlogType } from '../../../types/db.type';
-import { getUniqueId } from '../../../helpers/getUniqueId';
 
 import { blogRequestTypeBody } from '../types/blogsRequestResponseTypes';
-import { STATUSES } from '../../../variables/statusVariables';
+import { STATUSES } from '../../../variables/variables';
+import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
+import { NewBlogType } from '../../../types/db.type';
 
-export const addNewBlog = (
+export const addNewBlog = async (
   req: Request<{}, {}, blogRequestTypeBody>,
   res: Response,
 ) => {
-  const newBlog: BlogType = {
-    id: getUniqueId(),
+  const newBlog: NewBlogType = {
     name: req.body.name,
     description: req.body.description,
     websiteUrl: req.body.websiteUrl,
+    createdAt: new Date().toISOString(),
+    isMembership: false,
   };
 
-  const newAddedBlog = blogsRepository.addNewBlog(newBlog);
-  if (!newAddedBlog) {
-    res.sendStatus(STATUSES.BAD_REQUEST_400);
+  const newAddedBlog = await blogsRepository.addNewBlog(newBlog);
+  if (newAddedBlog) {
+    res.status(STATUSES.CREATED_201).send(responseObjectWithId(newAddedBlog));
+    return;
   }
-  res.status(STATUSES.CREATED_201).send(newAddedBlog);
+
+  res.sendStatus(STATUSES.BAD_REQUEST_400);
 };

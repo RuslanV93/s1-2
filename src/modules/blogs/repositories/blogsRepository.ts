@@ -1,26 +1,51 @@
-import { db } from '../../../db/db';
-import { BlogType } from '../../../types/db.type';
+import { client, db } from '../../../db/db';
+
+import { BLOGGERS_PLATFORM } from '../../../variables/variables';
+import { ObjectId, WithId } from 'mongodb';
+import {
+  BlogForUpdateType,
+  BlogViewType,
+  NewBlogType,
+} from '../../../types/db.type';
 
 export const blogsRepository = {
-  findBlogIndex(id: string) {
-    return db.blogs.findIndex((blog: BlogType) => blog.id === id);
+  async getBlogs(): Promise<Array<WithId<BlogViewType>>> {
+    return db
+      .collection<BlogViewType>(BLOGGERS_PLATFORM.blogs)
+      .find({})
+      .toArray();
   },
-  getBlogs(): Array<BlogType> {
-    return db.blogs;
+  async getBlogById(id: string): Promise<WithId<BlogViewType> | null> {
+    const [blogById] = await db
+      .collection<BlogViewType>(BLOGGERS_PLATFORM.blogs)
+      .find({ _id: new ObjectId(id) })
+      .toArray();
+    if (blogById) {
+      return blogById;
+    }
+    return null;
   },
-  getBlogById(id: string): BlogType {
-    const [blogById] = db.blogs.filter((blog): boolean => blog.id === id);
-    return blogById;
+  async addNewBlog(newBlog: NewBlogType): Promise<WithId<BlogViewType> | null> {
+    const result = await db
+      .collection(BLOGGERS_PLATFORM.blogs)
+      .insertOne(newBlog);
+    if (result.insertedId) {
+      return await db
+        .collection<BlogViewType>(BLOGGERS_PLATFORM.blogs)
+        .findOne({ _id: result.insertedId });
+    }
+    return null;
   },
-  addNewBlog(newBlog: BlogType) {
-    db.blogs = [...db.blogs, newBlog];
-    return db.blogs.find((blog) => blog.id === newBlog.id);
+  async deleteBlogById(id: string): Promise<boolean> {
+    const result = await db
+      .collection(BLOGGERS_PLATFORM.blogs)
+      .deleteOne({ _id: new ObjectId(id) });
+    return result.deletedCount === 1;
   },
-  deleteBlogById(id: string) {
-    db.blogs = db.blogs.filter((blog) => blog.id !== id);
-  },
-  updateBlogById(updatedBlog: BlogType) {
-    const blogIndex = this.findBlogIndex(updatedBlog.id);
-    db.blogs[blogIndex] = { ...db.blogs[blogIndex], ...updatedBlog };
+  async updateBlogById(updatedBlog: BlogForUpdateType) {
+    const result = await db
+      .collection(BLOGGERS_PLATFORM.blogs)
+      .updateOne({ _id: new ObjectId(updatedBlog.id) }, { $set: updatedBlog });
+    return result.modifiedCount === 1;
   },
 };

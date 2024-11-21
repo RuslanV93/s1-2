@@ -4,7 +4,7 @@ import { blogsRouter } from './modules/blogs/blogsController';
 import SETTINGS from './settings';
 import { postsRouter } from './modules/posts/postsController';
 import { allDataRouter } from './modules/testing/deleteAllData';
-import { STATUSES } from './variables/statusVariables';
+import { STATUSES } from './variables/variables';
 
 export const app = express();
 app.use(express.json());

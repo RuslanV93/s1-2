@@ -2,7 +2,7 @@ import { body, ValidationError, validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import { blogByIdExists } from './blogExistsCustomValidator';
 
-import { STATUSES } from '../variables/statusVariables';
+import { STATUSES } from '../variables/variables';
 
 type ValidationErrorCustom = {
   message: string;

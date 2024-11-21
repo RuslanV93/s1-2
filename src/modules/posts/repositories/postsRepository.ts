@@ -1,34 +1,65 @@
 import { db } from '../../../db/db';
-import { PostType } from '../../../types/db.type';
-import { NewPostType } from '../types/postsRequestResponseTypes';
+
+import { BLOGGERS_PLATFORM } from '../../../variables/variables';
+import { ObjectId, WithId } from 'mongodb';
+import {
+  BlogViewType,
+  NewPostType,
+  PostForUpdateType,
+  PostViewType,
+} from '../../../types/db.type';
 
 export const postsRepository = {
-  findPostIndex(id: string) {
-    return db.posts.findIndex((post) => post.id === id);
-  },
-  getBlogNameById(id: string) {
-    const [blog] = db.blogs.filter((blog) => blog.id === id);
-    console.log(blog);
-    return blog.name;
+  async getBlogNameById(id: string): Promise<string | null> {
+    const blog = await db
+      .collection<BlogViewType>(BLOGGERS_PLATFORM.blogs)
+      .findOne({ _id: new ObjectId(id) });
+    if (blog) {
+      return blog.name;
+    }
+    return null;
   },
 
-  getPosts: (): Array<PostType> => {
-    return db.posts;
+  async getPosts(): Promise<Array<WithId<PostViewType>>> {
+    return await db
+      .collection<PostViewType>(BLOGGERS_PLATFORM.posts)
+      .find({})
+      .toArray();
   },
-  getPostById: (id: string): PostType => {
-    console.log(id);
-    const [post] = db.posts.filter((post) => post.id === id);
-    return post;
+  async getPostById(id: string): Promise<WithId<PostViewType> | null> {
+    const [postById] = await db
+      .collection<PostViewType>(BLOGGERS_PLATFORM.posts)
+      .find({ _id: new ObjectId(id) })
+      .toArray();
+    if (postById) {
+      console.log(postById);
+      return postById;
+    }
+    return null;
   },
-  addNewPost: (newPost: NewPostType): PostType | undefined => {
-    db.posts = [...db.posts, newPost];
-    return db.posts.find((post) => post.id === newPost.id);
+  async addNewPost(newPost: NewPostType): Promise<WithId<PostViewType> | null> {
+    const result = await db
+      .collection(BLOGGERS_PLATFORM.posts)
+      .insertOne(newPost);
+    if (result.insertedId) {
+      return await db
+        .collection<PostViewType>(BLOGGERS_PLATFORM.posts)
+        .findOne({ _id: result.insertedId });
+    }
+    return null;
   },
-  deletePostById(id: string) {
-    db.posts = db.posts.filter((post) => post.id !== id);
+  async deletePostById(id: string): Promise<boolean> {
+    const result = await db
+      .collection(BLOGGERS_PLATFORM.posts)
+      .deleteOne({ _id: new ObjectId(id) });
+
+    return result.deletedCount === 1;
   },
-  updatePostById(updatedPost: PostType) {
-    const postIndex = this.findPostIndex(updatedPost.id);
-    db.posts[postIndex] = { ...db.posts[postIndex], ...updatedPost };
+  async updatePostById(updatedPost: PostForUpdateType): Promise<boolean> {
+    const result = await db
+      .collection(BLOGGERS_PLATFORM.posts)
+      .updateOne({ _id: new ObjectId(updatedPost.id) }, { $set: updatedPost });
+
+    return result.modifiedCount === 1;
   },
 };

@@ -1,12 +1,12 @@
 import { Request, Response, Router } from 'express';
-import { db } from '../../db/db';
+import { client, db } from '../../db/db';
 
-import { STATUSES } from '../../variables/statusVariables';
+import { BLOGGERS_PLATFORM, STATUSES } from '../../variables/variables';
 
 export const allDataRouter = Router();
 
-allDataRouter.delete('/all-data', (req: Request, res: Response) => {
-  db.posts = [];
-  db.blogs = [];
+allDataRouter.delete('/all-data', async (req: Request, res: Response) => {
+  await db.collection(BLOGGERS_PLATFORM.blogs).deleteMany({});
+  await db.collection(BLOGGERS_PLATFORM.posts).deleteMany({});
   res.sendStatus(STATUSES.NO_CONTENT_204);
 });

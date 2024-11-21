@@ -1,21 +1,26 @@
 import { Response, Request, NextFunction } from 'express';
 import { blogsRepository } from '../repositories/blogsRepository';
-import { BlogType } from '../../../types/db.type';
+import { BlogViewType } from '../../../types/db.type';
 
 import { blogRequestTypeParams } from '../types/blogsRequestResponseTypes';
-import { STATUSES } from '../../../variables/statusVariables';
+import { STATUSES } from '../../../variables/variables';
+import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
+import { WithId } from 'mongodb';
 
-export const getBlogById = (
+export const getBlogById = async (
   req: Request<blogRequestTypeParams>,
   res: Response,
   next: NextFunction,
 ) => {
   const id = req.params.id;
 
-  const blog: BlogType = blogsRepository.getBlogById(id);
-  if (!blog) {
-    res.sendStatus(STATUSES.NOT_FOUNT_404);
+  const blog: WithId<BlogViewType> | null =
+    await blogsRepository.getBlogById(id);
+
+  if (blog) {
+    console.log(blog);
+    res.status(STATUSES.OK_200).send(responseObjectWithId(blog));
+    return;
   }
-  res.status(STATUSES.OK_200).send(blog);
-  next();
+  res.sendStatus(STATUSES.NOT_FOUNT_404);
 };

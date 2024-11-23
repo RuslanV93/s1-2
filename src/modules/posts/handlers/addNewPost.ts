@@ -1,16 +1,15 @@
 import { Request, Response } from 'express';
-import { postsRepository } from '../repositories/postsRepository';
 import { postRequestTypeWithBody } from '../types/postsRequestResponseTypes';
-import { blogsRepository } from '../../blogs/repositories/blogsRepository';
 import { STATUSES } from '../../../variables/variables';
 import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
-import { NewPostType } from '../../../types/db.type';
+import { blogsService } from '../../blogs/services/blogsService';
+import { postsService } from '../services/postsService';
 
 export const addNewPost = async (
   req: Request<{}, {}, postRequestTypeWithBody>,
   res: Response,
 ) => {
-  const existingBlogToAddNewPost = await blogsRepository.getBlogById(
+  const existingBlogToAddNewPost = await blogsService.getBlogById(
     req.body.blogId,
   );
   if (!existingBlogToAddNewPost) {
@@ -19,15 +18,10 @@ export const addNewPost = async (
       .send('Blog not found. Incorrect blog ID');
     return;
   }
-  const newPost: NewPostType = {
-    title: req.body.title,
-    shortDescription: req.body.shortDescription,
-    content: req.body.content,
-    blogId: req.body.blogId,
-    blogName: await postsRepository.getBlogNameById(req.body.blogId),
-    createdAt: new Date().toISOString(),
-  };
-  const newAddedPost = await postsRepository.addNewPost(newPost);
+  const newAddedPost = await postsService.addNewPost(
+    req,
+    existingBlogToAddNewPost.name,
+  );
   if (!newAddedPost) {
     res.sendStatus(STATUSES.BAD_REQUEST_400);
     return;

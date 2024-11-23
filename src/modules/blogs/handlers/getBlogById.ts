@@ -6,6 +6,7 @@ import { blogRequestTypeParams } from '../types/blogsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
 import { WithId } from 'mongodb';
+import { blogsService } from '../services/blogsService';
 
 export const getBlogById = async (
   req: Request<blogRequestTypeParams>,
@@ -14,8 +15,7 @@ export const getBlogById = async (
 ) => {
   const id = req.params.id;
 
-  const blog: WithId<BlogViewType> | null =
-    await blogsRepository.getBlogById(id);
+  const blog = await blogsService.getBlogById(id);
 
   if (blog) {
     res.status(STATUSES.OK_200).send(responseObjectWithId(blog));

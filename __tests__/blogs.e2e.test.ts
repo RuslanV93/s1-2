@@ -4,6 +4,7 @@ import { MongoClient } from 'mongodb';
 import { req } from './default.e2e.test';
 import SETTINGS from '../src/settings';
 import { BlogViewType } from '../src/types/db.type';
+import { STATUSES } from '../src/variables/variables';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
@@ -28,7 +29,7 @@ describe('/blogs', () => {
       .post(SETTINGS.PATH.BLOGS)
       .set('authorization', authData)
       .send(newBlog)
-      .expect(201);
+      .expect(STATUSES.CREATED_201);
     newBlogForTestId = newBlogForTest.body.id;
   });
 
@@ -41,7 +42,7 @@ describe('/blogs', () => {
     }
   });
   it('should return all blogs', async () => {
-    const res = await req.get(SETTINGS.PATH.BLOGS).expect(200);
+    const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);
     res.body.forEach((blog: BlogViewType) => {
       expect(blog).toMatchObject({
         id: expect.any(String),
@@ -56,7 +57,7 @@ describe('/blogs', () => {
   it('should return blog by id', async () => {
     const res = await req
       .get(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}`)
-      .expect(200);
+      .expect(STATUSES.OK_200);
     expect(res.body).toMatchObject({
       id: newBlogForTestId,
       name: expect.any(String),
@@ -75,7 +76,7 @@ describe('/blogs', () => {
         description: 'Hi',
         websiteUrl: 'https://hello.com',
       })
-      .expect(201);
+      .expect(STATUSES.CREATED_201);
     expect(res.body).toMatchObject({
       id: expect.any(String),
       name: 'Hello',
@@ -94,10 +95,10 @@ describe('/blogs', () => {
         description: '1',
         websiteUrl: 'https://pasha.com',
       })
-      .expect(204);
+      .expect(STATUSES.NO_CONTENT_204);
     const res = await req
       .get(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}`)
-      .expect(200);
+      .expect(STATUSES.OK_200);
     expect(res.body).toMatchObject({
       id: expect.any(String),
       name: 'pasha',
@@ -108,14 +109,16 @@ describe('/blogs', () => {
     });
   });
   it('should delete blog by id', async () => {
-    const blogs = await req.get(SETTINGS.PATH.BLOGS).expect(200);
+    const blogs = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);
     const blogsLength = blogs.body.length;
     await req
       .delete(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}`)
       .set('authorization', authData)
-      .expect(204);
-    const res = await req.get(SETTINGS.PATH.BLOGS).expect(200);
+      .expect(STATUSES.NO_CONTENT_204);
+    const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);
     expect(res.body.length).toBe(blogsLength - 1);
-    await req.get(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}`).expect(404);
+    await req
+      .get(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}`)
+      .expect(STATUSES.NOT_FOUNT_404);
   });
 });

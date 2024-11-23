@@ -107,6 +107,8 @@ describe('/posts', () => {
       .delete(`${SETTINGS.PATH.POSTS}/` + postId)
       .set('authorization', authData)
       .expect(STATUSES.NO_CONTENT_204);
-    await req.delete(`${SETTINGS.PATH.POSTS}/${postId}`).expect(401);
+    await req
+      .delete(`${SETTINGS.PATH.POSTS}/${postId}`)
+      .expect(STATUSES.UNAUTHORIZED_401);
   });
 });

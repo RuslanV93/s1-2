@@ -4,13 +4,14 @@ import { postsRepository } from '../repositories/postsRepository';
 import { postRequestTypeWithParams } from '../types/postsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
+import { postsService } from '../services/postsService';
 
 export const getPostById = async (
   req: Request<postRequestTypeWithParams>,
   res: Response,
 ) => {
   const id = req.params.id;
-  const post = await postsRepository.getPostById(id);
+  const post = await postsService.getPostById(id);
 
   if (!post) {
     res.sendStatus(STATUSES.NOT_FOUNT_404);

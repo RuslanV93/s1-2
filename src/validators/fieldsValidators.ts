@@ -1,4 +1,10 @@
-import { body, ValidationError, validationResult } from 'express-validator';
+import {
+  body,
+  param,
+  ValidationChain,
+  ValidationError,
+  validationResult,
+} from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import { blogByIdExists } from './blogExistsCustomValidator';
 
@@ -77,14 +83,19 @@ export const contentValidator = body(postFields.content)
   .isLength({ min: 1, max: 1000 })
   .withMessage('Content must be between 1 and 1000 characters');
 
-export const blogIdValidator = [
-  body(postFields.blogId)
+const blogIdValidation = (field: ValidationChain) => [
+  field
+    .optional()
     .notEmpty()
     .withMessage('Blog ID is required')
     .isString()
     .trim()
     .isLength({ min: 1 })
     .withMessage('Blog ID is required'),
+];
+export const blogIdValidator = [
+  blogIdValidation(body(postFields.blogId)),
+  blogIdValidation(param(postFields.blogId)),
   blogByIdExists(),
 ];
 
@@ -104,8 +115,14 @@ export const inputValidationMiddleware = (
     .array({ onlyFirstError: true });
 
   if (errors.length > 0) {
-    res.status(STATUSES.BAD_REQUEST_400).send({ errorsMessages: errors });
-    return;
+    const error = errors[0];
+    if (error.message === 'Blog not found. Incorrect id.') {
+      res.status(404).send({ errorsMessages: [error] });
+      return;
+    } else {
+      res.status(STATUSES.BAD_REQUEST_400).send({ errorsMessages: errors });
+      return;
+    }
   }
   next();
 };

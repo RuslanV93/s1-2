@@ -1,11 +1,7 @@
 import { Response, Request, NextFunction } from 'express';
-import { blogsRepository } from '../repositories/blogsRepository';
-import { BlogViewType } from '../../../types/db.type';
-
 import { blogRequestTypeParams } from '../types/blogsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
-import { WithId } from 'mongodb';
 import { blogsService } from '../services/blogsService';
 
 export const getBlogById = async (

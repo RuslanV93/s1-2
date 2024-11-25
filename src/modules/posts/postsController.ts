@@ -12,6 +12,10 @@ import {
   shortDescriptionValidator,
   titleValidator,
 } from '../../validators/fieldsValidators';
+import {
+  queryFieldsValidatorMiddleware,
+  sortValidator,
+} from '../../validators/queryValidators';
 
 export const postsRouter = Router();
 export const postsController = {
@@ -22,7 +26,12 @@ export const postsController = {
   updatePost,
 };
 
-postsRouter.get('/', postsController.getPosts);
+postsRouter.get(
+  '/',
+  sortValidator,
+  queryFieldsValidatorMiddleware,
+  postsController.getPosts,
+);
 postsRouter.get('/:id', postsController.getPostById);
 
 postsRouter.post(
@@ -31,7 +40,7 @@ postsRouter.post(
   titleValidator,
   shortDescriptionValidator,
   contentValidator,
-  blogIdValidator,
+  ...blogIdValidator,
   inputValidationMiddleware,
   postsController.addNewPost,
 );
@@ -42,7 +51,7 @@ postsRouter.put(
   titleValidator,
   shortDescriptionValidator,
   contentValidator,
-  blogIdValidator,
+  ...blogIdValidator,
   inputValidationMiddleware,
   postsController.updatePost,
 );

@@ -18,6 +18,7 @@ export type NewPostType = {
   blogName: string | null;
   createdAt: string;
 };
+
 export type BlogForUpdateType = {
   id: string;
   name: string;
@@ -46,6 +47,6 @@ export type PostViewType = {
   shortDescription: string;
   content: string;
   blogId: string;
-  blogName?: string;
+  blogName: string | null;
   createdAt?: string;
 };

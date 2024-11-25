@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
 import { STATUSES } from '../../../variables/variables';
-import { responseArrayWithId } from '../../../helpers/responseArrayWithId';
-import { PostViewType } from '../../../types/db.type';
-import { WithId } from 'mongodb';
+
 import { postsService } from '../services/postsService';
+import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
 
 export const getPosts = async (req: Request, res: Response) => {
-  const posts: Array<WithId<PostViewType>> = await postsService.getPosts();
-
-  res.status(STATUSES.OK_200).send(responseArrayWithId(posts));
+  const paginationParams = getQueryFromRequest(req);
+  const posts = await postsService.getPosts(paginationParams);
+  res.status(STATUSES.OK_200).send(posts);
 };

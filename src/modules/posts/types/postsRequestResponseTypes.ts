@@ -8,5 +8,14 @@ export type postRequestTypeWithBody = {
   blogId: string;
   blogName?: string;
 };
+export type postRequestTypeQuery = {
+  pageNumber: number;
+  pageSize: number;
+  sortBy: string;
+  sortDirection: string;
+};
 export type postRequestTypeWithBodyAndParams = postRequestTypeWithParams &
   postRequestTypeWithBody;
+
+export type postRequestTypeWithBodyAndParamsAndQuery =
+  postRequestTypeWithParams & postRequestTypeWithBody & postRequestTypeQuery;

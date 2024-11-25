@@ -1,34 +1,41 @@
-import { db } from '../../../db/db';
-
-import { BLOGGERS_PLATFORM } from '../../../variables/variables';
+import { postsCollection } from '../../../db/db';
 import { ObjectId, WithId } from 'mongodb';
 import {
-  BlogViewType,
   NewPostType,
   PostForUpdateType,
   PostViewType,
 } from '../../../types/db.type';
+const createFilter = (paginationParams: any) => {
+  const filter: any = {};
+  const { search } = paginationParams;
+  if (search) {
+    filter.$or = [
+      { title: { $regex: search, $options: 'i' } },
+      { content: { $regex: search, $options: 'i' } },
+    ];
+  }
+  return filter;
+};
 
 export const postsRepository = {
-  async getBlogNameById(id: string): Promise<string | null> {
-    const blog = await db
-      .collection<BlogViewType>(BLOGGERS_PLATFORM.blogs)
-      .findOne({ _id: new ObjectId(id) });
-    if (blog) {
-      return blog.name;
-    }
-    return null;
+  async getPostsTotalCount(paginationParams: any) {
+    const filter = createFilter(paginationParams);
+    return await postsCollection.countDocuments(filter);
   },
+  async getPosts(paginationParams: any): Promise<Array<WithId<PostViewType>>> {
+    const filter: any = createFilter(paginationParams);
+    const { pageNumber, pageSize, sortBy, sortDirection, search } =
+      paginationParams;
 
-  async getPosts(): Promise<Array<WithId<PostViewType>>> {
-    return await db
-      .collection<PostViewType>(BLOGGERS_PLATFORM.posts)
-      .find({})
+    return await postsCollection
+      .find(filter)
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .skip(pageSize * (pageNumber - 1))
+      .limit(pageSize)
       .toArray();
   },
   async getPostById(id: string): Promise<WithId<PostViewType> | null> {
-    const [postById] = await db
-      .collection<PostViewType>(BLOGGERS_PLATFORM.posts)
+    const [postById] = await postsCollection
       .find({ _id: new ObjectId(id) })
       .toArray();
     if (postById) {
@@ -37,27 +44,22 @@ export const postsRepository = {
     return null;
   },
   async addNewPost(newPost: NewPostType): Promise<WithId<PostViewType> | null> {
-    const result = await db
-      .collection(BLOGGERS_PLATFORM.posts)
-      .insertOne(newPost);
+    const result = await postsCollection.insertOne(newPost);
     if (result.insertedId) {
-      return await db
-        .collection<PostViewType>(BLOGGERS_PLATFORM.posts)
-        .findOne({ _id: result.insertedId });
+      return await postsCollection.findOne({ _id: result.insertedId });
     }
     return null;
   },
   async deletePostById(id: string): Promise<boolean> {
-    const result = await db
-      .collection(BLOGGERS_PLATFORM.posts)
-      .deleteOne({ _id: new ObjectId(id) });
+    const result = await postsCollection.deleteOne({ _id: new ObjectId(id) });
 
     return result.deletedCount === 1;
   },
   async updatePostById(updatedPost: PostForUpdateType): Promise<boolean> {
-    const result = await db
-      .collection(BLOGGERS_PLATFORM.posts)
-      .updateOne({ _id: new ObjectId(updatedPost.id) }, { $set: updatedPost });
+    const result = await postsCollection.updateOne(
+      { _id: new ObjectId(updatedPost.id) },
+      { $set: updatedPost },
+    );
 
     return result.modifiedCount === 1;
   },

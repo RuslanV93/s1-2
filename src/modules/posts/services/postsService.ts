@@ -10,10 +10,20 @@ import {
   PostViewType,
 } from '../../../types/db.type';
 import { WithId } from 'mongodb';
+import { responseArrayWithId } from '../../../helpers/responseArrayWithId';
 
 export const postsService = {
-  async getPosts() {
-    return await postsRepository.getPosts();
+  async getPosts(paginationParams: any) {
+    const totalCount =
+      await postsRepository.getPostsTotalCount(paginationParams);
+    const postsFromDb = await postsRepository.getPosts(paginationParams);
+    return {
+      pagesCount: Math.ceil(totalCount / paginationParams.pageSize),
+      page: paginationParams.pageNumber,
+      pageSize: paginationParams.pageSize,
+      totalCount: totalCount,
+      items: responseArrayWithId(postsFromDb),
+    };
   },
   async getPostById(id: string) {
     return await postsRepository.getPostById(id);

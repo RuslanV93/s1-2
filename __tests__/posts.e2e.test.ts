@@ -30,7 +30,7 @@ describe('/posts', () => {
       })
       .expect(STATUSES.CREATED_201);
     const resBlog = await req.get(SETTINGS.PATH.BLOGS);
-    blogId = resBlog.body[0].id;
+    blogId = resBlog.body.items[0].id;
 
     await req
       .post(SETTINGS.PATH.POSTS)
@@ -43,7 +43,7 @@ describe('/posts', () => {
       })
       .expect(STATUSES.CREATED_201);
     const resPost = await req.get(SETTINGS.PATH.POSTS);
-    postId = resPost.body[0].id;
+    postId = resPost.body.items[0].id;
   });
   afterAll(async () => {
     if (server) {
@@ -56,8 +56,8 @@ describe('/posts', () => {
 
   it('should get all posts', async () => {
     const res = await req.get(SETTINGS.PATH.POSTS).expect(STATUSES.OK_200);
-    expect(Array.isArray(res.body)).toBe(true);
-    res.body.forEach((post: PostViewType) => {
+    expect(Array.isArray(res.body.items)).toBe(true);
+    res.body.items.forEach((post: PostViewType) => {
       expect(post).toMatchObject({
         id: expect.any(String),
         title: expect.any(String),

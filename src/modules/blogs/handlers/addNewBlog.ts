@@ -1,6 +1,9 @@
 import { Request, Response } from 'express';
 
-import { blogRequestTypeBody } from '../types/blogsRequestResponseTypes';
+import {
+  blogRequestTypeBody,
+  blogRequestTypeQuery,
+} from '../types/blogsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
 

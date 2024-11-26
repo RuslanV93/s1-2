@@ -11,8 +11,9 @@ export type postRequestTypeWithBody = {
 export type postRequestTypeQuery = {
   pageNumber: number;
   pageSize: number;
-  sortBy: string;
+  sortBy: any;
   sortDirection: string;
+  search: any;
 };
 export type postRequestTypeWithBodyAndParams = postRequestTypeWithParams &
   postRequestTypeWithBody;

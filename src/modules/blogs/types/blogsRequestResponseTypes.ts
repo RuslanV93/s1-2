@@ -1,5 +1,3 @@
-import QueryString from 'qs';
-
 export type blogRequestTypeParams = {
   id: string;
 };
@@ -11,7 +9,7 @@ export type blogRequestTypeBody = {
 export type blogRequestTypeQuery = {
   pageNumber: number;
   pageSize: number;
-  sortBy: string;
+  sortBy: any;
   sortDirection: string;
   search: any;
 };

@@ -8,10 +8,10 @@ import { blogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
 import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
 
 export const getBlogs = async (
-  req: Request<{}, {}, blogRequestTypeQuery>,
+  req: Request<{}, blogRequestTypeQuery, blogRequestTypeQuery>,
   res: Response,
 ) => {
-  const paginationParams = getQueryFromRequest(req);
+  const paginationParams: blogRequestTypeQuery = getQueryFromRequest(req);
 
   const blogs = await blogsService.getBlogs(paginationParams);
   res.status(STATUSES.OK_200).send(blogs);

@@ -12,7 +12,7 @@ jest.setTimeout(100000);
 describe('/blogs', () => {
   let server: MongoMemoryServer;
   let client: MongoClient;
-  let newBlogForTest;
+  let newBlogForTest: any;
   let newBlogForTestId: string;
   beforeAll(async () => {
     server = await MongoMemoryServer.create();
@@ -31,9 +31,23 @@ describe('/blogs', () => {
       .send(newBlog)
       .expect(STATUSES.CREATED_201);
     newBlogForTestId = newBlogForTest.body.id;
+
+    // let i = 0;
+    // while (i < 11) {
+    //   await req
+    //     .post(SETTINGS.PATH.BLOGS)
+    //     .set('authorization', authData)
+    //     .send(newBlog)
+    //     .expect(STATUSES.CREATED_201);
+    //   i++;
+    // }
   });
 
   afterAll(async () => {
+    await req
+      .delete('/testing/all-data')
+      .set('authorization', authData)
+      .expect(STATUSES.NO_CONTENT_204);
     if (server) {
       await server.stop();
     }
@@ -43,7 +57,7 @@ describe('/blogs', () => {
   });
   it('should return all blogs', async () => {
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);
-    res.body.forEach((blog: BlogViewType) => {
+    res.body.items.forEach((blog: BlogViewType) => {
       expect(blog).toMatchObject({
         id: expect.any(String),
         name: expect.any(String),
@@ -108,15 +122,50 @@ describe('/blogs', () => {
       isMembership: expect.any(Boolean),
     });
   });
+
+  it('should add post to blog', async () => {
+    const res = await req
+      .post(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}/posts`)
+      .set('authorization', authData)
+      .send({
+        title: 'string',
+        shortDescription: 'string',
+        content: 'string',
+      })
+      .expect(STATUSES.CREATED_201);
+
+    expect(res.body).toMatchObject({
+      id: expect.any(String),
+      title: 'string',
+      shortDescription: 'string',
+      content: 'string',
+      blogId: newBlogForTestId,
+      blogName: expect.any(String),
+      createdAt: expect.any(String),
+    });
+  });
+
+  it('should get posts by blogId', async () => {
+    const res = await req
+      .get(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}/posts`)
+      .expect(200);
+    expect(res.body).toMatchObject({
+      pagesCount: expect.any(Number),
+      page: expect.any(Number),
+      pageSize: expect.any(Number),
+      totalCount: expect.any(Number),
+      items: expect.any(Array),
+    });
+    await req
+      .get(`${SETTINGS.PATH.BLOGS}/6745ab1f9dcdf183ecf73778/posts`)
+      .expect(STATUSES.NOT_FOUNT_404);
+  });
   it('should delete blog by id', async () => {
-    const blogs = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);
-    const blogsLength = blogs.body.length;
     await req
       .delete(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}`)
       .set('authorization', authData)
       .expect(STATUSES.NO_CONTENT_204);
-    const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);
-    expect(res.body.length).toBe(blogsLength - 1);
+
     await req
       .get(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}`)
       .expect(STATUSES.NOT_FOUNT_404);

@@ -4,12 +4,13 @@ import { postsRepository } from '../repositories/postsRepository';
 import { postRequestTypeWithParams } from '../types/postsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { postsService } from '../services/postsService';
+import { ObjectId } from 'mongodb';
 
 export const deletePost = async (
   req: Request<postRequestTypeWithParams>,
   res: Response,
 ) => {
-  const postForDelete = await postsService.getPostById(req.params.id);
+  const postForDelete = await postsRepository.getPostById(new ObjectId(req.params.id));
 
   if (!postForDelete) {
     res.status(STATUSES.NOT_FOUNT_404).send('Post not found. Incorrect ID');

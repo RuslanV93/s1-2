@@ -22,8 +22,10 @@ import {
   sortValidator,
 } from '../../validators/queryValidators';
 
+// blogs router
 export const blogsRouter = Router();
 
+// blogs CRUD methods controller
 const blogsController = {
   getBlogs: getBlogs,
   getBlogsById: getBlogById,

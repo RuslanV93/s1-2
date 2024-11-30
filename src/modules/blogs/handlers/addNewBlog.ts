@@ -1,23 +1,26 @@
 import { Request, Response } from 'express';
-
-import {
-  blogRequestTypeBody,
-  blogRequestTypeQuery,
-} from '../types/blogsRequestResponseTypes';
+import { blogRequestTypeBody } from '../types/blogsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
-import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
-
 import { blogsService } from '../services/blogsService';
+import { ObjectId } from 'mongodb';
+import { blogsRepository } from '../repositories/blogsRepository';
 
 export const addNewBlog = async (
   req: Request<{}, {}, blogRequestTypeBody>,
   res: Response,
 ) => {
-  const newAddedBlog = await blogsService.addNewBlog(req.body);
-  if (newAddedBlog) {
-    res.status(STATUSES.CREATED_201).send(responseObjectWithId(newAddedBlog));
+  const addedBlogId: ObjectId | null = await blogsService.addNewBlog(req.body);
+
+  if (!addedBlogId) {
+    res.sendStatus(STATUSES.BAD_REQUEST_400);
+    return;
+  }
+  const newAddedBlog = await blogsRepository.getBlogById(addedBlogId);
+
+  if (!newAddedBlog) {
+    res.status(STATUSES.NOT_FOUNT_404).send('Blog not found.');
     return;
   }
 
-  res.sendStatus(STATUSES.BAD_REQUEST_400);
+  res.status(STATUSES.CREATED_201).send(newAddedBlog);
 };

@@ -69,9 +69,7 @@ describe('/posts', () => {
     });
   });
   it('should get post by id', async () => {
-    const res = await req
-      .get(`${SETTINGS.PATH.POSTS}/${postId}`)
-      .expect(STATUSES.OK_200);
+    const res = await req.get(`${SETTINGS.PATH.POSTS}/${postId}`).expect(STATUSES.OK_200);
     expect(res.body).toMatchObject({
       id: `${postId}`,
       title: 'title',

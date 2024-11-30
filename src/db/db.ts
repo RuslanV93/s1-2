@@ -1,7 +1,16 @@
 import { MongoClient } from 'mongodb';
 import SETTINGS from '../settings';
 import { BLOGGERS_PLATFORM } from '../variables/variables';
-import { BlogViewType, PostViewType } from '../types/db.type';
+import {
+  BlogDbType,
+  BlogForUpdateType,
+  BlogViewType,
+  NewBlogType,
+  NewPostType,
+  PostDbType,
+  PostForUpdateType,
+  PostViewType,
+} from '../types/db.type';
 
 // export const db: DBType = {
 //   posts: [],
@@ -31,12 +40,8 @@ import { BlogViewType, PostViewType } from '../types/db.type';
 const mongoUrl = SETTINGS.DB_URL || 'mongodb://0.0.0.0:27017';
 export const client = new MongoClient(mongoUrl);
 export const db = client.db(BLOGGERS_PLATFORM.dbName);
-export const blogsCollection = db.collection<BlogViewType>(
-  BLOGGERS_PLATFORM.blogs,
-);
-export const postsCollection = db.collection<PostViewType>(
-  BLOGGERS_PLATFORM.posts,
-);
+export const blogsCollection = db.collection(BLOGGERS_PLATFORM.blogs);
+export const postsCollection = db.collection(BLOGGERS_PLATFORM.posts);
 export async function runDB() {
   try {
     await client.connect();

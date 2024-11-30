@@ -1,20 +1,17 @@
 import { Response, Request } from 'express';
-import { blogsRepository } from '../repositories/blogsRepository';
-
 import { blogRequestTypeWithBodyAndParams } from '../types/blogsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
-
 import { blogsService } from '../services/blogsService';
+import { ObjectId } from 'mongodb';
+import { blogsRepository } from '../repositories/blogsRepository';
 
 export const updateBlog = async (
   req: Request<blogRequestTypeWithBodyAndParams>,
   res: Response,
 ) => {
-  const blogForUpdate = await blogsService.getBlogById(req.params.id);
+  const blogForUpdate = await blogsRepository.getBlogById(new ObjectId(req.params.id));
   if (!blogForUpdate) {
-    res
-      .status(STATUSES.NOT_FOUNT_404)
-      .send('Blog not found. Incorrect blog id');
+    res.status(STATUSES.NOT_FOUNT_404).send('Blog not found. Incorrect blog id');
     return;
   }
   const result = await blogsService.updateBlog(req);

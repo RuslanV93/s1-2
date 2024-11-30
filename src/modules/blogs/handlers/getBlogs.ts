@@ -1,18 +1,19 @@
 import { Request, Response } from 'express';
 import { STATUSES } from '../../../variables/variables';
-import { responseArrayWithId } from '../../../helpers/responseArrayWithId';
-import { WithId } from 'mongodb';
-import { BlogViewType } from '../../../types/db.type';
-import { blogsService } from '../services/blogsService';
-import { blogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
+
+import {
+  blogRequestTypeBody,
+  blogRequestTypeQuery,
+} from '../types/blogsRequestResponseTypes';
 import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
+import { blogsQueryRepository } from '../repositories/blogsQueryRepository';
 
 export const getBlogs = async (
-  req: Request<{}, blogRequestTypeQuery, blogRequestTypeQuery>,
+  req: Request<{}, blogRequestTypeQuery, blogRequestTypeBody>,
   res: Response,
 ) => {
   const paginationParams: blogRequestTypeQuery = getQueryFromRequest(req);
 
-  const blogs = await blogsService.getBlogs(paginationParams);
+  const blogs = await blogsQueryRepository.getBlogs(paginationParams);
   res.status(STATUSES.OK_200).send(blogs);
 };

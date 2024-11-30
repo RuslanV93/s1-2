@@ -4,45 +4,38 @@ import {
   postRequestTypeWithBody,
   postRequestTypeWithParams,
 } from '../types/postsRequestResponseTypes';
-import {
-  NewPostType,
-  PostForUpdateType,
-  PostViewType,
-} from '../../../types/db.type';
-import { WithId } from 'mongodb';
-import { responseArrayWithId } from '../../../helpers/responseArrayWithId';
+import { NewPostType, PostForUpdateType, PostViewType } from '../../../types/db.type';
+import { ObjectId, WithId } from 'mongodb';
+
+// posts bll service methods
 
 export const postsService = {
-  async getPosts(paginationParams: any) {
-    const totalCount =
-      await postsRepository.getPostsTotalCount(paginationParams);
-    const postsFromDb = await postsRepository.getPosts(paginationParams);
-    return {
-      pagesCount: Math.ceil(totalCount / paginationParams.pageSize),
-      page: paginationParams.pageNumber,
-      pageSize: paginationParams.pageSize,
-      totalCount: totalCount,
-      items: responseArrayWithId(postsFromDb),
-    };
-  },
-  async getPostById(id: string) {
-    return await postsRepository.getPostById(id);
-  },
-
+  // add new post to DB method
   async addNewPost(
     req: Request<{}, {}, postRequestTypeWithBody>,
     blogName: string,
-  ): Promise<WithId<PostViewType> | null> {
+  ): Promise<PostViewType | null> {
     const newPost: NewPostType = {
       title: req.body.title,
       shortDescription: req.body.shortDescription,
       content: req.body.content,
-      blogId: req.body.blogId,
+      blogId: new ObjectId(req.body.blogId),
       blogName: blogName,
       createdAt: new Date().toISOString(),
     };
-    return await postsRepository.addNewPost(newPost);
+
+    const newPostId = await postsRepository.addNewPost(newPost);
+    if (!newPostId) {
+      return null;
+    }
+    const newAddedPost = await postsRepository.getPostById(newPostId);
+    if (!newPost) {
+      return null;
+    }
+    return newAddedPost;
   },
+
+  // update post fields
   async updatePost(
     req: Request<postRequestTypeWithParams, {}, postRequestTypeWithBody>,
     blogName: string,
@@ -52,11 +45,14 @@ export const postsService = {
       title: req.body.title,
       shortDescription: req.body.shortDescription,
       content: req.body.content,
-      blogId: req.body.blogId,
-      blogName: req.body.blogName || blogName,
+      blogId: new ObjectId(req.body.blogId),
+      blogName: blogName,
     };
+
     return await postsRepository.updatePostById(updatedPost);
   },
+
+  // delete existing post by id
   async deletePostById(id: string): Promise<boolean> {
     return await postsRepository.deletePostById(id);
   },

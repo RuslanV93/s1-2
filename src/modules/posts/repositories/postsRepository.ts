@@ -1,52 +1,27 @@
 import { postsCollection } from '../../../db/db';
-import { ObjectId, WithId } from 'mongodb';
-import {
-  NewPostType,
-  PostForUpdateType,
-  PostViewType,
-} from '../../../types/db.type';
-const createFilter = (paginationParams: any) => {
-  const filter: any = {};
-  const { search } = paginationParams;
-  if (search) {
-    filter.$or = [
-      { title: { $regex: search, $options: 'i' } },
-      { content: { $regex: search, $options: 'i' } },
-    ];
-  }
-  return filter;
-};
+import { ObjectId } from 'mongodb';
+import { NewPostType, PostForUpdateType, PostViewType } from '../../../types/db.type';
 
 export const postsRepository = {
-  async getPostsTotalCount(paginationParams: any) {
-    const filter = createFilter(paginationParams);
-    return await postsCollection.countDocuments(filter);
-  },
-  async getPosts(paginationParams: any): Promise<Array<WithId<PostViewType>>> {
-    const filter: any = createFilter(paginationParams);
-    const { pageNumber, pageSize, sortBy, sortDirection, search } =
-      paginationParams;
-
-    return await postsCollection
-      .find(filter)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
-      .skip(pageSize * (pageNumber - 1))
-      .limit(pageSize)
-      .toArray();
-  },
-  async getPostById(id: string): Promise<WithId<PostViewType> | null> {
-    const [postById] = await postsCollection
-      .find({ _id: new ObjectId(id) })
-      .toArray();
+  async getPostById(id: ObjectId): Promise<PostViewType | null> {
+    const [postById] = await postsCollection.find({ _id: id }).toArray();
     if (postById) {
-      return postById;
+      return {
+        id: postById._id.toString(),
+        title: postById.title,
+        shortDescription: postById.shortDescription,
+        content: postById.content,
+        blogId: postById.blogId.toString(),
+        blogName: postById.blogName,
+        createdAt: postById.createdAt,
+      };
     }
     return null;
   },
-  async addNewPost(newPost: NewPostType): Promise<WithId<PostViewType> | null> {
-    const result = await postsCollection.insertOne(newPost);
+  async addNewPost(newPost: NewPostType): Promise<ObjectId | null> {
+    const result: any = await postsCollection.insertOne(newPost);
     if (result.insertedId) {
-      return await postsCollection.findOne({ _id: result.insertedId });
+      return result.insertedId;
     }
     return null;
   },

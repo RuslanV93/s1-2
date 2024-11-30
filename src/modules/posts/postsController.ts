@@ -17,7 +17,10 @@ import {
   sortValidator,
 } from '../../validators/queryValidators';
 
+// Router
 export const postsRouter = Router();
+
+// Controller methods
 export const postsController = {
   getPosts,
   getPostById,
@@ -32,6 +35,7 @@ postsRouter.get(
   queryFieldsValidatorMiddleware,
   postsController.getPosts,
 );
+
 postsRouter.get('/:id', postsController.getPostById);
 
 postsRouter.post(
@@ -44,7 +48,9 @@ postsRouter.post(
   inputValidationMiddleware,
   postsController.addNewPost,
 );
+
 postsRouter.delete('/:id', authValidatorMiddleware, postsController.deletePost);
+
 postsRouter.put(
   '/:id',
   authValidatorMiddleware,

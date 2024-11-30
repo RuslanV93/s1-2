@@ -6,9 +6,10 @@ import {
   validationResult,
 } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
-import { blogByIdExists } from './blogExistsCustomValidator';
-
 import { STATUSES } from '../variables/variables';
+import { blogsRepository } from '../modules/blogs/repositories/blogsRepository';
+import { BlogDbType } from '../types/db.type';
+import { blogByIdExists } from './blogExistsCustomValidator';
 
 type ValidationErrorCustom = {
   message: string;
@@ -51,12 +52,8 @@ export const webSiteUrlValidator = body(blogFields.websiteUrl)
   .trim()
   .isLength({ min: 3, max: 100 })
   .withMessage('Website url length must be between 1 and 100 characters')
-  .matches(
-    /^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/,
-  )
-  .withMessage(
-    "Invalid URL. Must start with 'https://' and contain a valid domain",
-  );
+  .matches(/^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/)
+  .withMessage("Invalid URL. Must start with 'https://' and contain a valid domain");
 
 export const titleValidator = body(postFields.title)
   .notEmpty()

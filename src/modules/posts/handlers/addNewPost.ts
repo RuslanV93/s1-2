@@ -4,21 +4,22 @@ import { STATUSES } from '../../../variables/variables';
 import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
 import { blogsService } from '../../blogs/services/blogsService';
 import { postsService } from '../services/postsService';
+import { ObjectId } from 'mongodb';
+import { blogsRepository } from '../../blogs/repositories/blogsRepository';
+import { PostViewType } from '../../../types/db.type';
 
 export const addNewPost = async (
   req: Request<{}, {}, postRequestTypeWithBody>,
   res: Response,
 ) => {
-  const existingBlogToAddNewPost = await blogsService.getBlogById(
-    req.body.blogId,
+  const existingBlogToAddNewPost = await blogsRepository.getBlogById(
+    new ObjectId(req.body.blogId),
   );
   if (!existingBlogToAddNewPost) {
-    res
-      .status(STATUSES.BAD_REQUEST_400)
-      .send('Blog not found. Incorrect blog ID');
+    res.status(STATUSES.BAD_REQUEST_400).send('Blog not found. Incorrect blog ID');
     return;
   }
-  const newAddedPost = await postsService.addNewPost(
+  const newAddedPost: PostViewType | null = await postsService.addNewPost(
     req,
     existingBlogToAddNewPost.name,
   );
@@ -26,5 +27,5 @@ export const addNewPost = async (
     res.sendStatus(STATUSES.BAD_REQUEST_400);
     return;
   }
-  res.status(STATUSES.CREATED_201).send(responseObjectWithId(newAddedPost));
+  res.status(STATUSES.CREATED_201).send(newAddedPost);
 };

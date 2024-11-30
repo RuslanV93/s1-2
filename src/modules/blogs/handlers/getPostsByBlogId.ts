@@ -4,16 +4,20 @@ import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
 import { STATUSES } from '../../../variables/variables';
 import { blogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
 
+import { blogsQueryRepository } from '../repositories/blogsQueryRepository';
+import { ObjectId } from 'mongodb';
+
 export const getPostsByBlogId = async (req: Request, res: Response) => {
-  const paginationParams: blogRequestTypeQuery = getQueryFromRequest(req);
-  const blog = await blogsService.getBlogById(req.params.id);
+  const paginationAndSearchParams: blogRequestTypeQuery = getQueryFromRequest(req);
+  const blog = await blogsQueryRepository.getBlogById(req.params.id);
+
   if (!blog) {
-    res.sendStatus(STATUSES.NOT_FOUNT_404);
+    res.status(STATUSES.NOT_FOUNT_404).send('Blog not found. Incorrect Blog Id.');
     return;
   }
-  const postsByBlogId = await blogsService.getPostsByBlogId(
-    req.params.id,
-    paginationParams,
+  const postsByBlogId = await blogsQueryRepository.getPostsByBlogId(
+    new ObjectId(req.params.id),
+    paginationAndSearchParams,
   );
 
   res.status(STATUSES.OK_200).send(postsByBlogId);

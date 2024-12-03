@@ -7,7 +7,9 @@ const SETTINGS = {
   PATH: {
     DEFAULT: '/',
     TESTING: '/testing',
+    AUTH: '/auth',
     VIDEOS: '/videos',
+    USERS: '/users',
     POSTS: '/posts',
     BLOGS: '/blogs',
   },

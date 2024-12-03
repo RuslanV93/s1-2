@@ -1,11 +1,12 @@
 import { Response, Request, NextFunction } from 'express';
-import { blogRequestTypeParams } from '../types/blogsRequestResponseTypes';
+import { BlogRequestTypeParams } from '../types/blogsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { blogsQueryRepository } from '../repositories/blogsQueryRepository';
-import { BlogViewType } from '../../../types/db.type';
+
+import { BlogViewType } from '../types/blogsTypes';
 
 export const getBlogById = async (
-  req: Request<blogRequestTypeParams>,
+  req: Request<BlogRequestTypeParams>,
   res: Response,
   next: NextFunction,
 ) => {

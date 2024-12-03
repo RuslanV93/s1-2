@@ -1,8 +1,3 @@
-// export type DBType = {
-//   posts: Array<RequestPostType>;
-//   blogs: Array<RequestBlogType>;
-// };
-
 import { ObjectId } from 'mongodb';
 
 export type PostDbType = {
@@ -14,21 +9,6 @@ export type PostDbType = {
   blogName: string;
   createdAt: string;
 };
-export type BlogDbType = {
-  _id: ObjectId;
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-  isMembership: boolean;
-};
-export type NewBlogType = {
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-  isMembership: boolean;
-};
 export type NewPostType = {
   title: string;
   shortDescription: string;
@@ -37,13 +17,6 @@ export type NewPostType = {
   blogName: string | null;
   createdAt: string;
 };
-
-export type BlogForUpdateType = {
-  id: string;
-  name: string;
-  description: string;
-  websiteUrl: string;
-};
 export type PostForUpdateType = {
   id: string;
   title: string;
@@ -51,14 +24,6 @@ export type PostForUpdateType = {
   content: string;
   blogId: ObjectId;
   blogName: string | null;
-};
-export type BlogViewType = {
-  id?: string;
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-  isMembership: boolean;
 };
 export type PostViewType = {
   id: string;
@@ -75,12 +40,4 @@ export type AllPostsViewType = {
   pageSize: number;
   totalCount: number;
   items: Array<PostViewType>;
-};
-
-export type AllBlogsViewType = {
-  pagesCount: number;
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  items: Array<BlogViewType>;
 };

@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { postsRepository } from '../repositories/postsRepository';
 
-import { postRequestTypeWithParams } from '../types/postsRequestResponseTypes';
+import { PostRequestTypeWithParams } from '../types/postsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { postsService } from '../services/postsService';
 import { ObjectId } from 'mongodb';
 
 export const deletePost = async (
-  req: Request<postRequestTypeWithParams>,
+  req: Request<PostRequestTypeWithParams>,
   res: Response,
 ) => {
   const postForDelete = await postsRepository.getPostById(new ObjectId(req.params.id));

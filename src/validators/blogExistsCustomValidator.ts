@@ -5,7 +5,7 @@ import { ObjectId } from 'mongodb';
 
 export const blogByIdExists = () => {
   return body('blogId').custom(async (value, { req }) => {
-    const blogId = value || req.params?.id;
+    const blogId: string = value || req.params?.id;
 
     const blog = await blogsRepository.getBlogById(new ObjectId(blogId));
     if (!blog) {

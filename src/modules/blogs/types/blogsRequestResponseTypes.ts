@@ -1,12 +1,12 @@
-export type blogRequestTypeParams = {
+export type BlogRequestTypeParams = {
   id: string;
 };
-export type blogRequestTypeBody = {
+export type BlogRequestTypeBody = {
   name: string;
   description: string;
   websiteUrl: string;
 };
-export type blogRequestTypeQuery = {
+export type BlogRequestTypeQuery = {
   pageNumber: number;
   pageSize: number;
   sortBy: any;
@@ -14,14 +14,14 @@ export type blogRequestTypeQuery = {
   search: any;
 };
 
-export type postByBlogRequestTypeBody = {
+export type PostByBlogRequestTypeBody = {
   title: string;
   shortDescription: string;
   content: string;
 };
-export type blogRequestTypeWithBodyAndParams = blogRequestTypeParams &
-  blogRequestTypeBody;
+export type BlogRequestTypeWithBodyAndParams = BlogRequestTypeParams &
+  BlogRequestTypeBody;
 
-export type blogRequestTypeWithBodyAndParamsAndQuery = blogRequestTypeParams &
-  blogRequestTypeBody &
-  blogRequestTypeQuery;
+export type BlogRequestTypeWithBodyAndParamsAndQuery = BlogRequestTypeParams &
+  BlogRequestTypeBody &
+  BlogRequestTypeQuery;

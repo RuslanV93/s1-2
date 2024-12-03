@@ -1,13 +1,20 @@
 import { Request, Response } from 'express';
 import { STATUSES } from '../../../variables/variables';
-
 import { blogsService } from '../services/blogsService';
 import { ObjectId } from 'mongodb';
 import { blogsRepository } from '../repositories/blogsRepository';
 import { postsRepository } from '../../posts/repositories/postsRepository';
-import { BlogViewType } from '../../../types/db.type';
 
-export const addNewPostToBlog = async (req: Request, res: Response) => {
+import { BlogViewType } from '../types/blogsTypes';
+import {
+  BlogRequestTypeParams,
+  PostByBlogRequestTypeBody,
+} from '../types/blogsRequestResponseTypes';
+
+export const addNewPostToBlog = async (
+  req: Request<BlogRequestTypeParams, {}, PostByBlogRequestTypeBody>,
+  res: Response,
+) => {
   const blogToAddPost: BlogViewType | null = await blogsRepository.getBlogById(
     new ObjectId(req.params.id),
   );

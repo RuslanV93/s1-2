@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import {
-  postRequestTypeWithBody,
-  postRequestTypeWithParams,
+  PostRequestTypeWithBody,
+  PostRequestTypeWithParams,
 } from '../types/postsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { postsService } from '../services/postsService';
@@ -10,7 +10,7 @@ import { blogsRepository } from '../../blogs/repositories/blogsRepository';
 import { ObjectId } from 'mongodb';
 
 export const updatePost = async (
-  req: Request<postRequestTypeWithParams, {}, postRequestTypeWithBody>,
+  req: Request<PostRequestTypeWithParams, {}, PostRequestTypeWithBody>,
   res: Response,
 ) => {
   const blogForUpdate = await blogsRepository.getBlogById(new ObjectId(req.body.blogId));

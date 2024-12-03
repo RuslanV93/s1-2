@@ -6,11 +6,13 @@ import {
   BlogForUpdateType,
   BlogViewType,
   NewBlogType,
+} from '../modules/blogs/types/blogsTypes';
+import {
   NewPostType,
   PostDbType,
   PostForUpdateType,
   PostViewType,
-} from '../types/db.type';
+} from '../modules/posts/types/postsTypes';
 
 // export const db: DBType = {
 //   posts: [],
@@ -42,6 +44,7 @@ export const client = new MongoClient(mongoUrl);
 export const db = client.db(BLOGGERS_PLATFORM.dbName);
 export const blogsCollection = db.collection(BLOGGERS_PLATFORM.blogs);
 export const postsCollection = db.collection(BLOGGERS_PLATFORM.posts);
+export const usersCollection = db.collection(BLOGGERS_PLATFORM.users);
 export async function runDB() {
   try {
     await client.connect();

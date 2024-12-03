@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import { postRequestTypeWithBody } from '../types/postsRequestResponseTypes';
+import { PostRequestTypeWithBody } from '../types/postsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
-import { responseObjectWithId } from '../../../helpers/responseObjectWithId';
-import { blogsService } from '../../blogs/services/blogsService';
+
 import { postsService } from '../services/postsService';
 import { ObjectId } from 'mongodb';
 import { blogsRepository } from '../../blogs/repositories/blogsRepository';
-import { PostViewType } from '../../../types/db.type';
+
+import { PostViewType } from '../types/postsTypes';
 
 export const addNewPost = async (
-  req: Request<{}, {}, postRequestTypeWithBody>,
+  req: Request<{}, {}, PostRequestTypeWithBody>,
   res: Response,
 ) => {
   const existingBlogToAddNewPost = await blogsRepository.getBlogById(

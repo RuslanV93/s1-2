@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import { blogsRepository } from '../repositories/blogsRepository';
-import { blogRequestTypeParams } from '../types/blogsRequestResponseTypes';
+import { BlogRequestTypeParams } from '../types/blogsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { blogsService } from '../services/blogsService';
 import { ObjectId } from 'mongodb';
 
-export const deleteBlog = async (req: Request<blogRequestTypeParams>, res: Response) => {
+export const deleteBlog = async (req: Request<BlogRequestTypeParams>, res: Response) => {
   // checking is blog exists
   const existingBlog = await blogsRepository.getBlogById(new ObjectId(req.params.id));
   if (!existingBlog) {

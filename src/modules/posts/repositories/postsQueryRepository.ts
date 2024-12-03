@@ -1,12 +1,12 @@
 import { postsCollection } from '../../../db/db';
-import { postRequestTypeQuery } from '../types/postsRequestResponseTypes';
-import { AllPostsViewType, PostDbType, PostViewType } from '../../../types/db.type';
+import { PostRequestTypeQuery } from '../types/postsRequestResponseTypes';
 import { ObjectId, WithId } from 'mongodb';
 import { postsMappers } from '../features/postsViewModelMapper';
+import { AllPostsViewType, PostDbType, PostViewType } from '../types/postsTypes';
 
 // search filter create function **********
 
-const createFilter = (searchAndPaginationParams: postRequestTypeQuery) => {
+const createFilter = (searchAndPaginationParams: PostRequestTypeQuery) => {
   const filter: any = {};
   const { search } = searchAndPaginationParams;
   if (search) {
@@ -24,7 +24,7 @@ export const postsQueryRepository = {
   // getting posts total count method **********
 
   async getPostsTotalCount(
-    searchAndPaginationParams: postRequestTypeQuery,
+    searchAndPaginationParams: PostRequestTypeQuery,
   ): Promise<number> {
     const filter = createFilter(searchAndPaginationParams);
     return await postsCollection.countDocuments(filter);
@@ -34,7 +34,7 @@ export const postsQueryRepository = {
 
   //get all posts method **********
 
-  async getPosts(searchAndPaginationParams: postRequestTypeQuery): Promise<any> {
+  async getPosts(searchAndPaginationParams: PostRequestTypeQuery): Promise<any> {
     const postsTotalCount = await this.getPostsTotalCount(searchAndPaginationParams);
     const filter = createFilter(searchAndPaginationParams);
     const { pageNumber, pageSize, sortBy, sortDirection, search } =

@@ -1,14 +1,18 @@
-import { blogsService } from '../services/blogsService';
 import { Request, Response } from 'express';
 import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
 import { STATUSES } from '../../../variables/variables';
-import { blogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
+import { BlogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
 
 import { blogsQueryRepository } from '../repositories/blogsQueryRepository';
 import { ObjectId } from 'mongodb';
+import { PostRequestTypeWithParams } from '../../posts/types/postsRequestResponseTypes';
 
-export const getPostsByBlogId = async (req: Request, res: Response) => {
-  const paginationAndSearchParams: blogRequestTypeQuery = getQueryFromRequest(req);
+export const getPostsByBlogId = async (
+  req: Request<PostRequestTypeWithParams>,
+  res: Response,
+) => {
+  const paginationAndSearchParams: BlogRequestTypeQuery =
+    getQueryFromRequest.getBlogsOrPostsQueryFromRequest(req);
   const blog = await blogsQueryRepository.getBlogById(req.params.id);
 
   if (!blog) {

@@ -17,6 +17,8 @@ const allowedSortFields = [
   'websiteUrl',
   'title',
   'blogName',
+  'login',
+  'email',
 ];
 const allowedSortDirections = ['asc', 'desc'];
 export const sortValidator = [

@@ -1,10 +1,10 @@
-import { AllBlogsViewType, BlogDbType } from '../../../types/db.type';
-import { blogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
+import { BlogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
+import { AllBlogsViewType, BlogDbType } from '../types/blogsTypes';
 
 export const blogsMappers = {
   async setBlogsToViewModelMapper(
     dbBlogs: Array<BlogDbType>,
-    paginationAndSearchParams: blogRequestTypeQuery,
+    paginationAndSearchParams: BlogRequestTypeQuery,
     blogsTotalCount: number,
   ): Promise<AllBlogsViewType> {
     const blogsWithId = dbBlogs.map((blog) => {

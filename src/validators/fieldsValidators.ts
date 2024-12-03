@@ -8,14 +8,16 @@ import {
 import { Request, Response, NextFunction } from 'express';
 import { STATUSES } from '../variables/variables';
 import { blogsRepository } from '../modules/blogs/repositories/blogsRepository';
-import { BlogDbType } from '../types/db.type';
 import { blogByIdExists } from './blogExistsCustomValidator';
+import { BlogDbType } from '../modules/blogs/types/blogsTypes';
 
+// validation error types
 type ValidationErrorCustom = {
   message: string;
   field: string;
 };
 
+// fields to validate
 const blogFields = {
   id: 'id',
   name: 'name',
@@ -28,6 +30,14 @@ const postFields = {
   content: 'content',
   blogId: 'blogId',
 };
+const userFields = {
+  login: 'login',
+  password: 'password',
+  email: 'email',
+};
+// ***************************** VALIDATORS ****************************
+
+// BLOGS VALIDATORS ____________________
 
 export const nameValidator = body(blogFields.name)
   .notEmpty()
@@ -54,6 +64,8 @@ export const webSiteUrlValidator = body(blogFields.websiteUrl)
   .withMessage('Website url length must be between 1 and 100 characters')
   .matches(/^https:\/\/([a-zA-Z0-9_-]+\.)+[a-zA-Z0-9_-]+(\/[a-zA-Z0-9_-]+)*\/?$/)
   .withMessage("Invalid URL. Must start with 'https://' and contain a valid domain");
+
+// POSTS VALIDATORS ________________
 
 export const titleValidator = body(postFields.title)
   .notEmpty()
@@ -95,6 +107,38 @@ export const blogIdValidator = [
   blogIdValidation(param(postFields.blogId)),
   blogByIdExists(),
 ];
+
+// USERS VALIDATORS ______________________________________
+
+export const userLoginValidator = body(userFields.login)
+  .optional()
+  .notEmpty()
+  .withMessage('Login is required!')
+  .isString()
+  .withMessage('Login must be a string!')
+  .trim()
+  .isLength({ min: 3, max: 10 })
+  .withMessage('Login must be between 3 and 10 symbols!')
+  .matches(/^[a-zA-Z0-9_-]*$/)
+  .withMessage('Login must contain only letters, numbers, underscores, or hyphens!');
+export const userPasswordValidator = body(userFields.password)
+  .notEmpty()
+  .withMessage('Password is required!')
+  .isString()
+  .withMessage('Login must be a string!')
+  .trim()
+  .isLength({ min: 6, max: 20 })
+  .withMessage('Password length must be between 6 and 20 symbols!');
+export const userEmailValidator = body(userFields.email)
+  .optional()
+  .notEmpty()
+  .withMessage('Email is required')
+  .isString()
+  .withMessage('Email must be a string!')
+  .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
+  .withMessage('Invalid email format!');
+
+// INPUT VALIDATION RESULT MIDDLEWARE ______________________________________
 
 export const inputValidationMiddleware = (
   req: Request,

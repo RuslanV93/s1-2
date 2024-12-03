@@ -3,8 +3,8 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
 import { req } from './default.e2e.test';
 import SETTINGS from '../src/settings';
-import { BlogViewType } from '../src/types/db.type';
 import { STATUSES } from '../src/variables/variables';
+import { BlogViewType } from '../src/modules/blogs/types/blogsTypes';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;

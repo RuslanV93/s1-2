@@ -1,16 +1,11 @@
-import { blogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
+import { BlogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
 import { blogsCollection, postsCollection } from '../../../db/db';
-import {
-  AllBlogsViewType,
-  AllPostsViewType,
-  BlogDbType,
-  BlogViewType,
-  PostDbType,
-} from '../../../types/db.type';
 import { ObjectId, WithId } from 'mongodb';
 import { blogsMappers } from '../features/blogsViewModelMapper';
 import { postsMappers } from '../../posts/features/postsViewModelMapper';
-import { postRequestTypeQuery } from '../../posts/types/postsRequestResponseTypes';
+import { PostRequestTypeQuery } from '../../posts/types/postsRequestResponseTypes';
+import { AllBlogsViewType, BlogDbType, BlogViewType } from '../types/blogsTypes';
+import { AllPostsViewType, PostDbType } from '../../posts/types/postsTypes';
 
 const createFilter = (paginationAndSearchParams: any, blogId?: ObjectId) => {
   const filter: any = {};
@@ -31,7 +26,7 @@ const createFilter = (paginationAndSearchParams: any, blogId?: ObjectId) => {
 export const blogsQueryRepository = {
   //getting blogs total count method *****
   async getBlogsTotalCount(
-    paginationAndSearchParams: blogRequestTypeQuery,
+    paginationAndSearchParams: BlogRequestTypeQuery,
   ): Promise<number> {
     const filter: any = createFilter(paginationAndSearchParams);
 
@@ -40,7 +35,7 @@ export const blogsQueryRepository = {
 
   //getting posts total count
   async getPostsTotalCount(
-    paginationAndSearchParams: postRequestTypeQuery,
+    paginationAndSearchParams: PostRequestTypeQuery,
     blogId: ObjectId,
   ) {
     const filter: any = createFilter(paginationAndSearchParams, blogId);
@@ -50,7 +45,7 @@ export const blogsQueryRepository = {
   // get all blogs method *******************
 
   async getBlogs(
-    paginationAndSearchParams: blogRequestTypeQuery,
+    paginationAndSearchParams: BlogRequestTypeQuery,
   ): Promise<AllBlogsViewType> {
     const blogsTotalCount = await this.getBlogsTotalCount(paginationAndSearchParams);
 
@@ -90,7 +85,7 @@ export const blogsQueryRepository = {
   // getting posts by blog id (blogs existing posts) *******************
   async getPostsByBlogId(
     blogId: ObjectId,
-    paginationAndSearchParams: blogRequestTypeQuery,
+    paginationAndSearchParams: BlogRequestTypeQuery,
   ): Promise<AllPostsViewType> {
     const postsTotalCount = await this.getPostsTotalCount(
       paginationAndSearchParams,

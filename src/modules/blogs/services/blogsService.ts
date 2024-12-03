@@ -1,24 +1,22 @@
 import { blogsRepository } from '../repositories/blogsRepository';
 import {
+  BlogRequestTypeBody,
+  BlogRequestTypeWithBodyAndParams,
+  PostByBlogRequestTypeBody,
+} from '../types/blogsRequestResponseTypes';
+import { ObjectId } from 'mongodb';
+import { Request } from 'express';
+import {
   BlogDbType,
   BlogForUpdateType,
   BlogViewType,
   NewBlogType,
-  NewPostType,
-  PostViewType,
-} from '../../../types/db.type';
-import {
-  blogRequestTypeBody,
-  blogRequestTypeWithBodyAndParams,
-  postByBlogRequestTypeBody,
-} from '../types/blogsRequestResponseTypes';
-import { ObjectId } from 'mongodb';
-import { Request } from 'express';
-import { responseArrayWithId } from '../../../helpers/responseArrayWithId';
+} from '../types/blogsTypes';
+import { NewPostType, PostViewType } from '../../posts/types/postsTypes';
 
 export const blogsService = {
   async addNewPostToBlog(
-    body: postByBlogRequestTypeBody,
+    body: PostByBlogRequestTypeBody,
     blogToAddPost: BlogViewType,
   ): Promise<ObjectId | null> {
     const newPost: NewPostType = {
@@ -31,7 +29,7 @@ export const blogsService = {
     };
     return await blogsRepository.addNewPostToBlog(newPost);
   },
-  async addNewBlog(body: blogRequestTypeBody): Promise<ObjectId | null> {
+  async addNewBlog(body: BlogRequestTypeBody): Promise<ObjectId | null> {
     const newBlog: NewBlogType = {
       name: body.name,
       description: body.description,
@@ -41,7 +39,7 @@ export const blogsService = {
     };
     return await blogsRepository.addNewBlog(newBlog);
   },
-  async updateBlog(req: Request<blogRequestTypeWithBodyAndParams>) {
+  async updateBlog(req: Request<BlogRequestTypeWithBodyAndParams>) {
     const updatedBlog: BlogForUpdateType = {
       id: req.params.id,
       name: req.body.name,

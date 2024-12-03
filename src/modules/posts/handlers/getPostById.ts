@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
-import { postRequestTypeWithParams } from '../types/postsRequestResponseTypes';
+import { PostRequestTypeWithParams } from '../types/postsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { postsQueryRepository } from '../repositories/postsQueryRepository';
-import { PostViewType } from '../../../types/db.type';
+
+import { PostViewType } from '../types/postsTypes';
 
 export const getPostById = async (
-  req: Request<postRequestTypeWithParams>,
+  req: Request<PostRequestTypeWithParams>,
   res: Response,
 ) => {
   const id = req.params.id;

@@ -1,12 +1,12 @@
 import { Response, Request } from 'express';
-import { blogRequestTypeWithBodyAndParams } from '../types/blogsRequestResponseTypes';
+import { BlogRequestTypeWithBodyAndParams } from '../types/blogsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
 import { blogsService } from '../services/blogsService';
 import { ObjectId } from 'mongodb';
 import { blogsRepository } from '../repositories/blogsRepository';
 
 export const updateBlog = async (
-  req: Request<blogRequestTypeWithBodyAndParams>,
+  req: Request<BlogRequestTypeWithBodyAndParams>,
   res: Response,
 ) => {
   const blogForUpdate = await blogsRepository.getBlogById(new ObjectId(req.params.id));

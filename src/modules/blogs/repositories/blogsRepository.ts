@@ -1,17 +1,15 @@
 import { blogsCollection, postsCollection } from '../../../db/db';
 import { ObjectId, WithId } from 'mongodb';
+
+import { postsMappers } from '../../posts/features/postsViewModelMapper';
+import { PostRequestTypeQuery } from '../../posts/types/postsRequestResponseTypes';
+import { BlogForUpdateType, BlogViewType, NewBlogType } from '../types/blogsTypes';
 import {
   AllPostsViewType,
-  BlogForUpdateType,
-  BlogViewType,
-  NewBlogType,
   NewPostType,
   PostDbType,
   PostViewType,
-} from '../../../types/db.type';
-
-import { postsMappers } from '../../posts/features/postsViewModelMapper';
-import { postRequestTypeQuery } from '../../posts/types/postsRequestResponseTypes';
+} from '../../posts/types/postsTypes';
 
 const createFilter = (searchAndPaginationParams: any, blogId?: string) => {
   const filter: any = {};
@@ -31,7 +29,7 @@ const createFilter = (searchAndPaginationParams: any, blogId?: string) => {
 
 export const blogsRepository = {
   async getPostsTotalCount(
-    searchAndPaginationParams: postRequestTypeQuery,
+    searchAndPaginationParams: PostRequestTypeQuery,
   ): Promise<number> {
     const filter = createFilter(searchAndPaginationParams);
     return await postsCollection.countDocuments(filter);

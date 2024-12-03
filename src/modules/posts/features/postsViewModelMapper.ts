@@ -1,10 +1,10 @@
-import { AllPostsViewType, PostDbType } from '../../../types/db.type';
-import { postRequestTypeQuery } from '../types/postsRequestResponseTypes';
+import { PostRequestTypeQuery } from '../types/postsRequestResponseTypes';
+import { AllPostsViewType, PostDbType } from '../types/postsTypes';
 
 export const postsMappers = {
   async setPostsToViewModelMapper(
     posts: Array<PostDbType>,
-    searchAndPaginationParams: postRequestTypeQuery,
+    searchAndPaginationParams: PostRequestTypeQuery,
     postsTotalCount: number,
   ): Promise<AllPostsViewType> {
     const postsWithId = posts.map((post) => {

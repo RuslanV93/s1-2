@@ -11,4 +11,5 @@ export const BLOGGERS_PLATFORM = {
   dbName: 'bloggers-platform',
   posts: 'posts',
   blogs: 'blogs',
+  users: 'users',
 };

@@ -1,22 +1,23 @@
-export type postRequestTypeWithParams = {
+export type PostRequestTypeWithParams = {
   id: string;
 };
-export type postRequestTypeWithBody = {
+export type PostRequestTypeWithBody = {
   title: string;
   shortDescription: string;
   content: string;
   blogId: string;
   blogName?: string;
 };
-export type postRequestTypeQuery = {
+export type PostRequestTypeQuery = {
   pageNumber: number;
   pageSize: number;
   sortBy: any;
   sortDirection: string;
   search: any;
 };
-export type postRequestTypeWithBodyAndParams = postRequestTypeWithParams &
-  postRequestTypeWithBody;
+export type PostRequestTypeWithBodyAndParams = PostRequestTypeWithParams &
+  PostRequestTypeWithBody;
 
-export type postRequestTypeWithBodyAndParamsAndQuery =
-  postRequestTypeWithParams & postRequestTypeWithBody & postRequestTypeQuery;
+export type PostRequestTypeWithBodyAndParamsAndQuery = PostRequestTypeWithParams &
+  PostRequestTypeWithBody &
+  PostRequestTypeQuery;

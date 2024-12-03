@@ -1,6 +1,6 @@
 import { postsCollection } from '../../../db/db';
 import { ObjectId } from 'mongodb';
-import { NewPostType, PostForUpdateType, PostViewType } from '../../../types/db.type';
+import { NewPostType, PostForUpdateType, PostViewType } from '../types/postsTypes';
 
 export const postsRepository = {
   async getPostById(id: ObjectId): Promise<PostViewType | null> {
@@ -19,7 +19,7 @@ export const postsRepository = {
     return null;
   },
   async addNewPost(newPost: NewPostType): Promise<ObjectId | null> {
-    const result: any = await postsCollection.insertOne(newPost);
+    const result = await postsCollection.insertOne(newPost);
     if (result.insertedId) {
       return result.insertedId;
     }

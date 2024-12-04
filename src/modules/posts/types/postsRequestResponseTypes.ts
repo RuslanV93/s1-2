@@ -15,6 +15,7 @@ export type PostRequestTypeQuery = {
   sortDirection: string;
   search: any;
 };
+
 export type PostRequestTypeWithBodyAndParams = PostRequestTypeWithParams &
   PostRequestTypeWithBody;
 

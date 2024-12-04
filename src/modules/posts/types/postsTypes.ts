@@ -9,6 +9,7 @@ export type PostDbType = {
   blogName: string;
   createdAt: string;
 };
+
 export type NewPostType = {
   title: string;
   shortDescription: string;
@@ -18,7 +19,6 @@ export type NewPostType = {
   createdAt: string;
 };
 export type PostForUpdateType = {
-  id: string;
   title: string;
   shortDescription: string;
   content: string;

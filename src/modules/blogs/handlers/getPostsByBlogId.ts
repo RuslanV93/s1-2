@@ -20,7 +20,7 @@ export const getPostsByBlogId = async (
     return;
   }
   const postsByBlogId = await blogsQueryRepository.getPostsByBlogId(
-    new ObjectId(req.params.id),
+    req.params.id,
     paginationAndSearchParams,
   );
 

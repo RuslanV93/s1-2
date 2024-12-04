@@ -11,6 +11,6 @@ describe('/', () => {
   });
   it('should get app version', async () => {
     const res = await req.get(SETTINGS.PATH.DEFAULT).expect(STATUSES.OK_200);
-    expect(res.body).toStrictEqual({ version: '1' });
+    expect(res.body).toStrictEqual({ version: 'HELLO!' });
   });
 });

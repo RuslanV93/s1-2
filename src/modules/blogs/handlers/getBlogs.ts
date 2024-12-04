@@ -9,9 +9,9 @@ import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
 import { blogsQueryRepository } from '../repositories/blogsQueryRepository';
 
 export const getBlogs = async (req: Request<{}, BlogRequestTypeQuery>, res: Response) => {
-  const paginationParams: BlogRequestTypeQuery =
+  const paginationAndSearchParams: BlogRequestTypeQuery =
     getQueryFromRequest.getBlogsOrPostsQueryFromRequest(req);
 
-  const blogs = await blogsQueryRepository.getBlogs(paginationParams);
+  const blogs = await blogsQueryRepository.getBlogs(paginationAndSearchParams);
   res.status(STATUSES.OK_200).send(blogs);
 };

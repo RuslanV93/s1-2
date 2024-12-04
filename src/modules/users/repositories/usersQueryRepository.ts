@@ -1,7 +1,8 @@
 import { usersCollection } from '../../../db/db';
 import { UsersSearchAndPaginationType } from '../types/usersRequestResponseTypes';
 import { usersMappers } from '../features/usersMappers';
-import { AllUsersViewType, UserDbType } from '../types/usersTypes';
+import { AllUsersViewType, UserDbType, UserViewType } from '../types/usersTypes';
+import { ObjectId } from 'mongodb';
 
 // creating filter for search
 const createFilter = (searchAndPaginationParams: UsersSearchAndPaginationType) => {
@@ -23,6 +24,18 @@ export const usersQueryRepository = {
   async getUsersTotalCount(searchAndPaginationParams: UsersSearchAndPaginationType) {
     const filter = createFilter(searchAndPaginationParams);
     return await usersCollection.countDocuments(filter);
+  },
+  async getUserById(id: string): Promise<UserViewType | null> {
+    const [user] = await usersCollection.find({ _id: new ObjectId(id) }).toArray();
+    if (user) {
+      return {
+        id: user._id.toString(),
+        login: user.login,
+        email: user.email,
+        createdAt: user.createdAt,
+      };
+    }
+    return null;
   },
 
   // getting all users from db

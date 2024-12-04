@@ -5,17 +5,18 @@ import { ObjectId } from 'mongodb';
 import { blogsRepository } from '../repositories/blogsRepository';
 import { postsRepository } from '../../posts/repositories/postsRepository';
 
-import { BlogViewType } from '../types/blogsTypes';
+import { BlogDbType, BlogViewType } from '../types/blogsTypes';
 import {
   BlogRequestTypeParams,
   PostByBlogRequestTypeBody,
 } from '../types/blogsRequestResponseTypes';
+import { postsQueryRepository } from '../../posts/repositories/postsQueryRepository';
 
 export const addNewPostToBlog = async (
   req: Request<BlogRequestTypeParams, {}, PostByBlogRequestTypeBody>,
   res: Response,
 ) => {
-  const blogToAddPost: BlogViewType | null = await blogsRepository.getBlogById(
+  const blogToAddPost: BlogDbType | null = await blogsRepository.getBlogById(
     new ObjectId(req.params.id),
   );
 
@@ -24,7 +25,7 @@ export const addNewPostToBlog = async (
     return;
   }
   // Getting new post id after adding to DB
-  const newPostId: ObjectId | null = await blogsService.addNewPostToBlog(
+  const newPostId: string | null = await blogsService.addNewPostToBlog(
     req.body,
     blogToAddPost,
   );
@@ -33,7 +34,7 @@ export const addNewPostToBlog = async (
     return;
   }
   // Getting new post to response him
-  const newPost = await postsRepository.getPostById(newPostId);
+  const newPost = await postsQueryRepository.getPostById(newPostId);
   if (!newPost) {
     res.status(STATUSES.NOT_FOUNT_404).send('Post not found.');
   }

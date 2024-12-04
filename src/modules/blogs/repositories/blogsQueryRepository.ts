@@ -84,14 +84,14 @@ export const blogsQueryRepository = {
 
   // getting posts by blog id (blogs existing posts) *******************
   async getPostsByBlogId(
-    blogId: ObjectId,
+    blogId: string,
     paginationAndSearchParams: BlogRequestTypeQuery,
   ): Promise<AllPostsViewType> {
     const postsTotalCount = await this.getPostsTotalCount(
       paginationAndSearchParams,
-      blogId,
+      new ObjectId(blogId),
     );
-    const filter = createFilter(paginationAndSearchParams, blogId);
+    const filter = createFilter(paginationAndSearchParams, new ObjectId(blogId));
     const { pageNumber, pageSize, sortBy, sortDirection } = paginationAndSearchParams;
     const dbPosts: Array<WithId<PostDbType>> = await postsCollection
       .find<PostDbType>(filter)

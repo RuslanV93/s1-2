@@ -27,7 +27,11 @@ export const updatePost = async (
     return;
   }
 
-  const updatedResult = await postsService.updatePost(req, blogForUpdate.name);
+  const updatedResult = await postsService.updatePost(
+    req.body,
+    req.params.id,
+    blogForUpdate.name,
+  );
 
   if (!updatedResult) {
     res.sendStatus(STATUSES.NOT_FOUNT_404);

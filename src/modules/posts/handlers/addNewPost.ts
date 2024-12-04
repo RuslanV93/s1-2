@@ -1,12 +1,10 @@
 import { Request, Response } from 'express';
 import { PostRequestTypeWithBody } from '../types/postsRequestResponseTypes';
 import { STATUSES } from '../../../variables/variables';
-
 import { postsService } from '../services/postsService';
 import { ObjectId } from 'mongodb';
 import { blogsRepository } from '../../blogs/repositories/blogsRepository';
-
-import { PostViewType } from '../types/postsTypes';
+import { postsQueryRepository } from '../repositories/postsQueryRepository';
 
 export const addNewPost = async (
   req: Request<{}, {}, PostRequestTypeWithBody>,
@@ -19,10 +17,16 @@ export const addNewPost = async (
     res.status(STATUSES.BAD_REQUEST_400).send('Blog not found. Incorrect blog ID');
     return;
   }
-  const newAddedPost: PostViewType | null = await postsService.addNewPost(
-    req,
+  // getting new added post id for request and check is post added
+  const newAddedPostId = await postsService.addNewPost(
+    req.body,
     existingBlogToAddNewPost.name,
   );
+  if (!newAddedPostId) {
+    res.sendStatus(STATUSES.BAD_REQUEST_400);
+    return;
+  }
+  const newAddedPost = await postsQueryRepository.getPostById(newAddedPostId);
   if (!newAddedPost) {
     res.sendStatus(STATUSES.BAD_REQUEST_400);
     return;

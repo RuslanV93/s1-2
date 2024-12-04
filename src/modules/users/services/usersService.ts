@@ -2,14 +2,14 @@ import { usersRepository } from '../repositories/usersRepository';
 import { UserRequestTypeWithBody } from '../types/usersRequestResponseTypes';
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
-import { NewUserType, UserViewType } from '../types/usersTypes';
+import { NewUserType } from '../types/usersTypes';
 import { getSaltAndHashFunction } from '../crypto/getHash';
 
 export const usersService = {
   // add new user to DB and return
   async addNewUser(
     req: Request<{}, {}, UserRequestTypeWithBody>,
-  ): Promise<UserViewType | null> {
+  ): Promise<string | null> {
     const isLoginOrEmailTaken = await usersRepository.isLoginOrEmailTaken(
       req.body.email,
       req.body.login,
@@ -43,23 +43,18 @@ export const usersService = {
       salt: salt,
       createdAt: new Date().toISOString(),
     };
-    const newUserId = await usersRepository.addNewUser(newUser);
+    const newUserId: string | null = await usersRepository.addNewUser(newUser);
 
     // new user add result check
     if (!newUserId) {
       return null;
     }
 
-    // finding new added user by new response
-    const newAddedUser = await usersRepository.getUserById(newUserId);
-    if (!newAddedUser) {
-      return null;
-    }
-    return newAddedUser;
+    return newUserId;
   },
 
   // delete existing user
-  async deleteUser(id: string): Promise<boolean | null> {
-    return await usersRepository.deleteUser(new ObjectId(id));
+  async deleteUser(id: ObjectId): Promise<boolean | null> {
+    return await usersRepository.deleteUser(id);
   },
 };

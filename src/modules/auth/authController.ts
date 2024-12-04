@@ -20,7 +20,6 @@ const authController = {
       res.sendStatus(STATUSES.NO_CONTENT_204);
       return;
     } catch (error: any) {
-      console.log(error.errorsMessages);
       res.status(STATUSES.UNAUTHORIZED_401).send(error.errorsMessages);
       return;
     }

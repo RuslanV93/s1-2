@@ -12,14 +12,14 @@ import { NewPostType, PostForUpdateType, PostViewType } from '../types/postsType
 export const postsService = {
   // add new post to DB method
   async addNewPost(
-    req: Request<{}, {}, PostRequestTypeWithBody>,
+    newPostBody: PostRequestTypeWithBody,
     blogName: string,
-  ): Promise<PostViewType | null> {
+  ): Promise<string | null> {
     const newPost: NewPostType = {
-      title: req.body.title,
-      shortDescription: req.body.shortDescription,
-      content: req.body.content,
-      blogId: new ObjectId(req.body.blogId),
+      title: newPostBody.title,
+      shortDescription: newPostBody.shortDescription,
+      content: newPostBody.content,
+      blogId: new ObjectId(newPostBody.blogId),
       blogName: blogName,
       createdAt: new Date().toISOString(),
     };
@@ -28,32 +28,29 @@ export const postsService = {
     if (!newPostId) {
       return null;
     }
-    const newAddedPost = await postsRepository.getPostById(newPostId);
-    if (!newAddedPost) {
-      return null;
-    }
-    return newAddedPost;
+
+    return newPostId;
   },
 
   // update post fields
   async updatePost(
-    req: Request<PostRequestTypeWithParams, {}, PostRequestTypeWithBody>,
+    updatedBody: PostRequestTypeWithBody,
+    postId: string,
     blogName: string,
   ): Promise<boolean> {
     const updatedPost: PostForUpdateType = {
-      id: req.params.id,
-      title: req.body.title,
-      shortDescription: req.body.shortDescription,
-      content: req.body.content,
-      blogId: new ObjectId(req.body.blogId),
+      title: updatedBody.title,
+      shortDescription: updatedBody.shortDescription,
+      content: updatedBody.content,
+      blogId: new ObjectId(updatedBody.blogId),
       blogName: blogName,
     };
 
-    return await postsRepository.updatePostById(updatedPost);
+    return await postsRepository.updatePostById(postId, updatedPost);
   },
 
   // delete existing post by id
-  async deletePostById(id: string): Promise<boolean> {
+  async deletePostById(id: ObjectId): Promise<boolean> {
     return await postsRepository.deletePostById(id);
   },
 };

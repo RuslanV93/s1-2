@@ -9,12 +9,14 @@ export const deleteUser = async (
   req: Request<UserRequestWithParamsType>,
   res: Response,
 ) => {
-  const userForDelete = await usersRepository.getUserById(new ObjectId(req.params.id));
-  if (!userForDelete) {
+  const userForDeleteId: ObjectId | null = await usersRepository.getUserById(
+    new ObjectId(req.params.id),
+  );
+  if (!userForDeleteId) {
     res.status(STATUSES.NOT_FOUNT_404).send('User not Found!');
     return;
   }
-  const deleteResult = await usersService.deleteUser(req.params.id);
+  const deleteResult = await usersService.deleteUser(userForDeleteId);
 
   if (!deleteResult) {
     res.status(STATUSES.BAD_REQUEST_400).send('Something went wrong. User not deleted.');

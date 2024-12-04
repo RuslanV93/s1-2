@@ -1,38 +1,35 @@
 import { postsCollection } from '../../../db/db';
 import { ObjectId } from 'mongodb';
-import { NewPostType, PostForUpdateType, PostViewType } from '../types/postsTypes';
+import {
+  NewPostType,
+  PostDbType,
+  PostForUpdateType,
+  PostViewType,
+} from '../types/postsTypes';
 
 export const postsRepository = {
-  async getPostById(id: ObjectId): Promise<PostViewType | null> {
-    const [postById] = await postsCollection.find({ _id: id }).toArray();
+  async getPostById(id: ObjectId): Promise<PostDbType | null> {
+    const [postById] = await postsCollection.find<PostDbType>({ _id: id }).toArray();
     if (postById) {
-      return {
-        id: postById._id.toString(),
-        title: postById.title,
-        shortDescription: postById.shortDescription,
-        content: postById.content,
-        blogId: postById.blogId.toString(),
-        blogName: postById.blogName,
-        createdAt: postById.createdAt,
-      };
+      return postById;
     }
     return null;
   },
-  async addNewPost(newPost: NewPostType): Promise<ObjectId | null> {
+  async addNewPost(newPost: NewPostType): Promise<string | null> {
     const result = await postsCollection.insertOne(newPost);
     if (result.insertedId) {
-      return result.insertedId;
+      return result.insertedId.toString();
     }
     return null;
   },
-  async deletePostById(id: string): Promise<boolean> {
-    const result = await postsCollection.deleteOne({ _id: new ObjectId(id) });
+  async deletePostById(id: ObjectId): Promise<boolean> {
+    const result = await postsCollection.deleteOne({ _id: id });
 
     return result.deletedCount === 1;
   },
-  async updatePostById(updatedPost: PostForUpdateType): Promise<boolean> {
+  async updatePostById(postId: string, updatedPost: PostForUpdateType): Promise<boolean> {
     const result = await postsCollection.updateOne(
-      { _id: new ObjectId(updatedPost.id) },
+      { _id: new ObjectId(postId) },
       { $set: updatedPost },
     );
 

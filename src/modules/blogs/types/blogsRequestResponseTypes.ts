@@ -21,7 +21,3 @@ export type PostByBlogRequestTypeBody = {
 };
 export type BlogRequestTypeWithBodyAndParams = BlogRequestTypeParams &
   BlogRequestTypeBody;
-
-export type BlogRequestTypeWithBodyAndParamsAndQuery = BlogRequestTypeParams &
-  BlogRequestTypeBody &
-  BlogRequestTypeQuery;

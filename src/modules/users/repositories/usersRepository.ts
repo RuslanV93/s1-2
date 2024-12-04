@@ -28,22 +28,17 @@ export const usersRepository = {
       .toArray();
 
     if (user) {
-      return {
-        id: user._id.toString(),
-        login: user.login,
-        email: user.email,
-        createdAt: user.createdAt,
-      };
+      return user._id;
     }
     return null;
   },
 
   // add new user to db and return inserted id
-  async addNewUser(newUser: NewUserType) {
+  async addNewUser(newUser: NewUserType): Promise<string | null> {
     const result = await usersCollection.insertOne(newUser);
 
     if (result.insertedId) {
-      return result.insertedId;
+      return result.insertedId.toString();
     }
     return null;
   },

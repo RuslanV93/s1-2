@@ -1,4 +1,4 @@
-import { after, describe } from 'node:test';
+import { describe } from 'node:test';
 import { req } from './default.e2e.test';
 import SETTINGS from '../src/settings';
 import { STATUSES } from '../src/variables/variables';
@@ -11,7 +11,7 @@ let blogId: string;
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
-jest.setTimeout(100000);
+jest.setTimeout(50000);
 describe('/posts', () => {
   let server: MongoMemoryServer;
   let client: MongoClient;

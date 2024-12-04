@@ -17,19 +17,19 @@ import { NewPostType, PostViewType } from '../../posts/types/postsTypes';
 export const blogsService = {
   async addNewPostToBlog(
     body: PostByBlogRequestTypeBody,
-    blogToAddPost: BlogViewType,
-  ): Promise<ObjectId | null> {
+    blogToAddPost: BlogDbType,
+  ): Promise<string | null> {
     const newPost: NewPostType = {
       title: body.title,
       shortDescription: body.shortDescription,
       content: body.content,
-      blogId: new ObjectId(blogToAddPost.id),
+      blogId: blogToAddPost._id,
       blogName: blogToAddPost.name,
       createdAt: new Date().toISOString(),
     };
     return await blogsRepository.addNewPostToBlog(newPost);
   },
-  async addNewBlog(body: BlogRequestTypeBody): Promise<ObjectId | null> {
+  async addNewBlog(body: BlogRequestTypeBody): Promise<string | null> {
     const newBlog: NewBlogType = {
       name: body.name,
       description: body.description,
@@ -39,16 +39,15 @@ export const blogsService = {
     };
     return await blogsRepository.addNewBlog(newBlog);
   },
-  async updateBlog(req: Request<BlogRequestTypeWithBodyAndParams>) {
+  async updateBlog(id: ObjectId, newBody: BlogForUpdateType) {
     const updatedBlog: BlogForUpdateType = {
-      id: req.params.id,
-      name: req.body.name,
-      description: req.body.description,
-      websiteUrl: req.body.websiteUrl,
+      name: newBody.name,
+      description: newBody.description,
+      websiteUrl: newBody.websiteUrl,
     };
-    return await blogsRepository.updateBlogById(updatedBlog);
+    return await blogsRepository.updateBlogById(id, updatedBlog);
   },
-  async deleteBlogById(id: string): Promise<boolean> {
+  async deleteBlogById(id: ObjectId): Promise<boolean> {
     return await blogsRepository.deleteBlogById(id);
   },
 };

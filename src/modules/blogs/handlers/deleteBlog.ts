@@ -13,7 +13,7 @@ export const deleteBlog = async (req: Request<BlogRequestTypeParams>, res: Respo
     return;
   }
   // getting delete result (success or not)
-  const deleteResult = await blogsService.deleteBlogById(req.params.id);
+  const deleteResult = await blogsService.deleteBlogById(existingBlog._id);
   if (!deleteResult) {
     res.status(STATUSES.BAD_REQUEST_400).send('Something went wrong');
     return;

@@ -16,7 +16,7 @@ export const deletePost = async (
     res.status(STATUSES.NOT_FOUNT_404).send('Post not found. Incorrect ID');
     return;
   }
-  const deleteResult = await postsService.deletePostById(req.params.id);
+  const deleteResult = await postsService.deletePostById(postForDelete._id);
 
   if (!deleteResult) {
     res.status(500).send('Something went wrong');

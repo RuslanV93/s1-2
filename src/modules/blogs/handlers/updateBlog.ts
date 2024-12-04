@@ -14,7 +14,7 @@ export const updateBlog = async (
     res.status(STATUSES.NOT_FOUNT_404).send('Blog not found. Incorrect blog id');
     return;
   }
-  const result = await blogsService.updateBlog(req);
+  const result = await blogsService.updateBlog(new ObjectId(req.params.id), req.body);
   if (!result) {
     res.status(500).send('Something went wrong.');
 

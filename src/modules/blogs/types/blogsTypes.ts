@@ -16,7 +16,6 @@ export type NewBlogType = {
   isMembership: boolean;
 };
 export type BlogForUpdateType = {
-  id: string;
   name: string;
   description: string;
   websiteUrl: string;

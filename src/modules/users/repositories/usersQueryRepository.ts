@@ -38,6 +38,15 @@ export const usersQueryRepository = {
     return null;
   },
 
+  async findMe(userId: string) {
+    const [me] = await usersCollection.find({ _id: new ObjectId(userId) }).toArray();
+    return {
+      email: me.email,
+      login: me.login,
+      userId: me._id.toString(),
+    };
+  },
+
   // getting all users from db
   async getUsers(
     searchAndPaginationParams: UsersSearchAndPaginationType,

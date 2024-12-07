@@ -3,9 +3,8 @@ import { STATUSES } from '../../../variables/variables';
 import { blogsService } from '../services/blogsService';
 import { ObjectId } from 'mongodb';
 import { blogsRepository } from '../repositories/blogsRepository';
-import { postsRepository } from '../../posts/repositories/postsRepository';
 
-import { BlogDbType, BlogViewType } from '../types/blogsTypes';
+import { BlogDbType } from '../types/blogsTypes';
 import {
   BlogRequestTypeParams,
   PostByBlogRequestTypeBody,

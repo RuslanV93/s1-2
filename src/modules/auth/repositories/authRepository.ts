@@ -11,14 +11,16 @@ const createFilter = (enteredField: string) => {
   return filter;
 };
 export const authRepository = {
-  async getHash(loginField: string): Promise<string | null> {
+  async getHash(loginField: string): Promise<UserDbType | null> {
     const filter = createFilter(loginField);
+
     const [user]: Array<UserDbType> = await usersCollection
       .find<UserDbType>(filter)
       .toArray();
+
     if (!user) {
       return null;
     }
-    return user.passwordHash;
+    return user;
   },
 };

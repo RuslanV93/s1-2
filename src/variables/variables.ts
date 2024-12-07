@@ -12,4 +12,5 @@ export const BLOGGERS_PLATFORM = {
   posts: 'posts',
   blogs: 'blogs',
   users: 'users',
+  comments: 'comments',
 };

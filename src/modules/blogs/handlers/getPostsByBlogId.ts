@@ -12,7 +12,7 @@ export const getPostsByBlogId = async (
   res: Response,
 ) => {
   const paginationAndSearchParams: BlogRequestTypeQuery =
-    getQueryFromRequest.getBlogsOrPostsQueryFromRequest(req);
+    getQueryFromRequest.getQueryFromRequest(req);
   const blog = await blogsQueryRepository.getBlogById(req.params.id);
 
   if (!blog) {

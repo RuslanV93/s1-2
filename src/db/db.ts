@@ -45,6 +45,7 @@ export const db = client.db(BLOGGERS_PLATFORM.dbName);
 export const blogsCollection = db.collection(BLOGGERS_PLATFORM.blogs);
 export const postsCollection = db.collection(BLOGGERS_PLATFORM.posts);
 export const usersCollection = db.collection(BLOGGERS_PLATFORM.users);
+export const commentsCollection = db.collection(BLOGGERS_PLATFORM.comments);
 export async function runDB() {
   try {
     await client.connect();

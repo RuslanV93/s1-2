@@ -4,7 +4,10 @@ import { getPostById } from './handlers/getPostById';
 import { addNewPost } from './handlers/addNewPost';
 import { deletePost } from './handlers/deletePost';
 import { updatePost } from './handlers/updatePost';
-import { authValidatorMiddleware } from '../../validators/authValidator';
+import {
+  accessTokenValidator,
+  authValidatorMiddleware,
+} from '../../validators/authValidator';
 import {
   blogIdValidator,
   contentValidator,
@@ -16,6 +19,8 @@ import {
   queryFieldsValidatorMiddleware,
   sortValidator,
 } from '../../validators/queryValidators';
+import { addNewCommentToPost } from './handlers/addNewCommentToPost';
+import { getCommentsByPostId } from './handlers/getCommentsByPostId';
 
 // Router
 export const postsRouter = Router();
@@ -27,8 +32,11 @@ export const postsController = {
   addNewPost,
   deletePost,
   updatePost,
+  getCommentsByPostId,
+  addNewCommentToPost,
 };
 
+// get all posts
 postsRouter.get(
   '/',
   sortValidator,
@@ -36,8 +44,10 @@ postsRouter.get(
   postsController.getPosts,
 );
 
+//get post by id
 postsRouter.get('/:id', postsController.getPostById);
 
+// add new post
 postsRouter.post(
   '/',
   authValidatorMiddleware,
@@ -49,8 +59,10 @@ postsRouter.post(
   postsController.addNewPost,
 );
 
+// delete existing post
 postsRouter.delete('/:id', authValidatorMiddleware, postsController.deletePost);
 
+//update post fields
 postsRouter.put(
   '/:id',
   authValidatorMiddleware,
@@ -60,4 +72,11 @@ postsRouter.put(
   ...blogIdValidator,
   inputValidationMiddleware,
   postsController.updatePost,
+);
+
+postsRouter.get('/:id/comments', postsController.getCommentsByPostId);
+postsRouter.post(
+  '/:id/comments',
+  accessTokenValidator,
+  postsController.addNewCommentToPost,
 );

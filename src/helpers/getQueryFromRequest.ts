@@ -2,7 +2,7 @@ import { Request } from 'express';
 import { UsersSearchAndPaginationType } from '../modules/users/types/usersRequestResponseTypes';
 
 export const getQueryFromRequest = {
-  getBlogsOrPostsQueryFromRequest(req: Request) {
+  getQueryFromRequest(req: Request) {
     const pageNumber = req.query.pageNumber !== undefined ? +req.query.pageNumber : 1;
     const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
     const sortBy = req.query.sortBy ? req.query.sortBy : 'createdAt';

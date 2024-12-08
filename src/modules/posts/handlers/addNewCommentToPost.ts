@@ -27,18 +27,18 @@ export const addNewCommentToPost = async (
     userLogin: commentator!.login,
   };
 
-  const newAddedCommentId = await commentsService.addNewComment(
+  const newAddedCommentResult = await commentsService.addNewComment(
     req.params.id,
     req.body,
     commentatorInfo,
   );
-  if (newAddedCommentId.status === 1) {
+  if (newAddedCommentResult.status === 1) {
     res.status(STATUSES.NOT_FOUNT_404).send('Post not found.');
     return;
   }
 
   const newAddedComment = await commentsQueryRepository.getCommentById(
-    newAddedCommentId.data!.toString(),
+    newAddedCommentResult.data!.toString(),
   );
-  res.status(201).send(newAddedComment);
+  res.status(STATUSES.CREATED_201).send(newAddedComment);
 };

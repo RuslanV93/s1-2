@@ -25,14 +25,6 @@ export const blogsRepository = {
     return null;
   },
 
-  async addNewPostToBlog(newPost: NewPostType): Promise<string | null> {
-    const result = await postsCollection.insertOne(newPost);
-    if (result.insertedId) {
-      return result.insertedId.toString();
-    }
-    return null;
-  },
-
   async addNewBlog(newBlog: NewBlogType): Promise<string | null> {
     const result = await blogsCollection.insertOne(newBlog);
     if (result.insertedId) {

@@ -15,20 +15,6 @@ import {
 import { NewPostType, PostViewType } from '../../posts/types/postsTypes';
 
 export const blogsService = {
-  async addNewPostToBlog(
-    body: PostByBlogRequestTypeBody,
-    blogToAddPost: BlogDbType,
-  ): Promise<string | null> {
-    const newPost: NewPostType = {
-      title: body.title,
-      shortDescription: body.shortDescription,
-      content: body.content,
-      blogId: blogToAddPost._id,
-      blogName: blogToAddPost.name,
-      createdAt: new Date().toISOString(),
-    };
-    return await blogsRepository.addNewPostToBlog(newPost);
-  },
   async addNewBlog(body: BlogRequestTypeBody): Promise<string | null> {
     const newBlog: NewBlogType = {
       name: body.name,

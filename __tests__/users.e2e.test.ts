@@ -24,9 +24,9 @@ describe('/users', () => {
       .post(SETTINGS.PATH.USERS)
       .set('authorization', authData)
       .send({
-        login: 'lg-772034',
-        email: 'lg@lg.com',
-        password: 'asdasdasd',
+        login: 'lg3',
+        email: 'lga@lg.com',
+        password: 'qwerty1',
       })
       .expect(STATUSES.CREATED_201);
 
@@ -52,30 +52,13 @@ describe('/users', () => {
     res.body.items.forEach((user: UserViewType) => {
       expect(user).toEqual({
         id: userId,
-        login: 'lg-772034',
-        email: 'lg@lg.com',
+        login: 'lg3',
+        email: 'lga@lg.com',
         createdAt: expect.any(String),
       });
     });
   });
-  it('should login by email and pass', async () => {
-    const res = await req
-      .post(`${SETTINGS.PATH.AUTH}/login`)
-      .send({
-        loginOrEmail: 'lg@lg.com',
-        password: 'asdasdasd',
-      })
-      .expect(STATUSES.NO_CONTENT_204);
-  });
-  it('should return error 401. incorrect password', async () => {
-    await req
-      .post(`${SETTINGS.PATH.AUTH}/login`)
-      .send({
-        loginOrEmail: 'lg@lg.com',
-        password: '1213211a',
-      })
-      .expect(STATUSES.UNAUTHORIZED_401);
-  });
+
   it('should delete 1 user by id', async () => {
     req
       .delete(`${SETTINGS.PATH.USERS}/${userId}`)

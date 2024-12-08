@@ -10,7 +10,6 @@ export const loginUser = async (req: Request<AuthRequestTypeWithBody>, res: Resp
     res.status(STATUSES.OK_200).send({ accessToken: token });
     return;
   } catch (error: any) {
-    console.error(error);
     res.status(STATUSES.UNAUTHORIZED_401).send(error.errorsMessages);
     return;
   }

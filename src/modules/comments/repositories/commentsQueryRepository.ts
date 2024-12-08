@@ -1,7 +1,11 @@
 import { CommentsRequestWithQueryType } from '../types/commentsResponseRequestTypes';
 import { commentsCollection } from '../../../db/db';
 import { commentsMappers } from '../features/commentsMappers';
-import { AllCommentsViewType, CommentDbType } from '../types/commentsTypes';
+import {
+  AllCommentsViewType,
+  CommentDbType,
+  CommentViewType,
+} from '../types/commentsTypes';
 import { ObjectId } from 'mongodb';
 
 const createFilter = (params: CommentsRequestWithQueryType) => {
@@ -23,7 +27,7 @@ export const commentsQueryRepository = {
     paginationAndSearchParams: CommentsRequestWithQueryType,
   ): Promise<AllCommentsViewType> {
     const filter = createFilter(paginationAndSearchParams);
-    console.log(filter);
+
     const totalCount = await this.getCommentsTotalCount(paginationAndSearchParams);
     const { pageNumber, pageSize, sortBy, sortDirection } = paginationAndSearchParams;
     const dbComments = await commentsCollection
@@ -38,11 +42,15 @@ export const commentsQueryRepository = {
       paginationAndSearchParams,
     );
   },
-  async getCommentById(id: string) {
+
+  // get 1 commentary by comment id
+  async getCommentById(id: string): Promise<CommentViewType | null> {
     const [dbComment] = await commentsCollection
       .find({ _id: new ObjectId(id) })
       .toArray();
-
+    if (!dbComment) {
+      return null;
+    }
     return {
       id: dbComment._id.toString(),
       content: dbComment.content,
@@ -50,6 +58,7 @@ export const commentsQueryRepository = {
         userId: dbComment.commentatorInfo.userId.toString(),
         userLogin: dbComment.commentatorInfo.userLogin,
       },
+      createdAt: dbComment.createdAt,
     };
   },
 };

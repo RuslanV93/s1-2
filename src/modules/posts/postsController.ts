@@ -10,6 +10,7 @@ import {
 } from '../../validators/authValidator';
 import {
   blogIdValidator,
+  commentContentValidator,
   contentValidator,
   inputValidationMiddleware,
   shortDescriptionValidator,
@@ -74,9 +75,14 @@ postsRouter.put(
   postsController.updatePost,
 );
 
+// getting all comments by post id
 postsRouter.get('/:id/comments', postsController.getCommentsByPostId);
+
+// add new comment to post
 postsRouter.post(
   '/:id/comments',
   accessTokenValidator,
+  commentContentValidator,
+  inputValidationMiddleware,
   postsController.addNewCommentToPost,
 );

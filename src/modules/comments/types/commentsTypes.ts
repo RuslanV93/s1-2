@@ -11,6 +11,10 @@ export type NewCommentType = {
   commentatorInfo: commentatorInfoType;
   createdAt: string;
 };
+
+export type UpdateCommentType = {
+  content: string;
+};
 export type CommentDbType = {
   _id: ObjectId;
   content: string;

@@ -6,9 +6,15 @@ import { AllPostsViewType, PostDbType, PostViewType } from '../types/postsTypes'
 
 // search filter create function **********
 
-const createFilter = (searchAndPaginationParams: PostRequestTypeQuery) => {
+const createFilter = (
+  searchAndPaginationParams: PostRequestTypeQuery,
+  blogId?: ObjectId,
+) => {
   const filter: any = {};
   const { search } = searchAndPaginationParams;
+  if (blogId) {
+    filter.blogId = blogId;
+  }
   if (search) {
     filter.$or = [
       { title: { $regex: search, $options: 'i' } },
@@ -23,32 +29,40 @@ const createFilter = (searchAndPaginationParams: PostRequestTypeQuery) => {
 export const postsQueryRepository = {
   // getting posts total count method **********
 
+  //getting posts total count
   async getPostsTotalCount(
-    searchAndPaginationParams: PostRequestTypeQuery,
-  ): Promise<number> {
-    const filter = createFilter(searchAndPaginationParams);
+    paginationAndSearchParams: PostRequestTypeQuery,
+    blogId?: ObjectId,
+  ) {
+    const filter: any = blogId
+      ? createFilter(paginationAndSearchParams, blogId)
+      : createFilter(paginationAndSearchParams);
     return await postsCollection.countDocuments(filter);
   },
 
-  // mapper **********
+  // getting posts by blog id (blogs existing posts) and getting all posts*************
 
-  //get all posts method **********
+  async getPosts(
+    paginationAndSearchParams: PostRequestTypeQuery,
+    blogId?: string,
+  ): Promise<AllPostsViewType> {
+    const postsTotalCount = blogId
+      ? await this.getPostsTotalCount(paginationAndSearchParams, new ObjectId(blogId))
+      : await this.getPostsTotalCount(paginationAndSearchParams);
 
-  async getPosts(searchAndPaginationParams: PostRequestTypeQuery): Promise<any> {
-    const postsTotalCount = await this.getPostsTotalCount(searchAndPaginationParams);
-    const filter = createFilter(searchAndPaginationParams);
-    const { pageNumber, pageSize, sortBy, sortDirection, search } =
-      searchAndPaginationParams;
-
+    const filter = blogId
+      ? createFilter(paginationAndSearchParams, new ObjectId(blogId))
+      : createFilter(paginationAndSearchParams);
+    const { pageNumber, pageSize, sortBy, sortDirection } = paginationAndSearchParams;
     const dbPosts: Array<WithId<PostDbType>> = await postsCollection
       .find<PostDbType>(filter)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip(pageSize * (pageNumber - 1))
       .limit(pageSize)
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .toArray();
     return await postsMappers.setPostsToViewModelMapper(
       dbPosts,
-      searchAndPaginationParams,
+      paginationAndSearchParams,
       postsTotalCount,
     );
   },

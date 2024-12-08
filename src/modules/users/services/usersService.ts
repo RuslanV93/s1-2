@@ -17,10 +17,10 @@ export const usersService = {
 
     // Checking is email or login exists
     const errors: { [key: string]: string } = {};
-    if (isLoginOrEmailTaken.emailCount) {
+    if (isLoginOrEmailTaken.loginCount) {
       errors.login = 'Login is already taken';
     }
-    if (isLoginOrEmailTaken.loginCount) {
+    if (isLoginOrEmailTaken.emailCount) {
       errors.email = 'Email is already taken';
     }
     if (Object.keys(errors).length > 0) {

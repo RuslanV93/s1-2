@@ -6,6 +6,9 @@ import {
 } from '../types/postsRequestResponseTypes';
 import { ObjectId, WithId } from 'mongodb';
 import { NewPostType, PostForUpdateType, PostViewType } from '../types/postsTypes';
+import { PostByBlogRequestTypeBody } from '../../blogs/types/blogsRequestResponseTypes';
+import { BlogDbType } from '../../blogs/types/blogsTypes';
+import { blogsRepository } from '../../blogs/repositories/blogsRepository';
 
 // posts bll service methods
 
@@ -30,6 +33,22 @@ export const postsService = {
     }
 
     return newPostId;
+  },
+
+  // add new post to existing blog
+  async addNewPostToBlog(
+    body: PostByBlogRequestTypeBody,
+    blogToAddPost: BlogDbType,
+  ): Promise<string | null> {
+    const newPost: NewPostType = {
+      title: body.title,
+      shortDescription: body.shortDescription,
+      content: body.content,
+      blogId: blogToAddPost._id,
+      blogName: blogToAddPost.name,
+      createdAt: new Date().toISOString(),
+    };
+    return await postsRepository.addNewPost(newPost);
   },
 
   // update post fields

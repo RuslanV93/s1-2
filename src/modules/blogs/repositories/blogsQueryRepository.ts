@@ -33,15 +33,6 @@ export const blogsQueryRepository = {
     return await blogsCollection.countDocuments(filter);
   },
 
-  //getting posts total count
-  async getPostsTotalCount(
-    paginationAndSearchParams: PostRequestTypeQuery,
-    blogId: ObjectId,
-  ) {
-    const filter: any = createFilter(paginationAndSearchParams, blogId);
-    return await postsCollection.countDocuments(filter);
-  },
-
   // get all blogs method *******************
 
   async getBlogs(
@@ -80,29 +71,5 @@ export const blogsQueryRepository = {
       createdAt: dbBlog.createdAt,
       isMembership: dbBlog.isMembership,
     };
-  },
-
-  // getting posts by blog id (blogs existing posts) *******************
-  async getPostsByBlogId(
-    blogId: string,
-    paginationAndSearchParams: BlogRequestTypeQuery,
-  ): Promise<AllPostsViewType> {
-    const postsTotalCount = await this.getPostsTotalCount(
-      paginationAndSearchParams,
-      new ObjectId(blogId),
-    );
-    const filter = createFilter(paginationAndSearchParams, new ObjectId(blogId));
-    const { pageNumber, pageSize, sortBy, sortDirection } = paginationAndSearchParams;
-    const dbPosts: Array<WithId<PostDbType>> = await postsCollection
-      .find<PostDbType>(filter)
-      .skip(pageSize * (pageNumber - 1))
-      .limit(pageSize)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
-      .toArray();
-    return await postsMappers.setPostsToViewModelMapper(
-      dbPosts,
-      paginationAndSearchParams,
-      postsTotalCount,
-    );
   },
 };

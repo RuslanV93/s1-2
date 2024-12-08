@@ -10,6 +10,7 @@ import {
   PostByBlogRequestTypeBody,
 } from '../types/blogsRequestResponseTypes';
 import { postsQueryRepository } from '../../posts/repositories/postsQueryRepository';
+import { postsService } from '../../posts/services/postsService';
 
 export const addNewPostToBlog = async (
   req: Request<BlogRequestTypeParams, {}, PostByBlogRequestTypeBody>,
@@ -24,7 +25,7 @@ export const addNewPostToBlog = async (
     return;
   }
   // Getting new post id after adding to DB
-  const newPostId: string | null = await blogsService.addNewPostToBlog(
+  const newPostId: string | null = await postsService.addNewPostToBlog(
     req.body,
     blogToAddPost,
   );

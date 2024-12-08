@@ -38,19 +38,23 @@ export const accessTokenValidator = async (
   }
   const [authType, token] = req.headers.authorization.split(' ');
 
-  if (authType !== 'Bearer') {
+  if (authType !== 'Bearer' || !token) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
   const payload = await authService.getUserByToken(token);
+  if (!payload) {
+    res.sendStatus(STATUSES.UNAUTHORIZED_401);
+    return;
+  }
   if (payload) {
     const { userId } = payload;
     const user = await usersQueryRepository.getUserById(userId);
     if (!user) {
       res.sendStatus(STATUSES.UNAUTHORIZED_401);
+      return;
     }
     req.user = { id: userId };
     next();
   }
-  return;
 };

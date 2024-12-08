@@ -1,13 +1,9 @@
 import { postsCollection } from '../../../db/db';
 import { ObjectId } from 'mongodb';
-import {
-  NewPostType,
-  PostDbType,
-  PostForUpdateType,
-  PostViewType,
-} from '../types/postsTypes';
+import { NewPostType, PostDbType, PostForUpdateType } from '../types/postsTypes';
 
 export const postsRepository = {
+  // getting post by post id
   async getPostById(id: ObjectId): Promise<PostDbType | null> {
     const [postById] = await postsCollection.find<PostDbType>({ _id: id }).toArray();
     if (postById) {
@@ -15,6 +11,7 @@ export const postsRepository = {
     }
     return null;
   },
+  //add new post
   async addNewPost(newPost: NewPostType): Promise<string | null> {
     const result = await postsCollection.insertOne(newPost);
     if (result.insertedId) {
@@ -22,11 +19,14 @@ export const postsRepository = {
     }
     return null;
   },
+  // delete existing post by id
   async deletePostById(id: ObjectId): Promise<boolean> {
     const result = await postsCollection.deleteOne({ _id: id });
 
     return result.deletedCount === 1;
   },
+
+  // update existing post by id
   async updatePostById(postId: string, updatedPost: PostForUpdateType): Promise<boolean> {
     const result = await postsCollection.updateOne(
       { _id: new ObjectId(postId) },

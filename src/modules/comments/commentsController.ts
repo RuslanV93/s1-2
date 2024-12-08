@@ -1,16 +1,27 @@
 import { Router } from 'express';
-import { getComments } from './handlers/getComments';
+import { getCommentById } from './handlers/getCommentById';
 import { updateComment } from './handlers/updateComment';
 import { deleteComment } from './handlers/deleteComment';
+import { accessTokenValidator } from '../../validators/authValidator';
+import {
+  commentContentValidator,
+  inputValidationMiddleware,
+} from '../../validators/fieldsValidators';
 
 export const commentsRouter = Router();
 
 const commentsController = {
-  getComments: getComments,
+  getCommentById: getCommentById,
   updateComment: updateComment,
   deleteComment: deleteComment,
 };
 
-commentsRouter.get('/', commentsController.getComments);
-commentsRouter.put('/:id', commentsController.updateComment);
-commentsRouter.delete('/:id', commentsController.deleteComment);
+commentsRouter.get('/:id', commentsController.getCommentById);
+commentsRouter.put(
+  '/:id',
+  accessTokenValidator,
+  commentContentValidator,
+  inputValidationMiddleware,
+  commentsController.updateComment,
+);
+commentsRouter.delete('/:id', accessTokenValidator, commentsController.deleteComment);

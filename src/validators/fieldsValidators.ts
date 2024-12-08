@@ -35,6 +35,10 @@ const userFields = {
   password: 'password',
   email: 'email',
 };
+
+const commentFields = {
+  content: 'content',
+};
 // ***************************** VALIDATORS ****************************
 
 // BLOGS VALIDATORS ____________________
@@ -137,6 +141,14 @@ export const userEmailValidator = body(userFields.email)
   .withMessage('Email must be a string!')
   .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   .withMessage('Invalid email format!');
+
+// COMMENT CONTENT FIELD VALIDATOR _____________________________________
+export const commentContentValidator = body(commentFields.content)
+  .notEmpty()
+  .withMessage('Content field is required.')
+  .trim()
+  .isLength({ min: 20, max: 300 })
+  .withMessage('Content field length must be between 20 and 100 symbols.');
 
 // INPUT VALIDATION RESULT MIDDLEWARE ______________________________________
 

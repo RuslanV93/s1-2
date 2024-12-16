@@ -1,6 +1,6 @@
 import { query, ValidationError, validationResult } from 'express-validator';
 
-import { STATUSES } from '../variables/variables';
+import { STATUSES } from '../common/variables/variables';
 import { Request, Response, NextFunction } from 'express';
 
 const queryFields = {

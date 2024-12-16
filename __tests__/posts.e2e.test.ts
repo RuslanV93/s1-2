@@ -1,7 +1,7 @@
 import { describe } from 'node:test';
 import { req } from './default.e2e.test';
 import SETTINGS from '../src/settings';
-import { STATUSES } from '../src/variables/variables';
+import { STATUSES } from '../src/common/variables/variables';
 import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { PostViewType } from '../src/modules/posts/types/postsTypes';

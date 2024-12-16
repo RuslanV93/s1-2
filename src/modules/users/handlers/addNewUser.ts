@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { usersService } from '../services/usersService';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 import { UserRequestTypeWithBody } from '../types/usersRequestResponseTypes';
 import { ObjectId } from 'mongodb';
 import { usersQueryRepository } from '../repositories/usersQueryRepository';
@@ -11,7 +11,11 @@ export const addNewUser = async (
   res: Response,
 ) => {
   try {
-    const newAddedUserId: string | null = await usersService.addNewUser(req);
+    const newAddedUserId: string | null = await usersService.addNewUser(
+      req.body.login,
+      req.body.email,
+      req.body.password,
+    );
 
     if (!newAddedUserId) {
       console.log('not new user');

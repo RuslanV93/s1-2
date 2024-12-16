@@ -1,14 +1,10 @@
 import { postsRepository } from '../repositories/postsRepository';
-import { Request } from 'express';
-import {
-  PostRequestTypeWithBody,
-  PostRequestTypeWithParams,
-} from '../types/postsRequestResponseTypes';
+
+import { PostRequestTypeWithBody } from '../types/postsRequestResponseTypes';
 import { ObjectId, WithId } from 'mongodb';
 import { NewPostType, PostForUpdateType, PostViewType } from '../types/postsTypes';
 import { PostByBlogRequestTypeBody } from '../../blogs/types/blogsRequestResponseTypes';
 import { BlogDbType } from '../../blogs/types/blogsTypes';
-import { blogsRepository } from '../../blogs/repositories/blogsRepository';
 
 // posts bll service methods
 

@@ -6,7 +6,7 @@ import {
   validationResult,
 } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
-import { STATUSES } from '../variables/variables';
+import { STATUSES } from '../common/variables/variables';
 import { blogsRepository } from '../modules/blogs/repositories/blogsRepository';
 import { blogByIdExists } from './blogExistsCustomValidator';
 import { BlogDbType } from '../modules/blogs/types/blogsTypes';
@@ -18,6 +18,9 @@ type ValidationErrorCustom = {
 };
 
 // fields to validate
+const authFields = {
+  code: 'code',
+};
 const blogFields = {
   id: 'id',
   name: 'name',
@@ -40,6 +43,15 @@ const commentFields = {
   content: 'content',
 };
 // ***************************** VALIDATORS ****************************
+
+// AUTH VALIDATORS ________________________________
+export const confirmationCodeValidator = body(authFields.code)
+  .notEmpty()
+  .withMessage('Code is required')
+  .isString()
+  .trim()
+  .isLength({ min: 1 })
+  .withMessage("Code length can't be less than 1 character");
 
 // BLOGS VALIDATORS ____________________
 

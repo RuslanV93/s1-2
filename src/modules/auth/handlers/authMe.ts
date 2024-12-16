@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 import { usersQueryRepository } from '../../users/repositories/usersQueryRepository';
 
 export const authMe = async (req: Request, res: Response) => {

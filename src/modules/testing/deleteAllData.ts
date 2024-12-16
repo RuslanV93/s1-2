@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { client, db } from '../../db/db';
 
-import { BLOGGERS_PLATFORM, STATUSES } from '../../variables/variables';
+import { BLOGGERS_PLATFORM, STATUSES } from '../../common/variables/variables';
 
 export const allDataRouter = Router();
 

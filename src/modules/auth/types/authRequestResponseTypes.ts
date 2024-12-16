@@ -3,3 +3,7 @@ export type AuthRequestTypeWithBody = {
   login?: string;
   password: string;
 };
+
+export type ConfirmationTypeWithBody = {
+  code: string;
+};

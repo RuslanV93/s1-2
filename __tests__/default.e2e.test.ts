@@ -1,7 +1,7 @@
 import SETTINGS from '../src/settings';
 import { agent } from 'supertest';
 import { app } from '../src/app';
-import { STATUSES } from '../src/variables/variables';
+import { STATUSES } from '../src/common/variables/variables';
 
 export const req = agent(app);
 

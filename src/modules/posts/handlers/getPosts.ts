@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 
-import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
+import { getQueryFromRequest } from '../../../common/helpers/getQueryFromRequest';
 import { PostRequestTypeQuery } from '../types/postsRequestResponseTypes';
 import { postsQueryRepository } from '../repositories/postsQueryRepository';
 

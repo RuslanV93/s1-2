@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { commentsService } from '../services/commentsService';
 import { CommentsRequestWithParamsType } from '../types/commentsResponseRequestTypes';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 
 export const deleteComment = async (
   req: Request<CommentsRequestWithParamsType>,

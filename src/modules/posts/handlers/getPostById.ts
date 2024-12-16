@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PostRequestTypeWithParams } from '../types/postsRequestResponseTypes';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 import { postsQueryRepository } from '../repositories/postsQueryRepository';
 
 import { PostViewType } from '../types/postsTypes';

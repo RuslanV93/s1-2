@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { CommentsRequestWithParamsType } from '../types/commentsResponseRequestTypes';
 import { CommentViewType } from '../types/commentsTypes';
 import { commentsQueryRepository } from '../repositories/commentsQueryRepository';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 
 export const getCommentById = async (
   req: Request<CommentsRequestWithParamsType>,

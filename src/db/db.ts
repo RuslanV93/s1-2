@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import SETTINGS from '../settings';
-import { BLOGGERS_PLATFORM } from '../variables/variables';
+import { BLOGGERS_PLATFORM } from '../common/variables/variables';
 import {
   BlogDbType,
   BlogForUpdateType,

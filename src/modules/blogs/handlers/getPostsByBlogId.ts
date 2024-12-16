@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
-import { STATUSES } from '../../../variables/variables';
+import { getQueryFromRequest } from '../../../common/helpers/getQueryFromRequest';
+import { STATUSES } from '../../../common/variables/variables';
 import { BlogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
 
 import { blogsQueryRepository } from '../repositories/blogsQueryRepository';

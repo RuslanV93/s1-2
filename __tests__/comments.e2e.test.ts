@@ -4,7 +4,7 @@ import { MongoClient } from 'mongodb';
 import SETTINGS from '../src/settings';
 import { req } from './default.e2e.test';
 import { newTestBlog, newTestPost, newTestUser } from './testData/data';
-import { STATUSES } from '../src/variables/variables';
+import { STATUSES } from '../src/common/variables/variables';
 
 jest.setTimeout(15000);
 

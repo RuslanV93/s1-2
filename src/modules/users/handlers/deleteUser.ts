@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { usersService } from '../services/usersService';
 import { UserRequestWithParamsType } from '../types/usersRequestResponseTypes';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 import { usersRepository } from '../repositories/usersRepository';
 import { ObjectId } from 'mongodb';
 

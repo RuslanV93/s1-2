@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 import { commentsService } from '../../comments/services/commentsService';
 import { usersQueryRepository } from '../../users/repositories/usersQueryRepository';
 import { UserViewType } from '../../users/types/usersTypes';

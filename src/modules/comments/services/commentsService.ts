@@ -1,35 +1,17 @@
 import { CommentsRequestWithBodyType } from '../types/commentsResponseRequestTypes';
-import {
-  commentatorInfoType,
-  NewCommentType,
-  UpdateCommentType,
-} from '../types/commentsTypes';
+import { commentatorInfoType, NewCommentType } from '../types/commentsTypes';
 import { commentsRepository } from '../repositories/commentsRepository';
 
 import { ObjectId } from 'mongodb';
+import { DomainStatusCode, ResultObject } from '../../../common/types/types';
 
-enum DomainStatusCode {
-  Success = 0,
-  NotFound = 1,
-  Forbidden = 2,
-  InternalServerError = 5,
-}
-type Extensions = {
-  message: string;
-  field?: string;
-};
-type Result<Data> = {
-  status: DomainStatusCode;
-  extensions: Extensions[];
-  data: Data;
-};
 export const commentsService = {
   // adding new comment
   async addNewComment(
     postId: string,
     body: CommentsRequestWithBodyType,
     commentatorInfo: commentatorInfoType,
-  ): Promise<Result<null | ObjectId>> {
+  ): Promise<ResultObject<null | ObjectId>> {
     const existingPostToAddCommentId = await commentsRepository.findPost(postId);
 
     if (!existingPostToAddCommentId) {

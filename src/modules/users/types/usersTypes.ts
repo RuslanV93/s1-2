@@ -1,5 +1,11 @@
 import { ObjectId } from 'mongodb';
 
+export type EmailConfirmationType = {
+  confirmationCode: string;
+  expirationDate: Date | null;
+  isConfirmed: string;
+};
+
 export type UserDbType = {
   _id: ObjectId;
   login: string;
@@ -7,13 +13,14 @@ export type UserDbType = {
   passwordHash: string;
   salt: string;
   createdAt: string;
+  emailConfirmation: EmailConfirmationType;
 };
 export type NewUserType = {
   login: string;
   email: string;
   passwordHash: string;
-  salt: string;
   createdAt: string;
+  emailConfirmation: EmailConfirmationType;
 };
 export type UserViewType = {
   id: string;

@@ -3,7 +3,7 @@ import {
   PostRequestTypeWithBody,
   PostRequestTypeWithParams,
 } from '../types/postsRequestResponseTypes';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 import { postsService } from '../services/postsService';
 import { postsRepository } from '../repositories/postsRepository';
 import { blogsRepository } from '../../blogs/repositories/blogsRepository';

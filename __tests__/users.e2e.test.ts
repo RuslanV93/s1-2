@@ -3,7 +3,7 @@ import { req } from './default.e2e.test';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
 import SETTINGS from '../src/settings';
-import { STATUSES } from '../src/variables/variables';
+import { STATUSES } from '../src/common/variables/variables';
 import { UserViewType } from '../src/modules/users/types/usersTypes';
 
 const correctAuthData: string = 'admin:qwerty';

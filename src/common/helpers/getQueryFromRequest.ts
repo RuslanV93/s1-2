@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { UsersSearchAndPaginationType } from '../modules/users/types/usersRequestResponseTypes';
+import { UsersSearchAndPaginationType } from '../../modules/users/types/usersRequestResponseTypes';
 
 export const getQueryFromRequest = {
   getQueryFromRequest(req: Request) {

@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { commentsQueryRepository } from '../../comments/repositories/commentsQueryRepository';
-import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
+import { getQueryFromRequest } from '../../../common/helpers/getQueryFromRequest';
 
 import { commentsRepository } from '../../comments/repositories/commentsRepository';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 
 export const getCommentsByPostId = async (req: Request, res: Response) => {
   const existingPost = await commentsRepository.findPost(req.params.id);

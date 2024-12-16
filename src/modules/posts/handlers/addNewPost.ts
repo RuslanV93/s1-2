@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { PostRequestTypeWithBody } from '../types/postsRequestResponseTypes';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 import { postsService } from '../services/postsService';
 import { ObjectId } from 'mongodb';
 import { blogsRepository } from '../../blogs/repositories/blogsRepository';

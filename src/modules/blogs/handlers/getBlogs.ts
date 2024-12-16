@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
-import { STATUSES } from '../../../variables/variables';
+import { STATUSES } from '../../../common/variables/variables';
 
 import {
   BlogRequestTypeBody,
   BlogRequestTypeQuery,
 } from '../types/blogsRequestResponseTypes';
-import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
+import { getQueryFromRequest } from '../../../common/helpers/getQueryFromRequest';
 import { blogsQueryRepository } from '../repositories/blogsQueryRepository';
+import { sendEmailAdapter } from '../../auth/adapters/sendEmailAdapter';
 
 export const getBlogs = async (req: Request<{}, BlogRequestTypeQuery>, res: Response) => {
   const paginationAndSearchParams: BlogRequestTypeQuery =

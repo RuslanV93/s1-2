@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { usersQueryRepository } from '../repositories/usersQueryRepository';
-import { getQueryFromRequest } from '../../../helpers/getQueryFromRequest';
+import { getQueryFromRequest } from '../../../common/helpers/getQueryFromRequest';
 import { UserRequestWithQueryType } from '../types/usersRequestResponseTypes';
 
 export const getUsers = async (

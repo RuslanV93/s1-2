@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { STATUSES } from '../variables/variables';
+import { STATUSES } from '../common/variables/variables';
 import { authService } from '../modules/auth/services/authService';
 import { usersQueryRepository } from '../modules/users/repositories/usersQueryRepository';
+import { jwtService } from '../common/crypto/jwtService';
 
 /// BASIC auth validation
 export const authValidatorMiddleware = (
@@ -42,7 +43,7 @@ export const accessTokenValidator = async (
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
-  const payload = await authService.getUserByToken(token);
+  const payload = await jwtService.getUserByToken(token);
   if (!payload) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;

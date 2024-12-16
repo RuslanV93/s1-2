@@ -4,7 +4,7 @@ import { blogsRouter } from './modules/blogs/blogsController';
 import SETTINGS from './settings';
 import { postsRouter } from './modules/posts/postsController';
 import { allDataRouter } from './modules/testing/deleteAllData';
-import { STATUSES } from './variables/variables';
+import { STATUSES } from './common/variables/variables';
 import { usersRouter } from './modules/users/usersController';
 import { authRouter } from './modules/auth/authController';
 import { commentsRouter } from './modules/comments/commentsController';

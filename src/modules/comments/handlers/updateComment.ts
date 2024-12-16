@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { commentsService } from '../services/commentsService';
-import { STATUSES } from '../../../variables/variables';
+import { DomainStatusCode } from '../../../common/types/types';
+import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHttpFunction';
+import { STATUSES } from '../../../common/variables/variables';
 
 export const updateComment = async (req: Request, res: Response) => {
   const userId: string = req.user.id;
@@ -12,21 +14,12 @@ export const updateComment = async (req: Request, res: Response) => {
     commentId,
     commentNewText,
   );
-  switch (updateCommentResult.status) {
-    case 0: {
-      res.status(STATUSES.NO_CONTENT_204).send(updateCommentResult.extensions);
-      return;
-    }
-    case 1: {
-      res.status(STATUSES.NOT_FOUNT_404).send(updateCommentResult.extensions);
-      return;
-    }
-    case 2: {
-      res.status(STATUSES.FORBIDDEN_403).send(updateCommentResult.extensions);
-      return;
-    }
-    case 5: {
-      res.status(STATUSES.INTERNAL_ERROR_500).send(updateCommentResult.extensions);
-    }
+  if (updateCommentResult.status !== DomainStatusCode.Success) {
+    res
+      .status(resultCodeToHttpFunction(updateCommentResult.status))
+      .send(updateCommentResult.extensions);
+    return;
   }
+  res.status(STATUSES.NO_CONTENT_204);
+  return;
 };

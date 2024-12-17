@@ -50,4 +50,8 @@ export const authRepository = {
 
     return confirmResult as UserDbType;
   },
+
+  async findUser (email:string) {
+    const user = await usersCollection.findOne({})
+  }
 };

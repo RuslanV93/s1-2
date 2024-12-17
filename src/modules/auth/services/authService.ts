@@ -126,4 +126,9 @@ export const authService = {
       extensions: [],
     };
   },
+
+  // email resending
+  async emailResend(email: string) {
+    const userExists = authRepository.findUser(email)
+  }
 };

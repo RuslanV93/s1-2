@@ -1,9 +1,10 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 
 export type EmailConfirmationType = {
   confirmationCode: string;
   expirationDate: Date | null;
   isConfirmed: string;
+  emailConfirmationCooldown: Date | null;
 };
 
 export type UserDbType = {

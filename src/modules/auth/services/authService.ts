@@ -1,26 +1,26 @@
-import { comparePassword } from '../../../common/crypto/verifyPassword';
-import { authRepository } from '../repositories/authRepository';
-import { NewUserType, UserDbType } from '../../users/types/usersTypes';
-import settings from '../../../settings';
-import { ObjectId, WithId } from 'mongodb';
-import { usersRepository } from '../../users/repositories/usersRepository';
-import { DomainStatusCode } from '../../../common/types/types';
-import { genHashFunction } from '../../../common/crypto/getHash';
-import { randomUUID } from 'node:crypto';
-import { add } from 'date-fns/add';
-import { sendEmailAdapter } from '../adapters/sendEmailAdapter';
+import { comparePassword } from "../../../common/crypto/verifyPassword";
+import { authRepository } from "../repositories/authRepository";
+import { NewUserType, UserDbType } from "../../users/types/usersTypes";
+import settings from "../../../settings";
+import { ObjectId, WithId } from "mongodb";
+import { usersRepository } from "../../users/repositories/usersRepository";
+import { DomainStatusCode } from "../../../common/types/types";
+import { genHashFunction } from "../../../common/crypto/getHash";
+import { randomUUID } from "node:crypto";
+import { add } from "date-fns/add";
+import { sendEmailAdapter } from "../adapters/sendEmailAdapter";
 
 export const authService = {
-  //checking credentials
+  /** checking credentials */
   async loginUser(loginField: string, passwordField: string): Promise<UserDbType> {
     const user = await authRepository.getHash(loginField);
 
     if (!user?.passwordHash) {
       const errors: { [key: string]: string } = {};
-      if (loginField.includes('@')) {
-        errors.email = 'User not found. Invalid email.';
+      if (loginField.includes("@")) {
+        errors.email = "User not found. Invalid email.";
       } else {
-        errors.login = 'User not found. Invalid login.';
+        errors.login = "User not found. Invalid login.";
       }
       throw {
         errorsMessages: Object.keys(errors).map(
@@ -34,18 +34,19 @@ export const authService = {
     const passwordIsMatch = await comparePassword(passwordField, user.passwordHash);
     if (!passwordIsMatch) {
       throw {
-        errorsMessages: [{ field: 'password', message: 'Incorrect password' }],
+        errorsMessages: [{ field: "password", message: "Incorrect password" }],
       };
     }
     return user;
   },
-  // Add new user by registration. Not added by super admin.
+
+  /** Add new user by registration. Not added by super admin. */
   async userRegistration(login: string, pass: string, email: string) {
     const user = await usersRepository.isLoginOrEmailTaken(email, login);
     if (user.emailCount || user.loginCount) {
       return {
         status: DomainStatusCode.BadRequest,
-        extensions: [{ field: 'loginOrEmail', message: 'User already exists.' }],
+        extensions: [{ field: "loginOrEmail", message: "User already exists." }],
         data: null,
       };
     }
@@ -64,7 +65,8 @@ export const authService = {
         expirationDate: add(new Date(), {
           hours: 1,
         }),
-        isConfirmed: 'unconfirmed',
+        isConfirmed: "unconfirmed",
+        emailConfirmationCooldown: null,
       },
     };
     const result = await usersRepository.addNewUser(newRegisteredUser);
@@ -72,7 +74,7 @@ export const authService = {
       return {
         status: DomainStatusCode.InternalServerError,
         data: null,
-        extensions: [{ message: 'Internal Server Error.' }],
+        extensions: [{ message: "Internal Server Error." }],
       };
     }
     const confirmationCode = newRegisteredUser.emailConfirmation.confirmationCode;
@@ -92,32 +94,34 @@ export const authService = {
     };
   },
 
+  /** registration confirm. confirm email sending */
   async registrationConfirm(code: string) {
     const existingUser = await authRepository.findUserByConfirmCode(code);
 
-    const isCodeExpired = new Date() > existingUser?.emailConfirmation.expirationDate!;
+    const isCodeExpired =
+      new Date() > existingUser?.emailConfirmation.expirationDate!;
 
-    const isCodeApplied = existingUser?.emailConfirmation.isConfirmed === 'confirmed';
+    const isCodeApplied =
+      existingUser?.emailConfirmation.isConfirmed === "confirmed";
     if (!existingUser || isCodeExpired || isCodeApplied) {
       return {
         status: DomainStatusCode.BadRequest,
         data: null,
         extensions: [
           {
-            message: 'Confirmation error. Code is incorrect',
-            field: 'Confirmation Code',
+            message: "Confirmation error. Code is incorrect or already activated.",
+            field: "Confirmation Code",
           },
         ],
       };
     }
     const result: WithId<UserDbType> | null =
       await authRepository.registrationConfirm(code);
-    if (!result || result.emailConfirmation.isConfirmed !== 'confirmed') {
-      console.log(result);
+    if (!result || result.emailConfirmation.isConfirmed !== "confirmed") {
       return {
         status: DomainStatusCode.InternalServerError,
         data: null,
-        extensions: [{ message: 'Internal Server Error' }],
+        extensions: [{ message: "Internal Server Error" }],
       };
     }
     return {
@@ -127,8 +131,56 @@ export const authService = {
     };
   },
 
-  // email resending
+  /** email resending service */
   async emailResend(email: string) {
-    const userExists = authRepository.findUser(email)
-  }
+    const userExists: UserDbType | null = await authRepository.findUser(email);
+    if (!userExists) {
+      return {
+        status: DomainStatusCode.InternalServerError,
+        data: null,
+        extensions: [{ message: "Internal Server Error" }],
+      };
+    }
+    if (userExists.emailConfirmation.isConfirmed === "confirmed") {
+      return {
+        status: DomainStatusCode.BadRequest,
+        data: null,
+        extensions: [{ message: "Email already confirmed" }],
+      };
+    }
+    const newExpirationDate: Date = add(new Date(), {
+      hours: 1,
+    });
+    const newConfirmationCode: string = randomUUID();
+    const userWithUpdatedEmailConfirmationFields =
+      await authRepository.emailConfirmationResendUpdate(
+        email,
+        newExpirationDate,
+        newConfirmationCode,
+      );
+    if (!userWithUpdatedEmailConfirmationFields) {
+      return {
+        status: DomainStatusCode.InternalServerError,
+        data: null,
+        extensions: [{ message: "Internal Server Error" }],
+      };
+    }
+    const emailSendResult = await sendEmailAdapter(
+      userExists.login,
+      email,
+      userWithUpdatedEmailConfirmationFields.emailConfirmation.confirmationCode,
+    );
+    if (!emailSendResult.success) {
+      return {
+        status: DomainStatusCode.InternalServerError,
+        data: null,
+        extensions: [{ message: "Internal Server Error" }],
+      };
+    }
+    return {
+      status: DomainStatusCode.Success,
+      data: null,
+      extensions: [],
+    };
+  },
 };

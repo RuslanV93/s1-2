@@ -1,11 +1,11 @@
-import { usersRepository } from '../repositories/usersRepository';
-import { UserRequestTypeWithBody } from '../types/usersRequestResponseTypes';
-import { Request } from 'express';
-import { ObjectId } from 'mongodb';
-import { NewUserType } from '../types/usersTypes';
-import { genHashFunction } from '../../../common/crypto/getHash';
-import { randomUUID } from 'node:crypto';
-import { add } from 'date-fns/add';
+import { usersRepository } from "../repositories/usersRepository";
+import { UserRequestTypeWithBody } from "../types/usersRequestResponseTypes";
+import { Request } from "express";
+import { ObjectId } from "mongodb";
+import { NewUserType } from "../types/usersTypes";
+import { genHashFunction } from "../../../common/crypto/getHash";
+import { randomUUID } from "node:crypto";
+import { add } from "date-fns/add";
 
 export const usersService = {
   // add new user to DB and return
@@ -14,15 +14,18 @@ export const usersService = {
     email: string,
     password: string,
   ): Promise<string | null> {
-    const isLoginOrEmailTaken = await usersRepository.isLoginOrEmailTaken(email, login);
+    const isLoginOrEmailTaken = await usersRepository.isLoginOrEmailTaken(
+      email,
+      login,
+    );
 
     // Checking is email or login exists
     const errors: { [key: string]: string } = {};
     if (isLoginOrEmailTaken.loginCount) {
-      errors.login = 'Login is already taken';
+      errors.login = "Login is already taken";
     }
     if (isLoginOrEmailTaken.emailCount) {
-      errors.email = 'Email is already taken';
+      errors.email = "Email is already taken";
     }
     if (Object.keys(errors).length > 0) {
       throw {
@@ -45,7 +48,8 @@ export const usersService = {
       emailConfirmation: {
         confirmationCode: randomUUID(),
         expirationDate: null,
-        isConfirmed: 'confirmed',
+        isConfirmed: "confirmed",
+        emailConfirmationCooldown: null,
       },
     };
     const newUserId: string | null = await usersRepository.addNewUser(newUser);

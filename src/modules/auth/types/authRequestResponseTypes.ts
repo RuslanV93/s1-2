@@ -7,3 +7,7 @@ export type AuthRequestTypeWithBody = {
 export type ConfirmationTypeWithBody = {
   code: string;
 };
+
+export type EmailResendTypeWithBody = {
+  email: string;
+};

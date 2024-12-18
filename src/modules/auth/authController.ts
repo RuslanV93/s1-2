@@ -1,16 +1,17 @@
-import { Router } from 'express';
+import { Router } from "express";
 import {
   confirmationCodeValidator,
   inputValidationMiddleware,
   userEmailValidator,
   userLoginValidator,
   userPasswordValidator,
-} from '../../validators/fieldsValidators';
-import { loginUser } from './handlers/loginUser';
-import { authMe } from './handlers/authMe';
-import { accessTokenValidator } from '../../validators/authValidator';
-import { userRegistration } from './handlers/userRegistration';
-import { registrationConfirmation } from './handlers/registrationConfirmation';
+} from "../../validators/fieldsValidators";
+import { loginUser } from "./handlers/loginUser";
+import { authMe } from "./handlers/authMe";
+import { accessTokenValidator } from "../../validators/authValidator";
+import { userRegistration } from "./handlers/userRegistration";
+import { registrationConfirmation } from "./handlers/registrationConfirmation";
+import { emailResending } from "./handlers/emailResending";
 export const authRouter = Router();
 
 const authController = {
@@ -18,10 +19,11 @@ const authController = {
   authMe,
   userRegistration,
   registrationConfirmation,
+  emailResending,
 };
 
 authRouter.post(
-  '/login',
+  "/login",
   userPasswordValidator,
   userEmailValidator,
   userLoginValidator,
@@ -29,15 +31,20 @@ authRouter.post(
   authController.loginUser,
 );
 authRouter.post(
-  '/registration',
+  "/registration",
   userLoginValidator,
   userPasswordValidator,
   userEmailValidator,
   authController.userRegistration,
 );
 authRouter.post(
-  '/registration-confirmation',
+  "/registration-confirmation",
   confirmationCodeValidator,
   authController.registrationConfirmation,
 );
-authRouter.get('/me', accessTokenValidator, authController.authMe);
+authRouter.post(
+  "/registration-email-resending",
+  userEmailValidator,
+  authController.emailResending,
+);
+authRouter.get("/me", accessTokenValidator, authController.authMe);

@@ -22,3 +22,4 @@ app.use(SETTINGS.PATH.TESTING, allDataRouter);
 app.use(SETTINGS.PATH.USERS, usersRouter);
 app.use(SETTINGS.PATH.AUTH, authRouter);
 app.use(SETTINGS.PATH.COMMENTS, commentsRouter);
+const mongoDB =

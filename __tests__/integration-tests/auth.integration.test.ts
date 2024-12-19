@@ -5,6 +5,8 @@ import { authService } from '../../src/modules/auth/services/authService';
 import { DomainStatusCode } from '../../src/common/types/types';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
+import { authRepository } from '../../src/modules/auth/repositories/authRepository';
+import { req } from '../e2e-tests/default.e2e.test';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
@@ -28,20 +30,20 @@ describe('/auth', () => {
     const uri = server.getUri();
     client = new MongoClient(uri);
     await client.connect();
-    process.env.MONGO_URI = uri;
   });
   afterAll(async () => {
-    // await req.delete('/testing/all-data').set('authorization', authData).expect(204);
+    await req.delete('/testing/all-data').set('authorization', authData).expect(204);
     await server.stop();
     await client.close();
   });
   it('should register user by correct data', async () => {
     const { login, email, password } = newTestUserForSelfRegistration;
-    const result = await authService.userRegistration(login, email, password);
+    console.log(email);
+    console.log(password);
+    const result = await authService.userRegistration(login, password, email);
     expect(result.status).toBe(DomainStatusCode.Success);
-    // const user = await authRepository.findUser(email);
-    // console.log(user);
-    // expect(user!.email).toBe(email);
+    const user = await authRepository.findUser(email);
+    expect(user!.email).toBe(email);
   });
   // it('should resend email confirmation code', async () => {
   //   const { email } = newTestUserForSelfRegistration;

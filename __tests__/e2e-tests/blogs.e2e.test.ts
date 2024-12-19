@@ -31,23 +31,13 @@ describe('/blogs', () => {
       .send(newBlog)
       .expect(STATUSES.CREATED_201);
     newBlogForTestId = newBlogForTest.body.id;
-
-    // let i = 0;
-    // while (i < 11) {
-    //   await req
-    //     .post(SETTINGS.PATH.BLOGS)
-    //     .set('authorization', authData)
-    //     .send(newBlog)
-    //     .expect(STATUSES.CREATED_201);
-    //   i++;
-    // }
   });
 
   afterAll(async () => {
-    // await req
-    //   .delete('/testing/all-data')
-    //   .set('authorization', authData)
-    //   .expect(STATUSES.NO_CONTENT_204);
+    await req
+      .delete('/testing/all-data')
+      .set('authorization', authData)
+      .expect(STATUSES.NO_CONTENT_204);
     if (server) {
       await server.stop();
     }

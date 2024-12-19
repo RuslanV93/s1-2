@@ -1,10 +1,14 @@
 import { describe } from 'node:test';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
-import SETTINGS from '../src/settings';
+import SETTINGS from '../../src/settings';
 import { req } from './default.e2e.test';
-import { newTestBlog, newTestPost, newTestUser } from './testData/data';
-import { STATUSES } from '../src/common/variables/variables';
+import {
+  newTestBlog,
+  newTestPost,
+  newTestUserForAdminRegistration,
+} from '../testData/data';
+import { STATUSES } from '../../src/common/variables/variables';
 
 jest.setTimeout(15000);
 
@@ -23,7 +27,8 @@ describe('/comments', () => {
     server = await MongoMemoryServer.create();
     const uri = server.getUri();
     client = new MongoClient(uri);
-
+    await client.connect();
+    process.env.MONGO_URI = uri;
     //creating blog
     const blog = await req
       .post(SETTINGS.PATH.BLOGS)
@@ -43,13 +48,16 @@ describe('/comments', () => {
     const user = await req
       .post(SETTINGS.PATH.USERS)
       .set('authorization', authData)
-      .send(newTestUser)
+      .send(newTestUserForAdminRegistration)
       .expect(STATUSES.CREATED_201);
     userId = user.body.id;
 
     const login = await req
       .post(`${SETTINGS.PATH.AUTH}/login`)
-      .send({ loginOrEmail: newTestUser.login, password: newTestUser.password })
+      .send({
+        loginOrEmail: newTestUserForAdminRegistration.login,
+        password: newTestUserForAdminRegistration.password,
+      })
       .expect(STATUSES.OK_200);
     token = login.body.accessToken;
   });
@@ -69,7 +77,8 @@ describe('/comments', () => {
       .post(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
       .set('authorization', `Bearer ${token}`)
       .send({
-        content: 'Hello! This is new commentary. Its added successful if you read it',
+        content:
+          'Hello! This is new commentary. Its added successful if you read it',
       })
       .expect(STATUSES.CREATED_201);
     expect(res.body.content).toBe(

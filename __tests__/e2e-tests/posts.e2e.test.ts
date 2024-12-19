@@ -1,10 +1,10 @@
 import { describe } from 'node:test';
 import { req } from './default.e2e.test';
-import SETTINGS from '../src/settings';
-import { STATUSES } from '../src/common/variables/variables';
+import SETTINGS from '../../src/settings';
+import { STATUSES } from '../../src/common/variables/variables';
 import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { PostViewType } from '../src/modules/posts/types/postsTypes';
+import { PostViewType } from '../../src/modules/posts/types/postsTypes';
 
 let postId: string;
 let blogId: string;
@@ -19,7 +19,8 @@ describe('/posts', () => {
     server = await MongoMemoryServer.create();
     const uri = server.getUri();
     client = new MongoClient(uri);
-
+    await client.connect();
+    process.env.MONGO_URI = uri;
     await req
       .post(SETTINGS.PATH.BLOGS)
       .set('authorization', authData)
@@ -69,7 +70,9 @@ describe('/posts', () => {
     });
   });
   it('should get post by id', async () => {
-    const res = await req.get(`${SETTINGS.PATH.POSTS}/${postId}`).expect(STATUSES.OK_200);
+    const res = await req
+      .get(`${SETTINGS.PATH.POSTS}/${postId}`)
+      .expect(STATUSES.OK_200);
     expect(res.body).toMatchObject({
       id: `${postId}`,
       title: 'title',

@@ -2,9 +2,9 @@ import { describe } from 'node:test';
 import { req } from './default.e2e.test';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
-import SETTINGS from '../src/settings';
-import { STATUSES } from '../src/common/variables/variables';
-import { UserViewType } from '../src/modules/users/types/usersTypes';
+import SETTINGS from '../../src/settings';
+import { STATUSES } from '../../src/common/variables/variables';
+import { UserViewType } from '../../src/modules/users/types/usersTypes';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
@@ -19,7 +19,8 @@ describe('/users', () => {
     server = await MongoMemoryServer.create();
     const uri = server.getUri();
     client = new MongoClient(uri);
-
+    await client.connect();
+    process.env.MONGO_URI = uri;
     await req
       .post(SETTINGS.PATH.USERS)
       .set('authorization', authData)
@@ -30,7 +31,9 @@ describe('/users', () => {
       })
       .expect(STATUSES.CREATED_201);
 
-    const resUsers = await req.get(SETTINGS.PATH.USERS).set('authorization', authData);
+    const resUsers = await req
+      .get(SETTINGS.PATH.USERS)
+      .set('authorization', authData);
 
     userId = resUsers.body.items[0].id;
   });

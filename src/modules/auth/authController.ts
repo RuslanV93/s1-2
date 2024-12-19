@@ -35,16 +35,19 @@ authRouter.post(
   userLoginValidator,
   userPasswordValidator,
   userEmailValidator,
+  inputValidationMiddleware,
   authController.userRegistration,
 );
 authRouter.post(
   "/registration-confirmation",
   confirmationCodeValidator,
+  inputValidationMiddleware,
   authController.registrationConfirmation,
 );
 authRouter.post(
   "/registration-email-resending",
   userEmailValidator,
+  inputValidationMiddleware,
   authController.emailResending,
 );
 authRouter.get("/me", accessTokenValidator, authController.authMe);

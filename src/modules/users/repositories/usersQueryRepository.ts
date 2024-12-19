@@ -1,8 +1,9 @@
-import { usersCollection } from '../../../db/db';
-import { UsersSearchAndPaginationType } from '../types/usersRequestResponseTypes';
-import { usersMappers } from '../features/usersMappers';
-import { AllUsersViewType, UserDbType, UserViewType } from '../types/usersTypes';
-import { ObjectId } from 'mongodb';
+import { usersCollection } from "../../../db/db";
+import { UsersSearchAndPaginationType } from "../types/usersRequestResponseTypes";
+import { usersMappers } from "../features/usersMappers";
+import { AllUsersViewType, UserDbType, UserViewType } from "../types/usersTypes";
+import { ObjectId } from "mongodb";
+import { AuthMeViewType } from "../../auth/types/authTypes";
 
 // creating filter for search
 const createFilter = (searchAndPaginationParams: UsersSearchAndPaginationType) => {
@@ -11,10 +12,10 @@ const createFilter = (searchAndPaginationParams: UsersSearchAndPaginationType) =
   if (searchLoginTerm || searchEmailTerm) {
     filter.$or = [];
     if (searchLoginTerm) {
-      filter.$or.push({ login: { $regex: searchLoginTerm, $options: 'i' } });
+      filter.$or.push({ login: { $regex: searchLoginTerm, $options: "i" } });
     }
     if (searchEmailTerm) {
-      filter.$or.push({ email: { $regex: searchEmailTerm, $options: 'i' } });
+      filter.$or.push({ email: { $regex: searchEmailTerm, $options: "i" } });
     }
   }
   return filter;
@@ -38,8 +39,13 @@ export const usersQueryRepository = {
     return null;
   },
 
-  async findMe(userId: string) {
-    const [me] = await usersCollection.find({ _id: new ObjectId(userId) }).toArray();
+  async findMe(userId: string): Promise<AuthMeViewType | null> {
+    const [me] = await usersCollection
+      .find<UserDbType>({ _id: new ObjectId(userId) })
+      .toArray();
+    if (!me) {
+      return null;
+    }
     return {
       email: me.email,
       login: me.login,
@@ -53,10 +59,11 @@ export const usersQueryRepository = {
   ): Promise<AllUsersViewType> {
     const filter = createFilter(searchAndPaginationParams);
     const usersTotalCount = await this.getUsersTotalCount(searchAndPaginationParams);
-    const { pageNumber, pageSize, sortBy, sortDirection } = searchAndPaginationParams;
+    const { pageNumber, pageSize, sortBy, sortDirection } =
+      searchAndPaginationParams;
     const dbUsers = await usersCollection
       .find<UserDbType>(filter)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
       .skip(pageSize * (pageNumber - 1))
       .limit(pageSize)
       .toArray();

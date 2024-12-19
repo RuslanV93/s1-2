@@ -9,8 +9,13 @@ export const newTestPost = {
   content: 'content',
 };
 
-export const newTestUser = {
+export const newTestUserForAdminRegistration = {
   login: 'user1',
   email: 'user@gmail.com',
+  password: 'qwerty1',
+};
+export const newTestUserForSelfRegistration = {
+  login: 'RuslanV',
+  email: 'ruslan-vak93@mail.ru',
   password: 'qwerty1',
 };

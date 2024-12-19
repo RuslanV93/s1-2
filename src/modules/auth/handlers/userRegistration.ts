@@ -8,7 +8,9 @@ export const userRegistration = async (req: Request, res: Response) => {
   const { login, password, email } = req.body;
   const result = await authService.userRegistration(login, password, email);
   if (result.status !== DomainStatusCode.Success) {
-    res.status(resultCodeToHttpFunction(result.status)).send(result.extensions);
+    res
+      .status(resultCodeToHttpFunction(result.status))
+      .send({ errorsMessages: result.extensions });
     return;
   }
   res.sendStatus(STATUSES.NO_CONTENT_204);

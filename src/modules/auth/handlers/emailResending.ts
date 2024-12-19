@@ -13,7 +13,7 @@ export const emailResending = async (
   if (emailSendResult.status !== DomainStatusCode.Success) {
     res
       .status(resultCodeToHttpFunction(emailSendResult.status))
-      .send(emailSendResult.extensions);
+      .send({ errorsMessages: emailSendResult.extensions });
     return;
   }
   res.sendStatus(STATUSES.NO_CONTENT_204);

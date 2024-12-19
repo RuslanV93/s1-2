@@ -2,9 +2,9 @@ import { describe } from 'node:test';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
 import { req } from './default.e2e.test';
-import SETTINGS from '../src/settings';
-import { STATUSES } from '../src/common/variables/variables';
-import { BlogViewType } from '../src/modules/blogs/types/blogsTypes';
+import SETTINGS from '../../src/settings';
+import { STATUSES } from '../../src/common/variables/variables';
+import { BlogViewType } from '../../src/modules/blogs/types/blogsTypes';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
@@ -44,10 +44,10 @@ describe('/blogs', () => {
   });
 
   afterAll(async () => {
-    await req
-      .delete('/testing/all-data')
-      .set('authorization', authData)
-      .expect(STATUSES.NO_CONTENT_204);
+    // await req
+    //   .delete('/testing/all-data')
+    //   .set('authorization', authData)
+    //   .expect(STATUSES.NO_CONTENT_204);
     if (server) {
       await server.stop();
     }

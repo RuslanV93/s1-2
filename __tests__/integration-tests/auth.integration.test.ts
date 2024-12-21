@@ -18,13 +18,14 @@ describe('/auth', () => {
         const info = {
           response: 'success',
         };
-        return { success: true, info: info.response };
+        return Promise.resolve({ success: true, info: info.response });
       },
     );
   let server: MongoMemoryServer;
   let client: MongoClient;
 
   beforeAll(async () => {
+    process.env.NODE_ENV = 'test';
     server = await MongoMemoryServer.create();
     const uri = server.getUri();
     client = new MongoClient(uri);
@@ -42,25 +43,22 @@ describe('/auth', () => {
     const user = await authRepository.findUser(email);
     expect(user!.email).toBe(email);
   });
-  // it('should resend email confirmation code', async () => {
-  //   const { email } = newTestUserForSelfRegistration;
-  //   console.log(email);
-  //
-  //   const result = await authService.emailResend(email);
-  //   console.log(result);
-  //   expect(result.status).toBe(DomainStatusCode.Success);
-  // });
-  // it('should return error cuz email is incorrect. email confirm code resend', async () => {
-  //   const email = 'ruslan@mail.ru';
-  //   const result = await authService.emailResend(email);
-  //   expect(result.status).toBe(DomainStatusCode.BadRequest);
-  // });
-  // it('should confirm email confirm registration. return success', async () => {
-  //   const { email } = newTestUserForSelfRegistration;
-  //   const user = await authRepository.findUser(email);
-  //   const confirmCode = user!.emailConfirmation.confirmationCode;
-  //   const result = await authService.registrationConfirm(confirmCode);
-  //
-  //   expect(result.status).toBe(DomainStatusCode.Success);
-  // });
+  it('should resend email confirmation code', async () => {
+    const { email } = newTestUserForSelfRegistration;
+
+    const result = await authService.emailResend(email);
+    expect(result.status).toBe(DomainStatusCode.Success);
+  });
+  it('should return error cuz email is incorrect. email confirm code resend', async () => {
+    const email = 'ruslan@mail.ru';
+    const result = await authService.emailResend(email);
+    expect(result.status).toBe(DomainStatusCode.BadRequest);
+  });
+  it('should confirm email confirm registration. return success', async () => {
+    const { email } = newTestUserForSelfRegistration;
+    const user = await authRepository.findUser(email);
+    const confirmCode = user!.emailConfirmation.confirmationCode;
+    const result = await authService.registrationConfirm(confirmCode);
+    expect(result.status).toBe(DomainStatusCode.Success);
+  });
 });

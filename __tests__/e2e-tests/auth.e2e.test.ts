@@ -44,7 +44,7 @@ describe('/auth', () => {
   });
 
   afterAll(async () => {
-    await req.delete('/testing/all-data').set('authorization', authData).expect(204);
+    // await req.delete('/testing/all-data').set('authorization', authData).expect(204);
     if (client) {
       await client.close();
     }

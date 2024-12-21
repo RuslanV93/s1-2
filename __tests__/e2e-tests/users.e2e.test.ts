@@ -16,6 +16,7 @@ describe('/users', () => {
   let client: MongoClient;
   let userId: string;
   beforeAll(async () => {
+    process.env.NODE_ENV = 'test';
     server = await MongoMemoryServer.create();
     const uri = server.getUri();
     client = new MongoClient(uri);
@@ -37,6 +38,7 @@ describe('/users', () => {
     userId = resUsers.body.items[0].id;
   });
   afterAll(async () => {
+    await req.delete('/testing/all-data').set('authorization', authData).expect(204);
     if (server) {
       await server.stop();
     }

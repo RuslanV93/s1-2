@@ -1,6 +1,7 @@
 import { config } from 'dotenv';
 
 config();
+
 const SETTINGS = {
   PORT: process.env.PORT || 5000,
   WEBSITE_URL: process.env.WEBSITE_VERSEL_URL || 'http://localhost:3003',

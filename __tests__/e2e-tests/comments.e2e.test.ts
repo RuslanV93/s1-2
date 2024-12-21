@@ -24,10 +24,11 @@ describe('/comments', () => {
   let commentId: string;
   let token: string;
   beforeAll(async () => {
+    process.env.NODE_ENV = 'test';
     server = await MongoMemoryServer.create();
     const uri = server.getUri();
-    client = new MongoClient(uri);
 
+    client = new MongoClient(uri);
     //creating blog
     const blog = await req
       .post(SETTINGS.PATH.BLOGS)
@@ -90,6 +91,7 @@ describe('/comments', () => {
       .get(`${SETTINGS.PATH.POSTS}/${postId}/comments`)
       .expect(STATUSES.OK_200);
     commentId = comments.body.items[0].id;
+
     expect(comments.body.items.length).toBe(1);
     expect(comments.body.items[0].commentatorInfo.userLogin).toBe('user1');
   });

@@ -1,11 +1,8 @@
 import { BlogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
-import { blogsCollection, postsCollection } from '../../../db/db';
-import { ObjectId, WithId } from 'mongodb';
+import { blogsCollection } from '../../../db/db';
+import { ObjectId } from 'mongodb';
 import { blogsMappers } from '../features/blogsViewModelMapper';
-import { postsMappers } from '../../posts/features/postsViewModelMapper';
-import { PostRequestTypeQuery } from '../../posts/types/postsRequestResponseTypes';
 import { AllBlogsViewType, BlogDbType, BlogViewType } from '../types/blogsTypes';
-import { AllPostsViewType, PostDbType } from '../../posts/types/postsTypes';
 
 const createFilter = (paginationAndSearchParams: any, blogId?: ObjectId) => {
   const filter: any = {};
@@ -41,7 +38,8 @@ export const blogsQueryRepository = {
     const blogsTotalCount = await this.getBlogsTotalCount(paginationAndSearchParams);
 
     const filter = createFilter(paginationAndSearchParams);
-    const { pageNumber, pageSize, sortBy, sortDirection } = paginationAndSearchParams;
+    const { pageNumber, pageSize, sortBy, sortDirection } =
+      paginationAndSearchParams;
     const dbBlogs: Array<BlogDbType> = await blogsCollection
       .find<BlogDbType>(filter)
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })

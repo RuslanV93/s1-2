@@ -5,6 +5,7 @@ import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
 import { BlogViewType } from '../../src/modules/blogs/types/blogsTypes';
+import { Database } from '../../src/db/db';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
@@ -15,10 +16,10 @@ describe('/blogs', () => {
   let newBlogForTest: any;
   let newBlogForTestId: string;
   beforeAll(async () => {
+    process.env.NODE_ENV = 'test';
     server = await MongoMemoryServer.create();
     const uri = server.getUri();
-    client = new MongoClient(uri);
-    await client.connect();
+    const db = new Database(uri);
 
     const newBlog = {
       name: 'asd',
@@ -31,16 +32,6 @@ describe('/blogs', () => {
       .send(newBlog)
       .expect(STATUSES.CREATED_201);
     newBlogForTestId = newBlogForTest.body.id;
-
-    // let i = 0;
-    // while (i < 11) {
-    //   await req
-    //     .post(SETTINGS.PATH.BLOGS)
-    //     .set('authorization', authData)
-    //     .send(newBlog)
-    //     .expect(STATUSES.CREATED_201);
-    //   i++;
-    // }
   });
 
   afterAll(async () => {
@@ -48,12 +39,6 @@ describe('/blogs', () => {
     //   .delete('/testing/all-data')
     //   .set('authorization', authData)
     //   .expect(STATUSES.NO_CONTENT_204);
-    if (server) {
-      await server.stop();
-    }
-    if (client) {
-      await client.close();
-    }
   });
   it('should return all blogs', async () => {
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);

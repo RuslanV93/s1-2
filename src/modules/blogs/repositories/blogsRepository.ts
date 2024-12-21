@@ -1,24 +1,12 @@
-import { blogsCollection, postsCollection } from '../../../db/db';
-import { ObjectId, WithId } from 'mongodb';
-
-import { postsMappers } from '../../posts/features/postsViewModelMapper';
-import { PostRequestTypeQuery } from '../../posts/types/postsRequestResponseTypes';
-import {
-  BlogDbType,
-  BlogForUpdateType,
-  BlogViewType,
-  NewBlogType,
-} from '../types/blogsTypes';
-import {
-  AllPostsViewType,
-  NewPostType,
-  PostDbType,
-  PostViewType,
-} from '../../posts/types/postsTypes';
+import { blogsCollection } from '../../../db/db';
+import { ObjectId } from 'mongodb';
+import { BlogDbType, BlogForUpdateType, NewBlogType } from '../types/blogsTypes';
 
 export const blogsRepository = {
   async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
-    const [blogById] = await blogsCollection.find<BlogDbType>({ _id: _id }).toArray();
+    const [blogById] = await blogsCollection
+      .find<BlogDbType>({ _id: _id })
+      .toArray();
     if (blogById) {
       return blogById;
     }

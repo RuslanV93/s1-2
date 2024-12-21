@@ -143,8 +143,7 @@ export const authService = {
   /** email resending service */
   async emailResend(email: string) {
     const userExists: UserDbType | null = await authRepository.findUser(email);
-    console.log(email);
-    console.log(userExists);
+
     if (!userExists) {
       return {
         status: DomainStatusCode.BadRequest,

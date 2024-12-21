@@ -24,7 +24,6 @@ describe('/auth', () => {
     const uri = server.getUri();
     client = new MongoClient(uri);
     await client.connect();
-    process.env.MONGO_URI = uri;
     // creating new user
     await req
       .post(SETTINGS.PATH.USERS)

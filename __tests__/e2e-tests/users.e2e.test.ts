@@ -20,7 +20,6 @@ describe('/users', () => {
     const uri = server.getUri();
     client = new MongoClient(uri);
     await client.connect();
-    process.env.MONGO_URI = uri;
     await req
       .post(SETTINGS.PATH.USERS)
       .set('authorization', authData)

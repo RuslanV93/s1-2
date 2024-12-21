@@ -20,7 +20,6 @@ describe('/posts', () => {
     const uri = server.getUri();
     client = new MongoClient(uri);
     await client.connect();
-    process.env.MONGO_URI = uri;
     await req
       .post(SETTINGS.PATH.BLOGS)
       .set('authorization', authData)

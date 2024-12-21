@@ -27,8 +27,7 @@ describe('/comments', () => {
     server = await MongoMemoryServer.create();
     const uri = server.getUri();
     client = new MongoClient(uri);
-    await client.connect();
-    process.env.MONGO_URI = uri;
+
     //creating blog
     const blog = await req
       .post(SETTINGS.PATH.BLOGS)

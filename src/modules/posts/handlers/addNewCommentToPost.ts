@@ -9,6 +9,8 @@ import {
 } from '../../comments/types/commentsResponseRequestTypes';
 import { commentsQueryRepository } from '../../comments/repositories/commentsQueryRepository';
 import { ObjectId } from 'mongodb';
+import { DomainStatusCode } from '../../../common/types/types';
+import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHttpFunction';
 
 export const addNewCommentToPost = async (
   req: Request<CommentsRequestWithParamsType, {}, CommentsRequestWithBodyType>,
@@ -20,7 +22,8 @@ export const addNewCommentToPost = async (
     return;
   }
 
-  const commentator: UserViewType | null = await usersQueryRepository.getUserById(userId);
+  const commentator: UserViewType | null =
+    await usersQueryRepository.getUserById(userId);
 
   const commentatorInfo = {
     userId: new ObjectId(userId),
@@ -32,8 +35,8 @@ export const addNewCommentToPost = async (
     req.body,
     commentatorInfo,
   );
-  if (newAddedCommentResult.status === 1) {
-    res.status(STATUSES.NOT_FOUNT_404).send('Post not found.');
+  if (newAddedCommentResult.status !== DomainStatusCode.Success) {
+    res.sendStatus(resultCodeToHttpFunction(newAddedCommentResult.status));
     return;
   }
 

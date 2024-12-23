@@ -12,6 +12,7 @@ import {
   nameValidator,
   shortDescriptionValidator,
   titleValidator,
+  validateObjectId,
   webSiteUrlValidator,
 } from '../../validators/fieldsValidators';
 import { authValidatorMiddleware } from '../../validators/authValidator';
@@ -42,7 +43,12 @@ blogsRouter.get(
   queryFieldsValidatorMiddleware,
   blogsController.getBlogs,
 );
-blogsRouter.get('/:id', blogsController.getBlogsById);
+blogsRouter.get(
+  '/:id',
+  validateObjectId,
+  inputValidationMiddleware,
+  blogsController.getBlogsById,
+);
 blogsRouter.post(
   '/',
   authValidatorMiddleware,
@@ -52,25 +58,35 @@ blogsRouter.post(
   inputValidationMiddleware,
   blogsController.addNewBlog,
 );
-blogsRouter.delete('/:id', authValidatorMiddleware, blogsController.deleteBlog);
+blogsRouter.delete(
+  '/:id',
+  authValidatorMiddleware,
+  validateObjectId,
+  inputValidationMiddleware,
+  blogsController.deleteBlog,
+);
 blogsRouter.put(
   '/:id',
   authValidatorMiddleware,
   nameValidator,
   descriptionValidator,
   webSiteUrlValidator,
+  validateObjectId,
   inputValidationMiddleware,
   blogsController.updateBlog,
 );
 blogsRouter.get(
   '/:id/posts',
+  validateObjectId,
   sortValidator,
   queryFieldsValidatorMiddleware,
+  inputValidationMiddleware,
   blogsController.getPostsByBlogId,
 );
 blogsRouter.post(
   '/:id/posts',
   authValidatorMiddleware,
+  validateObjectId,
   ...blogIdValidator,
   titleValidator,
   shortDescriptionValidator,

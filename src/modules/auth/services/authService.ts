@@ -236,7 +236,7 @@ export const authService = {
       return {
         status: DomainStatusCode.InternalServerError,
         data: null,
-        extensions: [{ message: 'Internal Server Error' }],
+        extensions: [{ message: 'Internal Server Error. Hello' }],
       };
     }
     return {

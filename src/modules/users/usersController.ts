@@ -12,6 +12,7 @@ import {
   userEmailValidator,
   userLoginValidator,
   userPasswordValidator,
+  validateObjectId,
 } from '../../validators/fieldsValidators';
 
 export const usersRouter = Router();
@@ -39,4 +40,10 @@ usersRouter.post(
   usersController.addNewUser,
 );
 
-usersRouter.delete('/:id', authValidatorMiddleware, usersController.deleteUser);
+usersRouter.delete(
+  '/:id',
+  authValidatorMiddleware,
+  validateObjectId,
+  inputValidationMiddleware,
+  usersController.deleteUser,
+);

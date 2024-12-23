@@ -10,6 +10,7 @@ import { STATUSES } from '../common/variables/variables';
 import { blogsRepository } from '../modules/blogs/repositories/blogsRepository';
 import { blogByIdExists } from './blogExistsCustomValidator';
 import { BlogDbType } from '../modules/blogs/types/blogsTypes';
+import { ObjectId } from 'mongodb';
 
 // validation error types
 type ValidationErrorCustom = {
@@ -42,7 +43,18 @@ const userFields = {
 const commentFields = {
   content: 'content',
 };
-// ***************************** VALIDATORS ****************************
+// ***************************** VALIDATORS **************************** /
+
+/** PARAMS ID VALIDATOR */
+export const validateObjectId = param('id')
+  .optional()
+  .custom((value) => {
+    if (!ObjectId.isValid(value)) {
+      throw new Error('Id is invalid');
+    }
+    return true;
+  })
+  .withMessage('Id is invalid.');
 
 // AUTH VALIDATORS ________________________________
 export const confirmationCodeValidator = body(authFields.code)

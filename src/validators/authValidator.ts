@@ -68,11 +68,12 @@ export const refreshTokenValidator = async (
   next: NextFunction,
 ) => {
   const refreshToken = req.cookies.refreshToken;
+
   if (!refreshToken) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
-  const payload = await jwtService.getUserByToken(refreshToken);
+  const payload = await jwtService.getUserByRefreshToken(refreshToken);
   if (!payload) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;

@@ -15,6 +15,7 @@ import {
   inputValidationMiddleware,
   shortDescriptionValidator,
   titleValidator,
+  validateObjectId,
 } from '../../validators/fieldsValidators';
 import {
   queryFieldsValidatorMiddleware,
@@ -46,7 +47,12 @@ postsRouter.get(
 );
 
 //get post by id
-postsRouter.get('/:id', postsController.getPostById);
+postsRouter.get(
+  '/:id',
+  validateObjectId,
+  inputValidationMiddleware,
+  postsController.getPostById,
+);
 
 // add new post
 postsRouter.post(
@@ -61,12 +67,19 @@ postsRouter.post(
 );
 
 // delete existing post
-postsRouter.delete('/:id', authValidatorMiddleware, postsController.deletePost);
+postsRouter.delete(
+  '/:id',
+  authValidatorMiddleware,
+  validateObjectId,
+  inputValidationMiddleware,
+  postsController.deletePost,
+);
 
 //update post fields
 postsRouter.put(
   '/:id',
   authValidatorMiddleware,
+  validateObjectId,
   titleValidator,
   shortDescriptionValidator,
   contentValidator,
@@ -76,12 +89,18 @@ postsRouter.put(
 );
 
 // getting all comments by post id
-postsRouter.get('/:id/comments', postsController.getCommentsByPostId);
+postsRouter.get(
+  '/:id/comments',
+  validateObjectId,
+  inputValidationMiddleware,
+  postsController.getCommentsByPostId,
+);
 
 // add new comment to post
 postsRouter.post(
   '/:id/comments',
   accessTokenValidator,
+  validateObjectId,
   commentContentValidator,
   inputValidationMiddleware,
   postsController.addNewCommentToPost,

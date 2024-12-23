@@ -98,7 +98,7 @@ export const authRepository = {
       { $set: { 'refreshTokenInfo.tokenVersion': tokenVersion } },
       { returnDocument: 'after' },
     );
-    if (!result?.refreshTokenInfo.tokenVersion) {
+    if (!result) {
       return null;
     }
     return result;

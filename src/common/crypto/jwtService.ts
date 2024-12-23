@@ -34,4 +34,11 @@ export const jwtService = {
       return null;
     }
   },
+  async getUserByRefreshToken(refreshToken: string) {
+    try {
+      return jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET);
+    } catch (error) {
+      return null;
+    }
+  },
 };

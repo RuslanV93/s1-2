@@ -11,6 +11,7 @@ export const logout = async (req: Request, res: Response) => {
     res
       .status(resultCodeToHttpFunction(verifyTokenResult.status))
       .send({ errorsMessages: verifyTokenResult.extensions });
+    return;
   }
   const logoutResult = await authService.updateRefreshToken(userId, null);
   if (logoutResult.status !== DomainStatusCode.Success) {

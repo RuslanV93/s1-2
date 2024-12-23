@@ -6,6 +6,7 @@ import { accessTokenValidator } from '../../validators/authValidator';
 import {
   commentContentValidator,
   inputValidationMiddleware,
+  validateObjectId,
 } from '../../validators/fieldsValidators';
 
 export const commentsRouter = Router();
@@ -16,12 +17,25 @@ const commentsController = {
   deleteComment: deleteComment,
 };
 
-commentsRouter.get('/:id', commentsController.getCommentById);
+commentsRouter.get(
+  '/:id',
+  validateObjectId,
+  inputValidationMiddleware,
+  commentsController.getCommentById,
+);
 commentsRouter.put(
   '/:id',
   accessTokenValidator,
   commentContentValidator,
+  validateObjectId,
   inputValidationMiddleware,
   commentsController.updateComment,
 );
-commentsRouter.delete('/:id', accessTokenValidator, commentsController.deleteComment);
+commentsRouter.delete(
+  '/:id',
+  validateObjectId,
+  accessTokenValidator,
+
+  inputValidationMiddleware,
+  commentsController.deleteComment,
+);

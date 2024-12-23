@@ -3,8 +3,6 @@ import { nodemailerService } from '../../src/modules/auth/adapters/sendEmailAdap
 import { newTestUserForSelfRegistration } from '../testData/data';
 import { authService } from '../../src/modules/auth/services/authService';
 import { DomainStatusCode } from '../../src/common/types/types';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { MongoClient } from 'mongodb';
 import { authRepository } from '../../src/modules/auth/repositories/authRepository';
 import { awaitDb } from '../jest.setup';
 import { req } from '../e2e-tests/default.e2e.test';

@@ -9,6 +9,7 @@ import {
   newTestUserForAdminRegistration,
 } from '../testData/data';
 import { STATUSES } from '../../src/common/variables/variables';
+import { awaitDb } from '../jest.setup';
 
 jest.setTimeout(15000);
 
@@ -16,19 +17,13 @@ const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
 describe('/comments', () => {
-  let server: MongoMemoryServer;
-  let client: MongoClient;
   let userId: string;
   let blogId: string;
   let postId: string;
   let commentId: string;
   let token: string;
   beforeAll(async () => {
-    process.env.NODE_ENV = 'test';
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
-
-    client = new MongoClient(uri);
+    await awaitDb(1000);
     //creating blog
     const blog = await req
       .post(SETTINGS.PATH.BLOGS)
@@ -64,12 +59,6 @@ describe('/comments', () => {
 
   afterAll(async () => {
     await req.delete('/testing/all-data').set('authorization', authData).expect(204);
-    if (client) {
-      await client.close();
-    }
-    if (server) {
-      await server.stop();
-    }
   });
 
   it('should add new comment', async () => {

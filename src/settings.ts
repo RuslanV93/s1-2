@@ -7,6 +7,7 @@ const SETTINGS = {
   WEBSITE_URL: process.env.WEBSITE_VERSEL_URL || 'http://localhost:3003',
   DB_URL: process.env.CLOUD_DB_URL,
   JWT_SECRET: process.env.JWT_SECRET || '123',
+  JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET || 'secret',
   PATH: {
     DEFAULT: '/',
     TESTING: '/testing',

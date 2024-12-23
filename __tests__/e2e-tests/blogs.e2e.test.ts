@@ -6,6 +6,7 @@ import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
 import { BlogViewType } from '../../src/modules/blogs/types/blogsTypes';
 import { Database } from '../../src/db/db';
+import { awaitDb } from '../jest.setup';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
@@ -16,10 +17,7 @@ describe('/blogs', () => {
   let newBlogForTest: any;
   let newBlogForTestId: string;
   beforeAll(async () => {
-    process.env.NODE_ENV = 'test';
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
-    const db = new Database(uri);
+    await awaitDb(1000);
 
     const newBlog = {
       name: 'asd',
@@ -35,10 +33,10 @@ describe('/blogs', () => {
   });
 
   afterAll(async () => {
-    // await req
-    //   .delete('/testing/all-data')
-    //   .set('authorization', authData)
-    //   .expect(STATUSES.NO_CONTENT_204);
+    await req
+      .delete('/testing/all-data')
+      .set('authorization', authData)
+      .expect(STATUSES.NO_CONTENT_204);
   });
   it('should return all blogs', async () => {
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);

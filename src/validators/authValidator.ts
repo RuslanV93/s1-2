@@ -4,8 +4,9 @@ import { STATUSES } from '../common/variables/variables';
 import { authService } from '../modules/auth/services/authService';
 import { usersQueryRepository } from '../modules/users/repositories/usersQueryRepository';
 import { jwtService } from '../common/crypto/jwtService';
+import { UserViewType } from '../modules/users/types/usersTypes';
 
-/// BASIC auth validation
+/** BASIC auth validation */
 export const authValidatorMiddleware = (
   req: Request<{}, {}, {}, { authorization: string }>,
   res: Response,
@@ -27,7 +28,7 @@ export const authValidatorMiddleware = (
   next();
 };
 
-// token auth validation
+/** Token auth validation */
 export const accessTokenValidator = async (
   req: Request,
   res: Response,
@@ -58,4 +59,31 @@ export const accessTokenValidator = async (
     req.user = { id: userId };
     next();
   }
+};
+
+/** Refresh Token validation. Add userId to request object */
+export const refreshTokenValidator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    res.sendStatus(STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+  const payload = await jwtService.getUserByToken(refreshToken);
+  if (!payload) {
+    res.sendStatus(STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+
+  const { userId } = payload;
+  const user: UserViewType | null = await usersQueryRepository.getUserById(userId);
+  if (!user) {
+    res.sendStatus(STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+  req.refreshTokenPayload = payload;
+  next();
 };

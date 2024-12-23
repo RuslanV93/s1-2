@@ -1,17 +1,22 @@
-import { Router } from "express";
+import { Router } from 'express';
 import {
   confirmationCodeValidator,
   inputValidationMiddleware,
   userEmailValidator,
   userLoginValidator,
   userPasswordValidator,
-} from "../../validators/fieldsValidators";
-import { loginUser } from "./handlers/loginUser";
-import { authMe } from "./handlers/authMe";
-import { accessTokenValidator } from "../../validators/authValidator";
-import { userRegistration } from "./handlers/userRegistration";
-import { registrationConfirmation } from "./handlers/registrationConfirmation";
-import { emailResending } from "./handlers/emailResending";
+} from '../../validators/fieldsValidators';
+import { loginUser } from './handlers/loginUser';
+import { authMe } from './handlers/authMe';
+import {
+  accessTokenValidator,
+  refreshTokenValidator,
+} from '../../validators/authValidator';
+import { userRegistration } from './handlers/userRegistration';
+import { registrationConfirmation } from './handlers/registrationConfirmation';
+import { emailResending } from './handlers/emailResending';
+import { refreshToken } from './handlers/refreshToken';
+import { logout } from './handlers/logout';
 export const authRouter = Router();
 
 const authController = {
@@ -20,10 +25,12 @@ const authController = {
   userRegistration,
   registrationConfirmation,
   emailResending,
+  refreshToken,
+  logout,
 };
 
 authRouter.post(
-  "/login",
+  '/login',
   userPasswordValidator,
   userEmailValidator,
   userLoginValidator,
@@ -31,7 +38,13 @@ authRouter.post(
   authController.loginUser,
 );
 authRouter.post(
-  "/registration",
+  '/refresh-token',
+  refreshTokenValidator,
+  authController.refreshToken,
+);
+authRouter.post('/logout', refreshTokenValidator, authController.logout);
+authRouter.post(
+  '/registration',
   userLoginValidator,
   userPasswordValidator,
   userEmailValidator,
@@ -39,15 +52,15 @@ authRouter.post(
   authController.userRegistration,
 );
 authRouter.post(
-  "/registration-confirmation",
+  '/registration-confirmation',
   confirmationCodeValidator,
   inputValidationMiddleware,
   authController.registrationConfirmation,
 );
 authRouter.post(
-  "/registration-email-resending",
+  '/registration-email-resending',
   userEmailValidator,
   inputValidationMiddleware,
   authController.emailResending,
 );
-authRouter.get("/me", accessTokenValidator, authController.authMe);
+authRouter.get('/me', accessTokenValidator, authController.authMe);

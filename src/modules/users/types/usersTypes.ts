@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 
 export type EmailConfirmationType = {
   confirmationCode: string;
@@ -6,7 +6,9 @@ export type EmailConfirmationType = {
   isConfirmed: string;
   emailConfirmationCooldown: Date | null;
 };
-
+export type RefreshTokenInfoType = {
+  tokenVersion: string | null;
+};
 export type UserDbType = {
   _id: ObjectId;
   login: string;
@@ -15,6 +17,7 @@ export type UserDbType = {
   salt: string;
   createdAt: string;
   emailConfirmation: EmailConfirmationType;
+  refreshTokenInfo: RefreshTokenInfoType;
 };
 export type NewUserType = {
   login: string;
@@ -22,6 +25,7 @@ export type NewUserType = {
   passwordHash: string;
   createdAt: string;
   emailConfirmation: EmailConfirmationType;
+  refreshTokenInfo: RefreshTokenInfoType;
 };
 export type UserViewType = {
   id: string;

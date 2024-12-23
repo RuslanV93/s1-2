@@ -1,11 +1,8 @@
-import { Collection, Document, MongoClient } from 'mongodb';
+import { Collection, MongoClient } from 'mongodb';
 import SETTINGS from '../settings';
 import { BLOGGERS_PLATFORM } from '../common/variables/variables';
-
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { BlogDbType } from '../modules/blogs/types/blogsTypes';
-
-/** Database Class */
+/** Database */
 export class Database {
   private client: MongoClient;
   private mongoUrl: string;
@@ -16,7 +13,6 @@ export class Database {
   public async runDb() {
     try {
       await this.client.connect();
-      console.log(this.mongoUrl);
       console.log('Database Connected');
       const adminDb = this.client.db().admin();
       const pingResult = await adminDb.command({ ping: 1 });
@@ -79,6 +75,7 @@ const db = getDbUrl().then((url) => {
   commentsCollection = db.commentsCollection;
   usersCollection = db.usersCollection;
 });
+
 export {
   blogsCollection,
   postsCollection,

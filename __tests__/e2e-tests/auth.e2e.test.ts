@@ -4,14 +4,13 @@ import { MongoClient } from 'mongodb';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
+import { awaitDb } from '../jest.setup';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
 jest.setTimeout(15000);
 describe('/auth', () => {
-  let server: MongoMemoryServer;
-  let client: MongoClient;
   let userData = {
     login: 'lg-772034',
     email: 'lg@lg.com',
@@ -20,10 +19,7 @@ describe('/auth', () => {
   let userToken: string;
 
   beforeAll(async () => {
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
-    client = new MongoClient(uri);
-    await client.connect();
+    await awaitDb(1000);
     // creating new user
     await req
       .post(SETTINGS.PATH.USERS)
@@ -44,13 +40,7 @@ describe('/auth', () => {
   });
 
   afterAll(async () => {
-    // await req.delete('/testing/all-data').set('authorization', authData).expect(204);
-    if (client) {
-      await client.close();
-    }
-    if (server) {
-      await server.stop();
-    }
+    await req.delete('/testing/all-data').set('authorization', authData).expect(204);
   });
 
   it("shouldn't login by correct data. return status 401", async () => {

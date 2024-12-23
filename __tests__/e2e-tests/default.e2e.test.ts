@@ -4,12 +4,13 @@ import { app } from '../../src/app';
 import { STATUSES } from '../../src/common/variables/variables';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Database } from '../../src/db/db';
+import { awaitDb } from '../jest.setup';
 
 export const req = agent(app);
 
 describe('/', () => {
   beforeAll(async () => {
-    process.env.NODE_ENV = 'test';
+    await awaitDb(1000);
   });
   afterAll((done) => {
     done();

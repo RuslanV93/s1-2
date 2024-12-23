@@ -5,6 +5,7 @@ import { STATUSES } from '../../src/common/variables/variables';
 import { MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { PostViewType } from '../../src/modules/posts/types/postsTypes';
+import { awaitDb } from '../jest.setup';
 
 let postId: string;
 let blogId: string;
@@ -13,14 +14,8 @@ const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 jest.setTimeout(50000);
 describe('/posts', () => {
-  let server: MongoMemoryServer;
-  let client: MongoClient;
   beforeAll(async () => {
-    process.env.NODE_ENV = 'test';
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
-    client = new MongoClient(uri);
-    await client.connect();
+    await awaitDb(1000);
     await req
       .post(SETTINGS.PATH.BLOGS)
       .set('authorization', authData)
@@ -47,13 +42,7 @@ describe('/posts', () => {
     postId = resPost.body.items[0].id;
   });
   afterAll(async () => {
-    // await req.delete('/testing/all-data').set('authorization', authData).expect(204);
-    if (server) {
-      await server.stop();
-    }
-    if (client) {
-      await client.close();
-    }
+    await req.delete('/testing/all-data').set('authorization', authData).expect(204);
   });
 
   it('should get all posts', async () => {

@@ -5,6 +5,7 @@ import { MongoClient } from 'mongodb';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
 import { UserViewType } from '../../src/modules/users/types/usersTypes';
+import { awaitDb } from '../jest.setup';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
@@ -12,15 +13,9 @@ const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 jest.setTimeout(50000);
 
 describe('/users', () => {
-  let server: MongoMemoryServer;
-  let client: MongoClient;
   let userId: string;
   beforeAll(async () => {
-    process.env.NODE_ENV = 'test';
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
-    client = new MongoClient(uri);
-    await client.connect();
+    await awaitDb(1000);
     await req
       .post(SETTINGS.PATH.USERS)
       .set('authorization', authData)
@@ -39,12 +34,6 @@ describe('/users', () => {
   });
   afterAll(async () => {
     await req.delete('/testing/all-data').set('authorization', authData).expect(204);
-    if (server) {
-      await server.stop();
-    }
-    if (client) {
-      await client.close();
-    }
   });
 
   it('should get all users', async () => {

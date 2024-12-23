@@ -5,4 +5,5 @@ module.exports = {
     '^.+.tsx?$': ['ts-jest', {}],
   },
   testMatch: ['**/*.e2e.test.ts', '**/*.integration.test.ts'],
+  setupFiles: ['./__tests__/jest.setup.ts'],
 };

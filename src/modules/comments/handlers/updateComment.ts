@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
-import { commentsService } from "../services/commentsService";
-import { DomainStatusCode } from "../../../common/types/types";
-import { resultCodeToHttpFunction } from "../../../common/helpers/resultCodeToHttpFunction";
-import { STATUSES } from "../../../common/variables/variables";
+import { Request, Response } from 'express';
+import { commentsService } from '../services/commentsService';
+import { DomainStatusCode } from '../../../common/types/types';
+import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHttpFunction';
+import { STATUSES } from '../../../common/variables/variables';
 
 export const updateComment = async (req: Request, res: Response) => {
   const userId: string = req.user.id;
@@ -17,7 +17,7 @@ export const updateComment = async (req: Request, res: Response) => {
   if (updateCommentResult.status !== DomainStatusCode.Success) {
     res
       .status(resultCodeToHttpFunction(updateCommentResult.status))
-      .send(updateCommentResult.extensions);
+      .send({ errorsMessages: updateCommentResult.extensions });
     return;
   }
   res.sendStatus(STATUSES.NO_CONTENT_204);

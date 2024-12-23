@@ -6,6 +6,8 @@ import { DomainStatusCode } from '../../src/common/types/types';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
 import { authRepository } from '../../src/modules/auth/repositories/authRepository';
+import { awaitDb } from '../jest.setup';
+import { req } from '../e2e-tests/default.e2e.test';
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
@@ -21,20 +23,12 @@ describe('/auth', () => {
         return Promise.resolve({ success: true, info: info.response });
       },
     );
-  let server: MongoMemoryServer;
-  let client: MongoClient;
 
   beforeAll(async () => {
-    process.env.NODE_ENV = 'test';
-    server = await MongoMemoryServer.create();
-    const uri = server.getUri();
-    client = new MongoClient(uri);
-    await client.connect();
+    await awaitDb(1000);
   });
   afterAll(async () => {
-    // await req.delete('/testing/all-data').set('authorization', authData).expect(204);
-    await server.stop();
-    await client.close();
+    await req.delete('/testing/all-data').set('authorization', authData).expect(204);
   });
   it('should register user by correct data', async () => {
     const { login, email, password } = newTestUserForSelfRegistration;

@@ -73,6 +73,9 @@ export const authService = {
         isConfirmed: 'unconfirmed',
         emailConfirmationCooldown: null,
       },
+      refreshTokenInfo: {
+        tokenVersion: null,
+      },
     };
     const result = await usersRepository.addNewUser(newRegisteredUser);
     if (!result) {
@@ -181,6 +184,55 @@ export const authService = {
       userWithUpdatedEmailConfirmationFields.emailConfirmation.confirmationCode,
     );
     if (!emailSendResult.success) {
+      return {
+        status: DomainStatusCode.InternalServerError,
+        data: null,
+        extensions: [{ message: 'Internal Server Error' }],
+      };
+    }
+    return {
+      status: DomainStatusCode.Success,
+      data: null,
+      extensions: [],
+    };
+  },
+
+  /** Getting users refresh token from DB. Verifying by token version. */
+  async verifyRefreshTokenVersion(userId: string, tokenVersion: number) {
+    const userRefreshTokenVersion =
+      await authRepository.getUsersRefreshTokenVersion(userId);
+    if (userRefreshTokenVersion === undefined) {
+      return {
+        status: DomainStatusCode.InternalServerError,
+        data: null,
+        extensions: [{ message: 'User not found. Something went wrong' }],
+      };
+    }
+    if (
+      userRefreshTokenVersion === null ||
+      userRefreshTokenVersion !== tokenVersion.toString()
+    ) {
+      return {
+        status: DomainStatusCode.Unauthorized,
+        data: null,
+        extensions: [
+          { message: 'Token not exists or expired.', field: 'refreshToken' },
+        ],
+      };
+    }
+    return {
+      status: DomainStatusCode.Success,
+      data: null,
+      extensions: [],
+    };
+  },
+  /** Updating refresh token fields. At the time update version. IF might be more */
+  async updateRefreshToken(userId: string, tokenVersion: string | null) {
+    const updateRefreshToken = await authRepository.updateRefreshToken(
+      userId,
+      tokenVersion,
+    );
+    if (!updateRefreshToken) {
       return {
         status: DomainStatusCode.InternalServerError,
         data: null,

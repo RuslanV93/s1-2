@@ -1,10 +1,10 @@
-import { usersCollection } from "../../../db/db";
-import { UserDbType } from "../../users/types/usersTypes";
-import { Document, WithId } from "mongodb";
-
+import { usersCollection } from '../../../db/db';
+import { UserDbType } from '../../users/types/usersTypes';
+import { Document, ObjectId, WithId } from 'mongodb';
+/** Create search filter function */
 const createFilter = (enteredField: string) => {
   const filter: any = {};
-  if (enteredField.includes("@")) {
+  if (enteredField.includes('@')) {
     filter.email = enteredField;
   } else {
     filter.login = enteredField;
@@ -12,6 +12,7 @@ const createFilter = (enteredField: string) => {
   return filter;
 };
 export const authRepository = {
+  /** Getting password hash from database. */
   async getHash(loginField: string): Promise<UserDbType | null> {
     const filter = createFilter(loginField);
     const [user]: Array<UserDbType> = await usersCollection
@@ -25,7 +26,7 @@ export const authRepository = {
   },
   async findUserByConfirmCode(confirmCode: string) {
     const user = await usersCollection.findOne({
-      "emailConfirmation.confirmationCode": confirmCode,
+      'emailConfirmation.confirmationCode': confirmCode,
     });
 
     if (!user) {
@@ -33,17 +34,19 @@ export const authRepository = {
     }
     return user;
   },
+
+  /** Registration confirm. Finding EmailConfirmation fields and update confirmation. */
   async registrationConfirm(
     confirmCode: string,
   ): Promise<WithId<UserDbType> | null> {
     const confirmResult = await usersCollection.findOneAndUpdate(
       {
-        "emailConfirmation.confirmationCode": confirmCode,
+        'emailConfirmation.confirmationCode': confirmCode,
       },
       {
-        $set: { "emailConfirmation.isConfirmed": "confirmed" },
+        $set: { 'emailConfirmation.isConfirmed': 'confirmed' },
       },
-      { returnDocument: "after" },
+      { returnDocument: 'after' },
     );
 
     if (!confirmResult) {
@@ -53,7 +56,7 @@ export const authRepository = {
     return confirmResult as UserDbType;
   },
 
-  // find user by email
+  /** Find user by users email */
   async findUser(email: string) {
     const user: UserDbType | null = await usersCollection.findOne<UserDbType>({
       email: email,
@@ -64,7 +67,7 @@ export const authRepository = {
     return user;
   },
 
-  /** Updating some email confirm fields. Update confirm code and expiration date */
+  /** Updating email confirm fields. Update confirm code and expiration date */
   async emailConfirmationResendUpdate(
     email: string,
     newExpirationDate: Date,
@@ -74,15 +77,42 @@ export const authRepository = {
       { email: email },
       {
         $set: {
-          "emailConfirmation.expirationDate": newExpirationDate,
-          "emailConfirmation.confirmationCode": newConfirmationCode,
+          'emailConfirmation.expirationDate': newExpirationDate,
+          'emailConfirmation.confirmationCode': newConfirmationCode,
         },
       },
-      { returnDocument: "after" },
+      { returnDocument: 'after' },
     );
     if (!updatedUser) {
       return null;
     }
     return updatedUser as UserDbType;
+  },
+
+  /** Update refresh token in database */
+  async updateRefreshToken(userId: string, tokenVersion: string | null) {
+    const result = await usersCollection.findOneAndUpdate(
+      {
+        _id: new ObjectId(userId),
+      },
+      { $set: { 'refreshTokenInfo.tokenVersion': tokenVersion } },
+      { returnDocument: 'after' },
+    );
+    if (!result?.refreshTokenInfo.tokenVersion) {
+      return null;
+    }
+    return result;
+  },
+
+  async getUsersRefreshTokenVersion(userId: string) {
+    const user: UserDbType | null = await usersCollection.findOne<UserDbType>({
+      _id: new ObjectId(userId),
+    });
+    if (!user) {
+      return undefined;
+    } else if (!user.refreshTokenInfo.tokenVersion) {
+      return null;
+    }
+    return user.refreshTokenInfo.tokenVersion;
   },
 };

@@ -1,12 +1,12 @@
 import { describe } from 'node:test';
 import { req } from './default.e2e.test';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { MongoClient } from 'mongodb';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
 import { UserViewType } from '../../src/modules/users/types/usersTypes';
-import { awaitDb } from '../jest.setup';
+import { runDb, stopDb } from '../../src/db/db';
 
+//@ts-ignore
+const uri: string = SETTINGS.LOCAL_DB_URL;
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
@@ -15,7 +15,7 @@ jest.setTimeout(50000);
 describe('/users', () => {
   let userId: string;
   beforeAll(async () => {
-    await awaitDb(1000);
+    await runDb(uri);
     await req
       .post(SETTINGS.PATH.USERS)
       .set('authorization', authData)
@@ -34,6 +34,7 @@ describe('/users', () => {
   });
   afterAll(async () => {
     await req.delete('/testing/all-data').set('authorization', authData).expect(204);
+    await stopDb();
   });
 
   it('should get all users', async () => {

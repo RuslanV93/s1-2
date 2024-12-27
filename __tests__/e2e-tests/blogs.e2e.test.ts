@@ -1,24 +1,22 @@
 import { describe } from 'node:test';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { MongoClient } from 'mongodb';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
 import { BlogViewType } from '../../src/modules/blogs/types/blogsTypes';
-import { Database } from '../../src/db/db';
-import { awaitDb } from '../jest.setup';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { runDb, stopDb } from '../../src/db/db';
 
+//@ts-ignore
+const uri: string = SETTINGS.LOCAL_DB_URL;
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
-jest.setTimeout(100000);
+jest.setTimeout(10000);
 describe('/blogs', () => {
   let server: MongoMemoryServer;
-  let client: MongoClient;
   let newBlogForTest: any;
   let newBlogForTestId: string;
   beforeAll(async () => {
-    await awaitDb(1000);
-
+    await runDb(uri);
     const newBlog = {
       name: 'asd',
       description: 'asd',
@@ -37,6 +35,7 @@ describe('/blogs', () => {
       .delete('/testing/all-data')
       .set('authorization', authData)
       .expect(STATUSES.NO_CONTENT_204);
+    await stopDb();
   });
   it('should return all blogs', async () => {
     const res = await req.get(SETTINGS.PATH.BLOGS).expect(STATUSES.OK_200);

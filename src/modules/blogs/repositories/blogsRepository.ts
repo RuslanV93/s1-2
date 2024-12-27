@@ -1,6 +1,6 @@
-import { blogsCollection } from '../../../db/db';
 import { ObjectId } from 'mongodb';
 import { BlogDbType, BlogForUpdateType, NewBlogType } from '../types/blogsTypes';
+import { blogsCollection } from '../../../db/db';
 
 export const blogsRepository = {
   async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
@@ -14,7 +14,7 @@ export const blogsRepository = {
   },
 
   async addNewBlog(newBlog: NewBlogType): Promise<string | null> {
-    const result = await blogsCollection.insertOne(newBlog);
+    const result = await blogsCollection.insertOne(newBlog as BlogDbType);
     if (result.insertedId) {
       return result.insertedId.toString();
     }
@@ -22,7 +22,9 @@ export const blogsRepository = {
   },
 
   async deleteBlogById(id: ObjectId): Promise<boolean> {
-    const result = await blogsCollection.deleteOne({ _id: id });
+    const result = await blogsCollection.deleteOne({
+      _id: id,
+    });
     return result.deletedCount === 1;
   },
 

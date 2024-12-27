@@ -1,6 +1,4 @@
 import { describe } from 'node:test';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { MongoClient } from 'mongodb';
 import SETTINGS from '../../src/settings';
 import { req } from './default.e2e.test';
 import {
@@ -9,21 +7,24 @@ import {
   newTestUserForAdminRegistration,
 } from '../testData/data';
 import { STATUSES } from '../../src/common/variables/variables';
-import { awaitDb } from '../jest.setup';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { runDb, stopDb } from '../../src/db/db';
 
-jest.setTimeout(15000);
+//@ts-ignore
+const uri: string = SETTINGS.LOCAL_DB_URL;
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
 describe('/comments', () => {
+  let server: MongoMemoryServer;
   let userId: string;
   let blogId: string;
   let postId: string;
   let commentId: string;
   let token: string;
   beforeAll(async () => {
-    await awaitDb(1000);
+    await runDb(uri);
     //creating blog
     const blog = await req
       .post(SETTINGS.PATH.BLOGS)
@@ -59,6 +60,7 @@ describe('/comments', () => {
 
   afterAll(async () => {
     await req.delete('/testing/all-data').set('authorization', authData).expect(204);
+    await stopDb();
   });
 
   it('should add new comment', async () => {

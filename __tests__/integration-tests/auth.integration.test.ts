@@ -4,9 +4,13 @@ import { newTestUserForSelfRegistration } from '../testData/data';
 import { authService } from '../../src/modules/auth/services/authService';
 import { DomainStatusCode } from '../../src/common/types/types';
 import { authRepository } from '../../src/modules/auth/repositories/authRepository';
-import { awaitDb } from '../jest.setup';
 import { req } from '../e2e-tests/default.e2e.test';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { runDb, stopDb } from '../../src/db/db';
+import SETTINGS from '../../src/settings';
 
+//@ts-ignore
+const uri: string = SETTINGS.LOCAL_DB_URL;
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
@@ -21,12 +25,13 @@ describe('/auth', () => {
         return Promise.resolve({ success: true, info: info.response });
       },
     );
-
+  let server: MongoMemoryServer;
   beforeAll(async () => {
-    await awaitDb(1000);
+    await runDb(uri);
   });
   afterAll(async () => {
     await req.delete('/testing/all-data').set('authorization', authData).expect(204);
+    await stopDb();
   });
   it('should register user by correct data', async () => {
     const { login, email, password } = newTestUserForSelfRegistration;

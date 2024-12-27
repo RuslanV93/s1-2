@@ -1,8 +1,8 @@
-import { postsCollection } from '../../../db/db';
 import { PostRequestTypeQuery } from '../types/postsRequestResponseTypes';
 import { ObjectId, WithId } from 'mongodb';
 import { postsMappers } from '../features/postsViewModelMapper';
 import { AllPostsViewType, PostDbType, PostViewType } from '../types/postsTypes';
+import { postsCollection } from '../../../db/db';
 
 // search filter create function **********
 
@@ -47,13 +47,17 @@ export const postsQueryRepository = {
     blogId?: string,
   ): Promise<AllPostsViewType> {
     const postsTotalCount = blogId
-      ? await this.getPostsTotalCount(paginationAndSearchParams, new ObjectId(blogId))
+      ? await this.getPostsTotalCount(
+          paginationAndSearchParams,
+          new ObjectId(blogId),
+        )
       : await this.getPostsTotalCount(paginationAndSearchParams);
 
     const filter = blogId
       ? createFilter(paginationAndSearchParams, new ObjectId(blogId))
       : createFilter(paginationAndSearchParams);
-    const { pageNumber, pageSize, sortBy, sortDirection } = paginationAndSearchParams;
+    const { pageNumber, pageSize, sortBy, sortDirection } =
+      paginationAndSearchParams;
     const dbPosts: Array<WithId<PostDbType>> = await postsCollection
       .find<PostDbType>(filter)
       .skip(pageSize * (pageNumber - 1))

@@ -2,20 +2,22 @@ import { describe } from 'node:test';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
-import { MongoClient } from 'mongodb';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { PostViewType } from '../../src/modules/posts/types/postsTypes';
-import { awaitDb } from '../jest.setup';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { runDb, stopDb } from '../../src/db/db';
 
 let postId: string;
 let blogId: string;
+//@ts-ignore
+const uri: string = SETTINGS.LOCAL_DB_URL;
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 jest.setTimeout(50000);
 describe('/posts', () => {
+  let server: MongoMemoryServer;
   beforeAll(async () => {
-    await awaitDb(1000);
+    await runDb(uri);
     await req
       .post(SETTINGS.PATH.BLOGS)
       .set('authorization', authData)
@@ -43,6 +45,7 @@ describe('/posts', () => {
   });
   afterAll(async () => {
     await req.delete('/testing/all-data').set('authorization', authData).expect(204);
+    await stopDb();
   });
 
   it('should get all posts', async () => {

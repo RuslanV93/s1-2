@@ -1,9 +1,9 @@
-import { usersCollection } from "../../../db/db";
-import { UsersSearchAndPaginationType } from "../types/usersRequestResponseTypes";
-import { usersMappers } from "../features/usersMappers";
-import { AllUsersViewType, UserDbType, UserViewType } from "../types/usersTypes";
-import { ObjectId } from "mongodb";
-import { AuthMeViewType } from "../../auth/types/authTypes";
+import { UsersSearchAndPaginationType } from '../types/usersRequestResponseTypes';
+import { usersMappers } from '../features/usersMappers';
+import { AllUsersViewType, UserDbType, UserViewType } from '../types/usersTypes';
+import { ObjectId } from 'mongodb';
+import { AuthMeViewType } from '../../auth/types/authTypes';
+import { usersCollection } from '../../../db/db';
 
 // creating filter for search
 const createFilter = (searchAndPaginationParams: UsersSearchAndPaginationType) => {
@@ -12,10 +12,10 @@ const createFilter = (searchAndPaginationParams: UsersSearchAndPaginationType) =
   if (searchLoginTerm || searchEmailTerm) {
     filter.$or = [];
     if (searchLoginTerm) {
-      filter.$or.push({ login: { $regex: searchLoginTerm, $options: "i" } });
+      filter.$or.push({ login: { $regex: searchLoginTerm, $options: 'i' } });
     }
     if (searchEmailTerm) {
-      filter.$or.push({ email: { $regex: searchEmailTerm, $options: "i" } });
+      filter.$or.push({ email: { $regex: searchEmailTerm, $options: 'i' } });
     }
   }
   return filter;
@@ -63,7 +63,7 @@ export const usersQueryRepository = {
       searchAndPaginationParams;
     const dbUsers = await usersCollection
       .find<UserDbType>(filter)
-      .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 })
+      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
       .skip(pageSize * (pageNumber - 1))
       .limit(pageSize)
       .toArray();

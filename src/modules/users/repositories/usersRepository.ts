@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
-import { usersCollection } from '../../../db/db';
 import { NewUserType, UserDbType } from '../types/usersTypes';
+import { usersCollection } from '../../../db/db';
 
 const createFilter = (email: string, login: string) => {
   const filter: any = {};
@@ -17,8 +17,12 @@ const createFilter = (email: string, login: string) => {
 };
 export const usersRepository = {
   async isLoginOrEmailTaken(email: string, login: string) {
-    const loginCount = await usersCollection.countDocuments({ login: login });
-    const emailCount = await usersCollection.countDocuments({ email: email });
+    const loginCount = await usersCollection.countDocuments({
+      login: login,
+    });
+    const emailCount = await usersCollection.countDocuments({
+      email: email,
+    });
     return { loginCount, emailCount };
   },
   // getting existing user
@@ -44,7 +48,9 @@ export const usersRepository = {
 
   //delete existing user by id
   async deleteUser(id: ObjectId): Promise<boolean> {
-    const deleteResult = await usersCollection.deleteOne({ _id: id });
+    const deleteResult = await usersCollection.deleteOne({
+      _id: id,
+    });
     return deleteResult.deletedCount === 1;
   },
 };

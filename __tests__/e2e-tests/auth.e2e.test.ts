@@ -1,16 +1,19 @@
 import { describe } from 'node:test';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { MongoClient } from 'mongodb';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
-import { awaitDb } from '../jest.setup';
+import { runDb, stopDb } from '../../src/db/db';
+
+//@ts-ignore
+const uri: string = SETTINGS.LOCAL_DB_URL;
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
-jest.setTimeout(15000);
+jest.setTimeout(10000);
 describe('/auth', () => {
+  let server: MongoMemoryServer;
   let userData = {
     login: 'lg-772034',
     email: 'lg@lg.com',
@@ -19,8 +22,8 @@ describe('/auth', () => {
   let userToken: string;
 
   beforeAll(async () => {
-    await awaitDb(1000);
-    // creating new user
+    await runDb(uri);
+
     await req
       .post(SETTINGS.PATH.USERS)
       .set('authorization', authData)
@@ -41,6 +44,7 @@ describe('/auth', () => {
 
   afterAll(async () => {
     await req.delete('/testing/all-data').set('authorization', authData).expect(204);
+    await stopDb();
   });
 
   it("shouldn't login by correct data. return status 401", async () => {

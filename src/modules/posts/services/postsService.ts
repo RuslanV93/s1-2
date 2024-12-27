@@ -1,7 +1,6 @@
 import { postsRepository } from '../repositories/postsRepository';
-
 import { PostRequestTypeWithBody } from '../types/postsRequestResponseTypes';
-import { ObjectId, WithId } from 'mongodb';
+import { ObjectId } from 'mongodb';
 import { NewPostType, PostForUpdateType, PostViewType } from '../types/postsTypes';
 import { PostByBlogRequestTypeBody } from '../../blogs/types/blogsRequestResponseTypes';
 import { BlogDbType } from '../../blogs/types/blogsTypes';

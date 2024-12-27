@@ -1,8 +1,8 @@
 import { BlogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
-import { blogsCollection } from '../../../db/db';
 import { ObjectId } from 'mongodb';
 import { blogsMappers } from '../features/blogsViewModelMapper';
 import { AllBlogsViewType, BlogDbType, BlogViewType } from '../types/blogsTypes';
+import { blogsCollection } from '../../../db/db';
 
 const createFilter = (paginationAndSearchParams: any, blogId?: ObjectId) => {
   const filter: any = {};

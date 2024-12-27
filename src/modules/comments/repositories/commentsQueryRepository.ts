@@ -1,5 +1,4 @@
 import { CommentsRequestWithQueryType } from '../types/commentsResponseRequestTypes';
-import { commentsCollection } from '../../../db/db';
 import { commentsMappers } from '../features/commentsMappers';
 import {
   AllCommentsViewType,
@@ -7,6 +6,7 @@ import {
   CommentViewType,
 } from '../types/commentsTypes';
 import { ObjectId } from 'mongodb';
+import { commentsCollection } from '../../../db/db';
 
 const createFilter = (params: CommentsRequestWithQueryType) => {
   const filter: any = {};
@@ -29,7 +29,8 @@ export const commentsQueryRepository = {
     const filter = createFilter(paginationAndSearchParams);
 
     const totalCount = await this.getCommentsTotalCount(paginationAndSearchParams);
-    const { pageNumber, pageSize, sortBy, sortDirection } = paginationAndSearchParams;
+    const { pageNumber, pageSize, sortBy, sortDirection } =
+      paginationAndSearchParams;
     const dbComments = await commentsCollection
       .find<CommentDbType>(filter)
       .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })

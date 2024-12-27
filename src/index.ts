@@ -1,13 +1,11 @@
 import { app } from './app';
 import SETTINGS from './settings';
-import { Database } from './db/db';
-// import { runDB } from './db/db';
+import { runDb } from './db/db';
 const PORT = SETTINGS.PORT;
-
-const indexDb = new Database(SETTINGS.DB_URL || 'mongodb://0.0.0.0:27017');
+//@ts-ignore
+const url: string = SETTINGS.DB_URL;
 
 app.listen(PORT, async () => {
-  await indexDb.runDb();
-  // await runDB();
+  await runDb(url);
   console.log(`Server started at ${PORT} port`);
 });

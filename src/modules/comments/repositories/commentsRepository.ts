@@ -1,11 +1,13 @@
-import { commentsCollection, postsCollection } from '../../../db/db';
 import { ObjectId } from 'mongodb';
 import { CommentDbType, NewCommentType } from '../types/commentsTypes';
+import { commentsCollection, postsCollection } from '../../../db/db';
 
 export const commentsRepository = {
   // finding existing post
   async findPost(postId: string): Promise<ObjectId | null> {
-    const [post] = await postsCollection.find({ _id: new ObjectId(postId) }).toArray();
+    const [post] = await postsCollection
+      .find({ _id: new ObjectId(postId) })
+      .toArray();
     return post ? post._id : null;
   },
 

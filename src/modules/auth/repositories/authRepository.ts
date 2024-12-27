@@ -1,6 +1,6 @@
-import { usersCollection } from '../../../db/db';
 import { UserDbType } from '../../users/types/usersTypes';
-import { Document, ObjectId, WithId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
+import { usersCollection } from '../../../db/db';
 /** Create search filter function */
 const createFilter = (enteredField: string) => {
   const filter: any = {};

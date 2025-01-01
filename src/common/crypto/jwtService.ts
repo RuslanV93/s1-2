@@ -11,19 +11,14 @@ export const jwtService = {
   },
 
   /** Creating JWT token for refresh tokens. Giving back new refresh token and token version */
-  async refreshJWT(
-    userId: string,
-  ): Promise<{ refreshToken: string; tokenVersion: string }> {
-    const refreshToken: string = jwt.sign(
-      { userId: userId },
+  async createRefreshJWT(userId: string, deviceId: string): Promise<string> {
+    return jwt.sign(
+      { userId: userId, deviceId: deviceId },
       settings.JWT_REFRESH_SECRET,
       {
         expiresIn: '20s',
       },
     );
-    const decoded = jwt.decode(refreshToken);
-    const tokenVersion: string = decoded.exp.toString();
-    return { refreshToken, tokenVersion };
   },
 
   /** getting user id by token from request headers */
@@ -34,7 +29,7 @@ export const jwtService = {
       return null;
     }
   },
-  async getUserByRefreshToken(refreshToken: string) {
+  async getRefreshTokenPayload(refreshToken: string) {
     try {
       return jwt.verify(refreshToken, settings.JWT_REFRESH_SECRET);
     } catch (error) {

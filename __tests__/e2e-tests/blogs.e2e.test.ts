@@ -3,7 +3,6 @@ import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
 import { BlogViewType } from '../../src/modules/blogs/types/blogsTypes';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { runDb, stopDb } from '../../src/db/db';
 
 //@ts-ignore
@@ -12,7 +11,6 @@ const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 jest.setTimeout(10000);
 describe('/blogs', () => {
-  let server: MongoMemoryServer;
   let newBlogForTest: any;
   let newBlogForTestId: string;
   beforeAll(async () => {

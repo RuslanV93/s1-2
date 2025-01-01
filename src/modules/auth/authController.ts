@@ -17,6 +17,7 @@ import { registrationConfirmation } from './handlers/registrationConfirmation';
 import { emailResending } from './handlers/emailResending';
 import { refreshToken } from './handlers/refreshToken';
 import { logout } from './handlers/logout';
+import { requestControl } from '../../validators/requestControl';
 export const authRouter = Router();
 
 const authController = {
@@ -31,6 +32,7 @@ const authController = {
 
 authRouter.post(
   '/login',
+  requestControl,
   userPasswordValidator,
   userEmailValidator,
   userLoginValidator,
@@ -45,6 +47,7 @@ authRouter.post(
 authRouter.post('/logout', refreshTokenValidator, authController.logout);
 authRouter.post(
   '/registration',
+  requestControl,
   userLoginValidator,
   userPasswordValidator,
   userEmailValidator,
@@ -53,12 +56,14 @@ authRouter.post(
 );
 authRouter.post(
   '/registration-confirmation',
+  requestControl,
   confirmationCodeValidator,
   inputValidationMiddleware,
   authController.registrationConfirmation,
 );
 authRouter.post(
   '/registration-email-resending',
+  requestControl,
   userEmailValidator,
   inputValidationMiddleware,
   authController.emailResending,

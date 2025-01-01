@@ -1,5 +1,4 @@
 import { describe } from 'node:test';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
@@ -13,7 +12,6 @@ const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
 jest.setTimeout(10000);
 describe('/auth', () => {
-  let server: MongoMemoryServer;
   let userData = {
     login: 'lg-772034',
     email: 'lg@lg.com',

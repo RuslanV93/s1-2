@@ -1,11 +1,8 @@
 import { usersRepository } from '../repositories/usersRepository';
-import { UserRequestTypeWithBody } from '../types/usersRequestResponseTypes';
-import { Request } from 'express';
 import { ObjectId } from 'mongodb';
 import { NewUserType } from '../types/usersTypes';
 import { genHashFunction } from '../../../common/crypto/getHash';
 import { randomUUID } from 'node:crypto';
-import { add } from 'date-fns/add';
 
 export const usersService = {
   // add new user to DB and return
@@ -50,9 +47,6 @@ export const usersService = {
         expirationDate: null,
         isConfirmed: 'confirmed',
         emailConfirmationCooldown: null,
-      },
-      refreshTokenInfo: {
-        tokenVersion: null,
       },
     };
     const newUserId: string | null = await usersRepository.addNewUser(newUser);

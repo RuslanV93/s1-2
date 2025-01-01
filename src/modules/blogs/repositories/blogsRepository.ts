@@ -14,7 +14,7 @@ export const blogsRepository = {
   },
 
   async addNewBlog(newBlog: NewBlogType): Promise<string | null> {
-    const result = await blogsCollection.insertOne(newBlog as BlogDbType);
+    const result = await blogsCollection.insertOne(newBlog);
     if (result.insertedId) {
       return result.insertedId.toString();
     }

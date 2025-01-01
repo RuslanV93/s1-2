@@ -3,7 +3,7 @@ import { DomainStatusCode } from '../../src/common/types/types';
 import { authService } from '../../src/modules/auth/services/authService';
 
 describe('/auth', () => {
-  authRepository.updateRefreshToken = jest
+  authRepository.updateDeviceSession = jest
     .fn()
     .mockImplementation((userId, refreshToken) => {
       return Promise.resolve({
@@ -19,6 +19,6 @@ describe('/auth', () => {
       data: {},
       extensions: [],
     });
-    expect(authRepository.updateRefreshToken).toBeCalledTimes(1);
+    expect(authRepository.updateDeviceSession).toBeCalledTimes(1);
   });
 });

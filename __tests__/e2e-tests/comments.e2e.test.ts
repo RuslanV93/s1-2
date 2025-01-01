@@ -7,7 +7,6 @@ import {
   newTestUserForAdminRegistration,
 } from '../testData/data';
 import { STATUSES } from '../../src/common/variables/variables';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { runDb, stopDb } from '../../src/db/db';
 
 //@ts-ignore
@@ -17,7 +16,6 @@ const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
 describe('/comments', () => {
-  let server: MongoMemoryServer;
   let userId: string;
   let blogId: string;
   let postId: string;

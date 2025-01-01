@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongodb';
+
 export enum DomainStatusCode {
   Success = 0,
   NotFound = 1,

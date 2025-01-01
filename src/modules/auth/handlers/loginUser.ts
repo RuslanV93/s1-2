@@ -1,39 +1,35 @@
 import { Request, Response } from 'express';
 import { AuthRequestTypeWithBody } from '../types/authRequestResponseTypes';
 import { authService } from '../services/authService';
-import { STATUSES } from '../../../common/variables/variables';
-import { jwtService } from '../../../common/crypto/jwtService';
+import { DomainStatusCode, ResultObject } from '../../../common/types/types';
 import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHttpFunction';
-import { DomainStatusCode } from '../../../common/types/types';
+import { STATUSES } from '../../../common/variables/variables';
 
+function isSuccess(result: ResultObject<any>): result is ResultObject<string> {
+  return result.status === DomainStatusCode.Success && result.data !== null;
+}
 /** User login. Giving access token and refresh token */
 export const loginUser = async (
   req: Request<AuthRequestTypeWithBody>,
   res: Response,
 ) => {
-  try {
-    const user = await authService.loginUser(
-      req.body.loginOrEmail,
-      req.body.password,
-    );
-    const token = await jwtService.createJWT(user._id.toString());
-    const { refreshToken, tokenVersion } = await jwtService.refreshJWT(
-      user._id.toString(),
-    );
-    const refreshTokenUpdateResult = await authService.updateRefreshToken(
-      user._id.toString(),
-      tokenVersion,
-    );
-    if (refreshTokenUpdateResult.status !== DomainStatusCode.Success) {
-      res
-        .status(resultCodeToHttpFunction(refreshTokenUpdateResult.status))
-        .send({ errorsMessages: refreshTokenUpdateResult.extensions });
-    }
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
-    res.status(STATUSES.OK_200).send({ accessToken: token });
-    return;
-  } catch (error: any) {
-    res.status(STATUSES.UNAUTHORIZED_401).send(error.errorsMessages);
+  const title = `Platform: ${req.useragent?.platform}, Browser: ${req.useragent?.browser}`;
+  const ip = Array.isArray(req.headers['x-forwarded-for'])
+    ? req.headers['x-forwarded-for'][0]
+    : req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'HELLO';
+  const loginResult = await authService.loginUser(
+    req.body.loginOrEmail,
+    req.body.password,
+    ip,
+    title,
+  );
+  if (!isSuccess(loginResult)) {
+    res
+      .status(resultCodeToHttpFunction(loginResult.status))
+      .send({ errorsMessages: loginResult.extensions });
     return;
   }
+  const [accessToken, refreshToken] = loginResult.data;
+  res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+  res.status(STATUSES.OK_200).send({ accessToken: accessToken });
 };

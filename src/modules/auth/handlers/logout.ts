@@ -5,20 +5,25 @@ import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHt
 import { STATUSES } from '../../../common/variables/variables';
 
 export const logout = async (req: Request, res: Response) => {
-  const { userId, exp } = req.refreshTokenPayload;
-  const verifyTokenResult = await authService.verifyRefreshTokenVersion(userId, exp);
+  const { userId, deviceId, exp } = req.refreshTokenPayload;
+
+  const verifyTokenResult = await authService.verifyRefreshTokenVersion(
+    deviceId,
+    exp,
+  );
   if (verifyTokenResult.status !== DomainStatusCode.Success) {
     res
       .status(resultCodeToHttpFunction(verifyTokenResult.status))
       .send({ errorsMessages: verifyTokenResult.extensions });
     return;
   }
-  const logoutResult = await authService.updateRefreshToken(userId, null);
+  const logoutResult = await authService.logout(deviceId);
   if (logoutResult.status !== DomainStatusCode.Success) {
     res
       .status(resultCodeToHttpFunction(logoutResult.status))
       .send({ errorsMessages: logoutResult.extensions });
     return;
   }
+  res.clearCookie('refreshToken');
   res.sendStatus(STATUSES.NO_CONTENT_204);
 };

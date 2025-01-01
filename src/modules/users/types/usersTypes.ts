@@ -17,7 +17,6 @@ export type UserDbType = {
   salt: string;
   createdAt: string;
   emailConfirmation: EmailConfirmationType;
-  refreshTokenInfo: RefreshTokenInfoType;
 };
 export type NewUserType = {
   login: string;
@@ -25,7 +24,6 @@ export type NewUserType = {
   passwordHash: string;
   createdAt: string;
   emailConfirmation: EmailConfirmationType;
-  refreshTokenInfo: RefreshTokenInfoType;
 };
 export type UserViewType = {
   id: string;

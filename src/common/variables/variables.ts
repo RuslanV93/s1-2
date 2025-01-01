@@ -3,6 +3,7 @@ export const STATUSES = {
   UNAUTHORIZED_401: 401,
   FORBIDDEN_403: 403,
   NOT_FOUNT_404: 404,
+  TOO_MANY_REQUEST_429: 429,
   CREATED_201: 201,
   OK_200: 200,
   NO_CONTENT_204: 204,
@@ -15,4 +16,8 @@ export const BLOGGERS_PLATFORM = {
   blogs: 'blogs',
   users: 'users',
   comments: 'comments',
+};
+export const DEVICE_CONTROL = {
+  devices: 'devices',
+  apiRequestControl: 'apiRequestControl',
 };

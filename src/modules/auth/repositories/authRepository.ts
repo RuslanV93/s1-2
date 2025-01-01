@@ -1,6 +1,7 @@
 import { UserDbType } from '../../users/types/usersTypes';
 import { ObjectId, WithId } from 'mongodb';
-import { usersCollection } from '../../../db/db';
+import { devicesCollection, usersCollection } from '../../../db/db';
+import { DeviceDbType } from '../../devices/types/deviceTypes';
 /** Create search filter function */
 const createFilter = (enteredField: string) => {
   const filter: any = {};
@@ -12,8 +13,8 @@ const createFilter = (enteredField: string) => {
   return filter;
 };
 export const authRepository = {
-  /** Getting password hash from database. */
-  async getHash(loginField: string): Promise<UserDbType | null> {
+  /** Getting user info for hash and password compare */
+  async getUserByLogin(loginField: string): Promise<UserDbType | null> {
     const filter = createFilter(loginField);
     const [user]: Array<UserDbType> = await usersCollection
       .find<UserDbType>(filter)
@@ -87,32 +88,5 @@ export const authRepository = {
       return null;
     }
     return updatedUser as UserDbType;
-  },
-
-  /** Update refresh token in database */
-  async updateRefreshToken(userId: string, tokenVersion: string | null) {
-    const result = await usersCollection.findOneAndUpdate(
-      {
-        _id: new ObjectId(userId),
-      },
-      { $set: { 'refreshTokenInfo.tokenVersion': tokenVersion } },
-      { returnDocument: 'after' },
-    );
-    if (!result) {
-      return null;
-    }
-    return result;
-  },
-
-  async getUsersRefreshTokenVersion(userId: string) {
-    const user: UserDbType | null = await usersCollection.findOne<UserDbType>({
-      _id: new ObjectId(userId),
-    });
-    if (!user) {
-      return undefined;
-    } else if (!user.refreshTokenInfo.tokenVersion) {
-      return null;
-    }
-    return user.refreshTokenInfo.tokenVersion;
   },
 };

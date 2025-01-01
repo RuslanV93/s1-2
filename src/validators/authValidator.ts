@@ -5,6 +5,8 @@ import { authService } from '../modules/auth/services/authService';
 import { usersQueryRepository } from '../modules/users/repositories/usersQueryRepository';
 import { jwtService } from '../common/crypto/jwtService';
 import { UserViewType } from '../modules/users/types/usersTypes';
+import { devicesService } from '../modules/devices/services/devicesService';
+import { devicesRepository } from '../modules/devices/repositories/devicesRepository';
 
 /** BASIC auth validation */
 export const authValidatorMiddleware = (
@@ -73,18 +75,23 @@ export const refreshTokenValidator = async (
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
-  const payload = await jwtService.getUserByRefreshToken(refreshToken);
-  if (!payload) {
+  const tokenPayload = await jwtService.getRefreshTokenPayload(refreshToken);
+  if (!tokenPayload) {
+    res.sendStatus(STATUSES.UNAUTHORIZED_401);
+    return;
+  }
+  const session = await devicesRepository.findDevice(tokenPayload.deviceId);
+  if (!session) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
 
-  const { userId } = payload;
+  const { userId } = tokenPayload;
   const user: UserViewType | null = await usersQueryRepository.getUserById(userId);
   if (!user) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
-  req.refreshTokenPayload = payload;
+  req.refreshTokenPayload = tokenPayload;
   next();
 };

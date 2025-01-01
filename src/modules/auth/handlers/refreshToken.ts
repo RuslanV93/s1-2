@@ -8,8 +8,8 @@ import { STATUSES } from '../../../common/variables/variables';
 /** Refresh token endpoint. Firstly validates token version against the current valid version.
  * Then gives back new token and updates the version in the database*/
 export const refreshToken = async (req: Request, res: Response) => {
-  const { userId, exp } = req.refreshTokenPayload;
-  const verifyResult = await authService.verifyRefreshTokenVersion(userId, exp);
+  const { userId, deviceId, exp } = req.refreshTokenPayload;
+  const verifyResult = await authService.verifyRefreshTokenVersion(deviceId, exp);
 
   if (verifyResult.status !== DomainStatusCode.Success) {
     res
@@ -17,15 +17,15 @@ export const refreshToken = async (req: Request, res: Response) => {
       .send({ errorsMessages: verifyResult.extensions });
     return;
   }
-  const newToken = await jwtService.createJWT(userId);
-  const { refreshToken, tokenVersion } = await jwtService.refreshJWT(userId);
-  const result = await authService.updateRefreshToken(userId, tokenVersion);
+  const newAccessToken = await jwtService.createJWT(userId);
+
+  const result = await authService.updateRefreshToken(userId, deviceId);
   if (result.status !== DomainStatusCode.Success) {
     res
       .status(resultCodeToHttpFunction(result.status))
       .send({ errorsMessages: result.extensions });
     return;
   }
-  res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
-  res.status(STATUSES.OK_200).send({ accessToken: newToken });
+  res.cookie('refreshToken', result.data, { httpOnly: true, secure: true });
+  res.status(STATUSES.OK_200).send({ accessToken: newAccessToken });
 };

@@ -3,7 +3,6 @@ import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
 import { PostViewType } from '../../src/modules/posts/types/postsTypes';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { runDb, stopDb } from '../../src/db/db';
 
 let postId: string;
@@ -15,7 +14,6 @@ const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 jest.setTimeout(50000);
 describe('/posts', () => {
-  let server: MongoMemoryServer;
   beforeAll(async () => {
     await runDb(uri);
     await req

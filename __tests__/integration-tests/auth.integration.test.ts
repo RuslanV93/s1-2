@@ -5,7 +5,6 @@ import { authService } from '../../src/modules/auth/services/authService';
 import { DomainStatusCode } from '../../src/common/types/types';
 import { authRepository } from '../../src/modules/auth/repositories/authRepository';
 import { req } from '../e2e-tests/default.e2e.test';
-import { MongoMemoryServer } from 'mongodb-memory-server';
 import { runDb, stopDb } from '../../src/db/db';
 import SETTINGS from '../../src/settings';
 
@@ -25,7 +24,6 @@ describe('/auth', () => {
         return Promise.resolve({ success: true, info: info.response });
       },
     );
-  let server: MongoMemoryServer;
   beforeAll(async () => {
     await runDb(uri);
   });

@@ -5,7 +5,12 @@ declare global {
   namespace Express {
     export interface Request {
       user: { id: string };
-      refreshTokenPayload: { userId: string; iat: number; exp: number };
+      refreshTokenPayload: {
+        userId: string;
+        deviceId: string;
+        iat: number;
+        exp: number;
+      };
     }
   }
 }

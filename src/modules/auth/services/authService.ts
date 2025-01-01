@@ -3,40 +3,80 @@ import { authRepository } from '../repositories/authRepository';
 import { NewUserType, UserDbType } from '../../users/types/usersTypes';
 import { WithId } from 'mongodb';
 import { usersRepository } from '../../users/repositories/usersRepository';
-import { DomainStatusCode } from '../../../common/types/types';
+import { DomainStatusCode, ResultObject } from '../../../common/types/types';
 import { genHashFunction } from '../../../common/crypto/getHash';
 import { randomUUID } from 'node:crypto';
 import { add } from 'date-fns/add';
 import { nodemailerService } from '../adapters/sendEmailAdapter';
+import { jwtService } from '../../../common/crypto/jwtService';
+import { devicesService } from '../../devices/services/devicesService';
+import { devicesRepository } from '../../devices/repositories/devicesRepository';
 
+function isSuccess(result: ResultObject<any>): result is ResultObject<string> {
+  return result.status === DomainStatusCode.Success && result.data !== null;
+}
 export const authService = {
   /** checking credentials */
-  async loginUser(loginField: string, passwordField: string): Promise<UserDbType> {
-    const user = await authRepository.getHash(loginField);
-
+  async loginUser(
+    loginField: string,
+    passwordField: string,
+    ip: string,
+    title: string,
+  ): Promise<ResultObject<null | Array<string>>> {
+    // checking is user exist. getting users pass hash
+    const user = await authRepository.getUserByLogin(loginField);
     if (!user?.passwordHash) {
-      const errors: { [key: string]: string } = {};
-      if (loginField.includes('@')) {
-        errors.email = 'User not found. Invalid email.';
-      } else {
-        errors.login = 'User not found. Invalid login.';
-      }
-      throw {
-        errorsMessages: Object.keys(errors).map(
-          (field): { field: string; message: string } => ({
-            message: errors[field],
-            field,
-          }),
-        ),
+      return {
+        status: DomainStatusCode.Unauthorized,
+        data: null,
+        extensions: [
+          {
+            message: loginField.includes('@')
+              ? 'User not found. Invalid email.'
+              : 'User not found. Invalid login',
+            field: loginField.includes('@') ? 'email' : 'login',
+          },
+        ],
       };
     }
+    // comparing password and pass hash
     const passwordIsMatch = await comparePassword(passwordField, user.passwordHash);
     if (!passwordIsMatch) {
-      throw {
-        errorsMessages: [{ message: 'Incorrect password', field: 'password' }],
+      return {
+        status: DomainStatusCode.Unauthorized,
+        data: null,
+        extensions: [{ message: 'incorrect password', field: 'password' }],
       };
     }
-    return user;
+
+    // checking user email confirmation
+    if (user.emailConfirmation.isConfirmed !== 'confirmed') {
+      return {
+        status: DomainStatusCode.Unauthorized,
+        data: null,
+        extensions: [{ message: 'Email is not confirmed', field: 'email' }],
+      };
+    }
+
+    // Creating new access token
+    const accessToken: string = await jwtService.createJWT(user._id.toString());
+
+    // Creating session for login device
+    const newDeviceCreationResult: ResultObject<string | null> =
+      await devicesService.createDevice(user._id.toString(), ip, title);
+
+    if (!isSuccess(newDeviceCreationResult)) {
+      return {
+        status: newDeviceCreationResult.status,
+        data: null,
+        extensions: newDeviceCreationResult.extensions,
+      };
+    }
+    return {
+      status: DomainStatusCode.Success,
+      data: [accessToken, newDeviceCreationResult.data],
+      extensions: [],
+    };
   },
 
   /** Add new user by registration. Not added by super admin. */
@@ -72,9 +112,6 @@ export const authService = {
         }),
         isConfirmed: 'unconfirmed',
         emailConfirmationCooldown: null,
-      },
-      refreshTokenInfo: {
-        tokenVersion: null,
       },
     };
     const result = await usersRepository.addNewUser(newRegisteredUser);
@@ -198,9 +235,9 @@ export const authService = {
   },
 
   /** Getting users refresh token from DB. Verifying by token version. */
-  async verifyRefreshTokenVersion(userId: string, tokenVersion: number) {
+  async verifyRefreshTokenVersion(deviceId: string, exp: number) {
     const userRefreshTokenVersion =
-      await authRepository.getUsersRefreshTokenVersion(userId);
+      await devicesRepository.getDeviceSessionTokenExpDate(deviceId);
     if (userRefreshTokenVersion === undefined) {
       return {
         status: DomainStatusCode.InternalServerError,
@@ -208,9 +245,10 @@ export const authService = {
         extensions: [{ message: 'User not found. Something went wrong' }],
       };
     }
+
     if (
       userRefreshTokenVersion === null ||
-      userRefreshTokenVersion !== tokenVersion.toString()
+      userRefreshTokenVersion !== exp.toString()
     ) {
       return {
         status: DomainStatusCode.Unauthorized,
@@ -226,17 +264,36 @@ export const authService = {
       extensions: [],
     };
   },
-  /** Updating refresh token fields. At the time update version. IF might be more */
-  async updateRefreshToken(userId: string, tokenVersion: string | null) {
-    const updateRefreshToken = await authRepository.updateRefreshToken(
-      userId,
-      tokenVersion,
+  /** Update access and refresh tokens. Update device sessions fields */
+  async updateRefreshToken(userId: string, deviceId: string) {
+    const refreshToken = await jwtService.createRefreshJWT(userId, deviceId);
+    const refreshTokenPayload =
+      await jwtService.getRefreshTokenPayload(refreshToken);
+    const updateDeviceSession = await devicesRepository.updateDeviceSession(
+      deviceId,
+      refreshTokenPayload.exp,
+      refreshTokenPayload.iat,
     );
-    if (!updateRefreshToken) {
+    if (!updateDeviceSession) {
       return {
         status: DomainStatusCode.InternalServerError,
         data: null,
         extensions: [{ message: 'Internal Server Error. Hello' }],
+      };
+    }
+    return {
+      status: DomainStatusCode.Success,
+      data: refreshToken,
+      extensions: [],
+    };
+  },
+  async logout(deviceId: string) {
+    const logoutResult = await devicesRepository.deleteDeviceSession(deviceId);
+    if (!logoutResult) {
+      return {
+        status: DomainStatusCode.InternalServerError,
+        data: null,
+        extensions: [{ message: 'Internal Server Error' }],
       };
     }
     return {

@@ -1,9 +1,10 @@
 import { authRepository } from '../../src/modules/auth/repositories/authRepository';
 import { DomainStatusCode } from '../../src/common/types/types';
 import { authService } from '../../src/modules/auth/services/authService';
+import { devicesRepository } from '../../src/modules/devices/repositories/devicesRepository';
 
 describe('/auth', () => {
-  authRepository.updateDeviceSession = jest
+  devicesRepository.updateDeviceSession = jest
     .fn()
     .mockImplementation((userId, refreshToken) => {
       return Promise.resolve({
@@ -19,6 +20,6 @@ describe('/auth', () => {
       data: {},
       extensions: [],
     });
-    expect(authRepository.updateDeviceSession).toBeCalledTimes(1);
+    expect(devicesRepository.updateDeviceSession).toBeCalledTimes(1);
   });
 });

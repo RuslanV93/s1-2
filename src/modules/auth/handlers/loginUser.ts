@@ -13,7 +13,7 @@ export const loginUser = async (
   req: Request<AuthRequestTypeWithBody>,
   res: Response,
 ) => {
-  const title = `Platform: ${req.useragent?.platform}, Browser: ${req.useragent?.browser}`;
+  const title = `Platform: ${req.useragent?.platform || 'default'}, Browser: ${req.useragent?.browser || 'default'}`;
   const ip = Array.isArray(req.headers['x-forwarded-for'])
     ? req.headers['x-forwarded-for'][0]
     : req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'HELLO';

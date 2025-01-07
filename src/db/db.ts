@@ -1,4 +1,4 @@
-import { Collection, MongoClient } from 'mongodb';
+import { Collection, MongoClient, ObjectId } from 'mongodb';
 import { NewUserType, UserDbType } from '../modules/users/types/usersTypes';
 import { BlogDbType, NewBlogType } from '../modules/blogs/types/blogsTypes';
 import { NewPostType, PostDbType } from '../modules/posts/types/postsTypes';
@@ -7,13 +7,16 @@ import {
   NewCommentType,
 } from '../modules/comments/types/commentsTypes';
 import { BLOGGERS_PLATFORM, DEVICE_CONTROL } from '../common/variables/variables';
-import SETTINGS from '../settings';
 import {
   ApiRequestControlDbType,
   NewApiRequestControlType,
 } from '../modules/devices/types/apiRequestControlTypes';
 import { DeviceDbType, NewDeviceType } from '../modules/devices/types/deviceTypes';
+import mongoose from 'mongoose';
 
+const mongooseUrl =
+  'mongodb+srv://ruslanvak93:3lWTPDW3SX3caJsA@cluster0.t6d7t.mongodb.net/bloggers-platform?retryWrites=true&w=majority&appName=Cluster0';
+/** Init collection */
 export let usersCollection: Collection<UserDbType | NewUserType>;
 export let blogsCollection: Collection<BlogDbType | NewBlogType>;
 export let postsCollection: Collection<PostDbType | NewPostType>;
@@ -24,6 +27,8 @@ export let apiRequestsCollection: Collection<
 export let devicesCollection: Collection<DeviceDbType | NewDeviceType>;
 
 let client: MongoClient;
+
+/** using mongoose */
 
 export const runDb = async (url: string) => {
   client = new MongoClient(url);
@@ -37,6 +42,7 @@ export const runDb = async (url: string) => {
   devicesCollection = db.collection(DEVICE_CONTROL.devices);
 
   try {
+    await mongoose.connect(mongooseUrl);
     await client.connect();
     await db.command({ ping: 1 });
     console.log('Connected to DB');

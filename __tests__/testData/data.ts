@@ -19,3 +19,13 @@ export const newTestUserForSelfRegistration = {
   email: 'ruslan-vak93@mail.ru',
   password: 'qwerty1',
 };
+
+export const testRequestValidData = {
+  query: {
+    pageNumber: 1,
+    pageSize: 10,
+    sortBy: 'createdAt',
+    sortDirection: 'desc',
+    searchNameTerm: 'name',
+  },
+};

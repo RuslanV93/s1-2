@@ -1,7 +1,6 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, WithId } from 'mongodb';
 
-export type DeviceDbType = {
-  _id: ObjectId;
+export type DeviceDbType = WithId<{
   userId: ObjectId;
   ip: string;
   loginDate: number;
@@ -9,7 +8,7 @@ export type DeviceDbType = {
   title: string;
   deviceId: string;
   expiryDate: number;
-};
+}>;
 
 export type NewDeviceType = {
   userId: ObjectId;

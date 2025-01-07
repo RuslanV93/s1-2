@@ -2,8 +2,9 @@ import { Request } from 'express';
 import { UsersSearchAndPaginationType } from '../../modules/users/types/usersRequestResponseTypes';
 
 export const getQueryFromRequest = {
-  getQueryFromRequest(req: Request) {
-    const pageNumber = req.query.pageNumber !== undefined ? +req.query.pageNumber : 1;
+  getQueryFromRequest(req: any) {
+    const pageNumber =
+      req.query.pageNumber !== undefined ? +req.query.pageNumber : 1;
     const pageSize: number = req.query.pageSize ? +req.query.pageSize : 10;
     const sortBy = req.query.sortBy ? req.query.sortBy : 'createdAt';
     const sortDirection =
@@ -16,7 +17,8 @@ export const getQueryFromRequest = {
     return { pageNumber, pageSize, sortBy, sortDirection, search };
   },
   getUsersQueryFromRequest(req: Request): UsersSearchAndPaginationType {
-    const pageNumber = req.query.pageNumber !== undefined ? +req.query.pageNumber : 1;
+    const pageNumber =
+      req.query.pageNumber !== undefined ? +req.query.pageNumber : 1;
     const pageSize = req.query.pageSize ? +req.query.pageSize : 10;
     const sortBy = req.query.sortBy ? req.query.sortBy : 'createdAt';
     const sortDirection =

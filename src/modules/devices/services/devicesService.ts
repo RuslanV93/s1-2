@@ -1,13 +1,21 @@
-import { NewDeviceType } from '../types/deviceTypes';
-import { nanoid } from 'nanoid';
+import { DeviceDbType, NewDeviceType } from '../types/deviceTypes';
 import { jwtService } from '../../../common/crypto/jwtService';
 import { devicesRepository } from '../repositories/devicesRepository';
 import { DomainStatusCode, ResultObject } from '../../../common/types/types';
 import { ObjectId } from 'mongodb';
-import { devicesCollection } from '../../../db/db';
+import { randomUUID } from 'node:crypto';
+import { resultObject } from '../../../common/helpers/resultObjectHelpers';
 
 export const devicesService = {
-  async getDevices(deviceId: string) {},
+  async findSession(deviceId: string) {
+    const session = await devicesRepository.findDevice(deviceId);
+    if (!session) {
+      return resultObject.errorResultObject('Unauthorized', {
+        message: 'Unauthorized',
+      });
+    }
+    return resultObject.successResultObject<DeviceDbType>(session);
+  },
 
   /** Creating new device session after user login */
   async createDevice(
@@ -15,7 +23,7 @@ export const devicesService = {
     ip: string,
     title: string,
   ): Promise<ResultObject<string | null>> {
-    const deviceId: string = nanoid(10);
+    const deviceId: string = randomUUID();
     const refreshToken = await jwtService.createRefreshJWT(userId, deviceId);
     const refreshTokenPayload =
       await jwtService.getRefreshTokenPayload(refreshToken);

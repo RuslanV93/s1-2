@@ -15,6 +15,6 @@ export type Extensions = {
 };
 export type ResultObject<Data> = {
   status: DomainStatusCode;
-  extensions: Extensions[];
   data: Data;
+  extensions: Extensions[];
 };

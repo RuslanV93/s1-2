@@ -11,6 +11,7 @@ import { nodemailerService } from '../adapters/sendEmailAdapter';
 import { jwtService } from '../../../common/crypto/jwtService';
 import { devicesService } from '../../devices/services/devicesService';
 import { devicesRepository } from '../../devices/repositories/devicesRepository';
+import { resultObject } from '../../../common/helpers/resultObjectHelpers';
 
 function isSuccess(result: ResultObject<any>): result is ResultObject<string> {
   return result.status === DomainStatusCode.Success && result.data !== null;
@@ -26,27 +27,37 @@ export const authService = {
     // checking is user exist. getting users pass hash
     const user = await authRepository.getUserByLogin(loginField);
     if (!user?.passwordHash) {
-      return {
-        status: DomainStatusCode.Unauthorized,
-        data: null,
-        extensions: [
-          {
-            message: loginField.includes('@')
-              ? 'User not found. Invalid email.'
-              : 'User not found. Invalid login',
-            field: loginField.includes('@') ? 'email' : 'login',
-          },
-        ],
-      };
+      return resultObject.errorResultObject('Unauthorized', {
+        message: loginField.includes('@')
+          ? 'User not found. Invalid email.'
+          : 'User not found. Invalid login',
+        field: loginField.includes('@') ? 'email' : 'login',
+      });
+      // return {
+      //   status: DomainStatusCode.Unauthorized,
+      //   data: null,
+      //   extensions: [
+      //     {
+      //       message: loginField.includes('@')
+      //         ? 'User not found. Invalid email.'
+      //         : 'User not found. Invalid login',
+      //       field: loginField.includes('@') ? 'email' : 'login',
+      //     },
+      //   ],
+      // };
     }
     // comparing password and pass hash
     const passwordIsMatch = await comparePassword(passwordField, user.passwordHash);
     if (!passwordIsMatch) {
-      return {
-        status: DomainStatusCode.Unauthorized,
-        data: null,
-        extensions: [{ message: 'incorrect password', field: 'password' }],
-      };
+      return resultObject.errorResultObject('Unauthorized', {
+        message: 'incorrect password',
+        field: 'password',
+      });
+      // return {
+      //   status: DomainStatusCode.Unauthorized,
+      //   data: null,
+      //   extensions: [{ message: 'incorrect password', field: 'password' }],
+      // };
     }
 
     // checking user email confirmation

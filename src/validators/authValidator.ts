@@ -7,6 +7,8 @@ import { jwtService } from '../common/crypto/jwtService';
 import { UserViewType } from '../modules/users/types/usersTypes';
 import { devicesService } from '../modules/devices/services/devicesService';
 import { devicesRepository } from '../modules/devices/repositories/devicesRepository';
+import { DomainStatusCode } from '../common/types/types';
+import { resultCodeToHttpFunction } from '../common/helpers/resultCodeToHttpFunction';
 
 /** BASIC auth validation */
 export const authValidatorMiddleware = (
@@ -80,18 +82,13 @@ export const refreshTokenValidator = async (
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
-  const session = await devicesRepository.findDevice(tokenPayload.deviceId);
-  if (!session) {
-    res.sendStatus(STATUSES.UNAUTHORIZED_401);
+
+  const session = await devicesService.findSession(tokenPayload.deviceId);
+  if (session.status !== DomainStatusCode.Success) {
+    res.sendStatus(resultCodeToHttpFunction(session.status));
     return;
   }
 
-  const { userId } = tokenPayload;
-  const user: UserViewType | null = await usersQueryRepository.getUserById(userId);
-  if (!user) {
-    res.sendStatus(STATUSES.UNAUTHORIZED_401);
-    return;
-  }
   req.refreshTokenPayload = tokenPayload;
   next();
 };

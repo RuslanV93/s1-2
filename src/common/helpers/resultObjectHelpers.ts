@@ -16,8 +16,3 @@ export const resultObject = {
     };
   },
 };
-
-console.log(resultObject.successResultObject([1, 2, 3]));
-console.log(
-  resultObject.errorResultObject('Unauthorized', { message: 'hello world' }),
-);

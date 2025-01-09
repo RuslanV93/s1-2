@@ -13,9 +13,8 @@ import {
 } from '../modules/devices/types/apiRequestControlTypes';
 import { DeviceDbType, NewDeviceType } from '../modules/devices/types/deviceTypes';
 import mongoose from 'mongoose';
+import SETTINGS from '../settings';
 
-const mongooseUrl =
-  'mongodb+srv://ruslanvak93:3lWTPDW3SX3caJsA@cluster0.t6d7t.mongodb.net/bloggers-platform?retryWrites=true&w=majority&appName=Cluster0';
 /** Init collection */
 export let usersCollection: Collection<UserDbType | NewUserType>;
 export let blogsCollection: Collection<BlogDbType | NewBlogType>;
@@ -28,6 +27,8 @@ export let devicesCollection: Collection<DeviceDbType | NewDeviceType>;
 
 let client: MongoClient;
 
+const mongooseUrl =
+  'mongodb+srv://ruslanvak93:3lWTPDW3SX3caJsA@cluster0.t6d7t.mongodb.net/bloggers-platform?retryWrites=true&w=majority&appName=Cluster0';
 /** using mongoose */
 
 export const runDb = async (url: string) => {
@@ -42,8 +43,8 @@ export const runDb = async (url: string) => {
   devicesCollection = db.collection(DEVICE_CONTROL.devices);
 
   try {
-    await mongoose.connect(mongooseUrl);
     await client.connect();
+    await mongoose.connect(url + '/' + BLOGGERS_PLATFORM.dbName);
     await db.command({ ping: 1 });
     console.log('Connected to DB');
     await apiRequestsCollection.createIndex({ date: 1 }, { expireAfterSeconds: 30 });
@@ -56,6 +57,7 @@ export const runDb = async (url: string) => {
 export const stopDb = async () => {
   try {
     if (client) {
+      await mongoose.disconnect();
       await client.close();
     }
   } catch (err) {

@@ -12,9 +12,9 @@ const uri: string = SETTINGS.LOCAL_DB_URL;
 
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
-jest.setTimeout(50000);
 describe('/posts', () => {
   beforeAll(async () => {
+    console.log('uri is ' + uri);
     await runDb(uri);
     await req
       .post(SETTINGS.PATH.BLOGS)

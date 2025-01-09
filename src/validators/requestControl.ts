@@ -7,7 +7,7 @@ export const requestControl = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const limit = 5;
+  const limit = 8;
   const timeWindow = 10 * 1000; // Лучше вынести в константы
 
   const ip =

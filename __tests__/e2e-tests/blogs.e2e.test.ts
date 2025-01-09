@@ -9,7 +9,6 @@ import { runDb, stopDb } from '../../src/db/db';
 const uri: string = SETTINGS.LOCAL_DB_URL;
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
-jest.setTimeout(10000);
 describe('/blogs', () => {
   let newBlogForTest: any;
   let newBlogForTestId: string;

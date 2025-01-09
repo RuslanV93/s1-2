@@ -10,8 +10,6 @@ const uri: string = SETTINGS.LOCAL_DB_URL;
 const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
-jest.setTimeout(50000);
-
 describe('/users', () => {
   let userId: string;
   beforeAll(async () => {

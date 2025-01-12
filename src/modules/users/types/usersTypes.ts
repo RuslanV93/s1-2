@@ -6,6 +6,11 @@ export type EmailConfirmationType = {
   isConfirmed: string;
   emailConfirmationCooldown: Date | null;
 };
+export type PasswordInfoType = {
+  passwordHash: string;
+  passwordRecoveryCode: string | null;
+  passwordRecoveryCodeExpires: Date | null;
+};
 export type RefreshTokenInfoType = {
   tokenVersion: string | null;
 };
@@ -13,15 +18,14 @@ export type UserDbType = {
   _id: ObjectId;
   login: string;
   email: string;
-  passwordHash: string;
-  salt: string;
+  passwordInfo: PasswordInfoType,
   createdAt: string;
   emailConfirmation: EmailConfirmationType;
 };
 export type NewUserType = {
   login: string;
   email: string;
-  passwordHash: string;
+  passwordInfo: PasswordInfoType,
   createdAt: string;
   emailConfirmation: EmailConfirmationType;
 };

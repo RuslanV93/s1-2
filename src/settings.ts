@@ -20,6 +20,7 @@ const SETTINGS = {
     BLOGS: '/blogs',
     COMMENTS: '/comments',
     CONFIRM_REGISTRATION: 'auth/registration-confirmation?code=',
+    PASSWORD_RECOVERY: 'auth/password-recovery?recoveryCode=',
   },
   EMAIL_PASS_CODE: process.env.EMAIL_PASS_CODE,
 };

@@ -1,10 +1,11 @@
 import { DeviceDbType, NewDeviceType } from '../types/deviceTypes';
 import { devicesCollection } from '../../../db/db';
 import { ObjectId } from 'mongodb';
+import { Devices } from '../domain/devicesModel';
 
 export const devicesRepository = {
   async findDevice(deviceId: string): Promise<DeviceDbType | null> {
-    const device = await devicesCollection.findOne({ deviceId: deviceId });
+    const device: DeviceDbType | null = await Devices.findOne({ deviceId: deviceId }).exec();
     if (!device) {
       return null;
     }
@@ -12,50 +13,59 @@ export const devicesRepository = {
   },
   /** Create new session */
   async createDevice(device: NewDeviceType): Promise<string | null> {
-    const result = await devicesCollection.insertOne(device);
-    if (!result) {
-      return null;
+    try {
+      const newDevice = new Devices(device);
+      const savedDevice = await newDevice.save()
+      return savedDevice._id.toString();
+    } catch (error) {
+      return null
     }
-    return result.insertedId.toString();
+
+    // const result = await devicesCollection.insertOne(device);
+    // if (!result) {
+    //   return null;
+    // }
+    // return result.insertedId.toString();
   },
 
   /** Update refresh token in database */
   async updateDeviceSession(deviceId: string, expiryDate: number, issuedAt: number) {
-    const result = await devicesCollection.findOneAndUpdate(
-      { deviceId: deviceId },
+    return await Devices.findOneAndUpdate(
+      { deviceId },
       {
-        $set: { lastActiveDate: issuedAt, expiryDate: expiryDate },
+        lastActiveDate: issuedAt,
+        expiryDate: expiryDate
       },
-      {
-        returnDocument: 'after',
-      },
-    );
-    if (!result) {
-      return null;
-    }
-    return result;
+      { new: true }  // вернет обновленный документ
+    ).exec();
+    // const result = await devicesCollection.findOneAndUpdate(
+    //   { deviceId: deviceId },
+    //   {
+    //     $set: { lastActiveDate: issuedAt, expiryDate: expiryDate },
+    //   },
+    //   {
+    //     returnDocument: 'after',
+    //   },
+    // );
+    // if (!result) {
+    //   return null;
+    // }
+    // return result;
   },
 
   /** Getting token exp date for verifying is token expired */
   async getDeviceSessionTokenExpDate(deviceId: string): Promise<string | null> {
-    const result = await devicesCollection.findOne({ deviceId: deviceId });
+    const result = await Devices.findOne({ deviceId: deviceId });
     if (!result) {
       return null;
     }
 
     return result.expiryDate.toString();
   },
-  /** Delete session by deviceId*/
-  async deleteDeviceSession(deviceId: string): Promise<number | null> {
-    const result = await devicesCollection.deleteOne({ deviceId: deviceId });
-    if (!result) {
-      return null;
-    }
-    return result.deletedCount;
-  },
+
   /** Delete(Terminate) all devices sessions, except current session */
   async terminateOtherDevices(userId: string, deviceId: string) {
-    const result = await devicesCollection.deleteMany({
+    const result = await Devices.deleteMany({
       userId: new ObjectId(userId),
       deviceId: { $ne: deviceId },
     });
@@ -67,7 +77,7 @@ export const devicesRepository = {
 
   /** Delete session by device ID*/
   async deleteDeviceById(deviceId: string): Promise<number | null> {
-    const result = await devicesCollection.deleteOne({
+    const result = await Devices.deleteOne({
       deviceId: deviceId,
     });
     if (!result) {

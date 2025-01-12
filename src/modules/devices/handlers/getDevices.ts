@@ -3,7 +3,7 @@ import { devicesQueryRepository } from '../repositories/devicesQueryRepository';
 import { STATUSES } from '../../../common/variables/variables';
 import { DeviceViewType } from '../types/deviceTypes';
 export const getDevices = async (req: Request, res: Response) => {
-  const { userId } = req.refreshTokenPayload;
+  const { userId } = req.userContext;
   const devices: DeviceViewType[] | null =
     await devicesQueryRepository.getAllDevices(userId);
   if (!devices) {

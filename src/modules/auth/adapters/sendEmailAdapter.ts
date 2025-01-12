@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 export const nodemailerService = {
-  async sendEmailAdapter(
+  async sendConfirmEmailAdapter(
     username: string,
     userEmail: string,
     confirmationCode: string,
@@ -32,4 +32,20 @@ export const nodemailerService = {
       return { success: false, error };
     }
   },
+  async sendPasswordResetAdapter(userEmail: string, userName: string, recoveryCode: string) {
+    const mailOptions = {
+      from: '"Bloggers Platform 👻" <ruslanvak411@gmail.com>',
+      to: userEmail,
+      subject: "Password Recovery.",
+      html: `<h1>Hello, ${userName}!</h1><p>This email contains a link to reset your password. If you did not request a password reset, please ignore this email. Do not share this link with anyone.
+To reset your password, follow this link:<a>${SETTINGS.WEBSITE_URL}/${SETTINGS.PATH.PASSWORD_RECOVERY}${recoveryCode}</a></p>`
+    };
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent: ' + info.response);
+      return { success: true, info: info.response };
+    } catch (error) {
+      return { success: false, error };
+    }
+  }
 };

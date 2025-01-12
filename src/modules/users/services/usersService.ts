@@ -40,7 +40,11 @@ export const usersService = {
     const newUser: NewUserType = {
       login: login,
       email: email,
-      passwordHash: passwordHash,
+      passwordInfo: {
+        passwordHash: passwordHash,
+        passwordRecoveryCode: null,
+        passwordRecoveryCodeExpires: null,
+      },
       createdAt: new Date().toISOString(),
       emailConfirmation: {
         confirmationCode: randomUUID(),

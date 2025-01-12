@@ -4,9 +4,7 @@ import { STATUSES } from '../common/variables/variables';
 import { authService } from '../modules/auth/services/authService';
 import { usersQueryRepository } from '../modules/users/repositories/usersQueryRepository';
 import { jwtService } from '../common/crypto/jwtService';
-import { UserViewType } from '../modules/users/types/usersTypes';
 import { devicesService } from '../modules/devices/services/devicesService';
-import { devicesRepository } from '../modules/devices/repositories/devicesRepository';
 import { DomainStatusCode } from '../common/types/types';
 import { resultCodeToHttpFunction } from '../common/helpers/resultCodeToHttpFunction';
 
@@ -72,23 +70,19 @@ export const refreshTokenValidator = async (
   next: NextFunction,
 ) => {
   const refreshToken = req.cookies.refreshToken;
-
-  if (!refreshToken) {
-    res.sendStatus(STATUSES.UNAUTHORIZED_401);
-    return;
-  }
   const tokenPayload = await jwtService.getRefreshTokenPayload(refreshToken);
-  if (!tokenPayload) {
+  if (!refreshToken || !tokenPayload) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
 
-  const session = await devicesService.findSession(tokenPayload.deviceId);
+
+  const session = await devicesService.findSessionAndVerify(tokenPayload.deviceId,tokenPayload.exp);
   if (session.status !== DomainStatusCode.Success) {
     res.sendStatus(resultCodeToHttpFunction(session.status));
     return;
   }
 
-  req.refreshTokenPayload = tokenPayload;
+  req.userContext = tokenPayload;
   next();
 };

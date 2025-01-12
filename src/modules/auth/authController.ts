@@ -18,6 +18,8 @@ import { emailResending } from './handlers/emailResending';
 import { refreshToken } from './handlers/refreshToken';
 import { logout } from './handlers/logout';
 import { requestControl } from '../../validators/requestControl';
+import { passwordRecovery } from './handlers/passwordRecovery';
+
 export const authRouter = Router();
 
 const authController = {
@@ -28,6 +30,7 @@ const authController = {
   emailResending,
   refreshToken,
   logout,
+  passwordRecovery,
 };
 
 authRouter.post(
@@ -69,3 +72,5 @@ authRouter.post(
   authController.emailResending,
 );
 authRouter.get('/me', accessTokenValidator, authController.authMe);
+
+authRouter.post('/password-recovery', requestControl, userEmailValidator, authController.passwordRecovery);

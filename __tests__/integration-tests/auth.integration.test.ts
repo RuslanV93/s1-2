@@ -14,7 +14,7 @@ const correctAuthData: string = 'admin:qwerty';
 const authData = `Basic ${Buffer.from(correctAuthData).toString('base64')}`;
 
 describe('/auth', () => {
-  nodemailerService.sendEmailAdapter = jest
+  nodemailerService.sendConfirmEmailAdapter = jest
     .fn()
     .mockImplementation(
       (username: string, userEmail: string, confirmationCode: string) => {

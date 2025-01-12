@@ -16,6 +16,11 @@ import { resultObject } from '../../../common/helpers/resultObjectHelpers';
 function isSuccess(result: ResultObject<any>): result is ResultObject<string> {
   return result.status === DomainStatusCode.Success && result.data !== null;
 }
+function hasPasswordRecoveryCode(user: UserDbType): user is UserDbType & {
+  passwordInfo: { passwordRecoveryCode: string }
+} {
+  return !!user.passwordInfo?.passwordRecoveryCode;
+}
 export const authService = {
   /** checking credentials */
   async loginUser(
@@ -26,7 +31,7 @@ export const authService = {
   ): Promise<ResultObject<null | Array<string>>> {
     // checking is user exist. getting users pass hash
     const user = await authRepository.getUserByLogin(loginField);
-    if (!user?.passwordHash) {
+    if (!user?.passwordInfo.passwordHash) {
       return resultObject.errorResultObject('Unauthorized', {
         message: loginField.includes('@')
           ? 'User not found. Invalid email.'
@@ -47,7 +52,7 @@ export const authService = {
       // };
     }
     // comparing password and pass hash
-    const passwordIsMatch = await comparePassword(passwordField, user.passwordHash);
+    const passwordIsMatch = await comparePassword(passwordField, user.passwordInfo.passwordHash);
     if (!passwordIsMatch) {
       return resultObject.errorResultObject('Unauthorized', {
         message: 'incorrect password',
@@ -114,7 +119,10 @@ export const authService = {
     const newRegisteredUser: NewUserType = {
       login,
       email,
-      passwordHash,
+      passwordInfo: { passwordHash,
+      passwordRecoveryCode: null,
+      passwordRecoveryCodeExpires: null
+      },
       createdAt: new Date().toISOString(),
       emailConfirmation: {
         confirmationCode: randomUUID(),
@@ -134,7 +142,7 @@ export const authService = {
       };
     }
     const confirmationCode = newRegisteredUser.emailConfirmation.confirmationCode;
-    const emailSend = await nodemailerService.sendEmailAdapter(
+    const emailSend = await nodemailerService.sendConfirmEmailAdapter(
       login,
       email,
       confirmationCode,
@@ -226,7 +234,7 @@ export const authService = {
         extensions: [{ message: 'Internal Server Error' }],
       };
     }
-    const emailSendResult = await nodemailerService.sendEmailAdapter(
+    const emailSendResult = await nodemailerService.sendConfirmEmailAdapter(
       userExists.login,
       email,
       userWithUpdatedEmailConfirmationFields.emailConfirmation.confirmationCode,
@@ -245,36 +253,7 @@ export const authService = {
     };
   },
 
-  /** Getting users refresh token from DB. Verifying by token version. */
-  async verifyRefreshTokenVersion(deviceId: string, exp: number) {
-    const userRefreshTokenVersion =
-      await devicesRepository.getDeviceSessionTokenExpDate(deviceId);
-    if (userRefreshTokenVersion === undefined) {
-      return {
-        status: DomainStatusCode.InternalServerError,
-        data: null,
-        extensions: [{ message: 'User not found. Something went wrong' }],
-      };
-    }
 
-    if (
-      userRefreshTokenVersion === null ||
-      userRefreshTokenVersion !== exp.toString()
-    ) {
-      return {
-        status: DomainStatusCode.Unauthorized,
-        data: null,
-        extensions: [
-          { message: 'Token not exists or expired.', field: 'refreshToken' },
-        ],
-      };
-    }
-    return {
-      status: DomainStatusCode.Success,
-      data: null,
-      extensions: [],
-    };
-  },
   /** Update access and refresh tokens. Update device sessions fields */
   async updateRefreshToken(userId: string, deviceId: string) {
     const refreshToken = await jwtService.createRefreshJWT(userId, deviceId);
@@ -299,7 +278,7 @@ export const authService = {
     };
   },
   async logout(deviceId: string) {
-    const logoutResult = await devicesRepository.deleteDeviceSession(deviceId);
+    const logoutResult = await devicesRepository.deleteDeviceById(deviceId);
     if (!logoutResult) {
       return {
         status: DomainStatusCode.InternalServerError,
@@ -313,4 +292,33 @@ export const authService = {
       extensions: [],
     };
   },
+ async passwordRecovery(email: string) {
+    const user: UserDbType | null = await authRepository.findUser(email);
+    if (!user) {
+      return resultObject.errorResultObject('NotFound', {message: 'User Not Found'})
+    }
+    const recoveryCode = randomUUID()
+    const recoveryCodeExpDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const passwordRecoveryInfoUpdateResult = await authRepository.setPasswordRecoveryInfo(email, recoveryCode, recoveryCodeExpDate);
+    if (!passwordRecoveryInfoUpdateResult) {
+      return resultObject.errorResultObject('InternalServerError', {message: 'Something went wrong.'})
+    }
+    const passwordSendResult = await nodemailerService.sendPasswordResetAdapter(email, user.login, recoveryCode)
+    if (!passwordSendResult.success) {
+      return resultObject.errorResultObject('InternalServerError', {message: 'Email sent error. Something went wrong.'})
+    }
+
+   return resultObject.successResultObject()
+  },
+  async confirmPasswordRecovery(email: string, recoveryCode: string) {
+    const user: UserDbType | null = await authRepository.findUser(email);
+    if (!user) {
+      return resultObject.errorResultObject('NotFound', {message: 'User Not Found'})
+    }
+    if (recoveryCode !== user.passwordInfo.passwordRecoveryCode) {
+      return resultObject.errorResultObject('BadRequest', {message: 'Recovery Code does not match.'})
+    }
+    return resultObject.successResultObject()
+  }
+
 };

@@ -1,7 +1,8 @@
 import { ObjectId } from 'mongodb';
 import { DeviceDbType, DeviceViewType } from '../types/deviceTypes';
-import { devicesViewModelMapper } from '../features/devicesViewModelMapper';
-import { Devices } from '../../../db/dbModels';
+import { devicesViewModelMapper } from './devicesViewModelMapper';
+
+import { Devices } from '../domain/devicesModel';
 
 export const devicesQueryRepository = {
   /** Getting all devices(session) for current user. */

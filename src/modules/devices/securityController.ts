@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { getDevices } from './handlers/getDevices';
 import {
-  accessTokenValidator,
   refreshTokenValidator,
 } from '../../validators/authValidator';
 import { terminateOtherDevices } from './handlers/terminateOtherDevices';

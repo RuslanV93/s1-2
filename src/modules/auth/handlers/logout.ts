@@ -5,18 +5,8 @@ import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHt
 import { STATUSES } from '../../../common/variables/variables';
 
 export const logout = async (req: Request, res: Response) => {
-  const { userId, deviceId, exp } = req.refreshTokenPayload;
+  const { userId, deviceId, exp } = req.userContext;
 
-  const verifyTokenResult = await authService.verifyRefreshTokenVersion(
-    deviceId,
-    exp,
-  );
-  if (verifyTokenResult.status !== DomainStatusCode.Success) {
-    res
-      .status(resultCodeToHttpFunction(verifyTokenResult.status))
-      .send({ errorsMessages: verifyTokenResult.extensions });
-    return;
-  }
   const logoutResult = await authService.logout(deviceId);
   if (logoutResult.status !== DomainStatusCode.Success) {
     res

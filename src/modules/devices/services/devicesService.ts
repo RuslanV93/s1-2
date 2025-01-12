@@ -7,7 +7,24 @@ import { randomUUID } from 'node:crypto';
 import { resultObject } from '../../../common/helpers/resultObjectHelpers';
 
 export const devicesService = {
-  async findSession(deviceId: string) {
+  async findSessionAndVerify(deviceId: string, exp: number) {
+    //getting refresh token version
+    const userRefreshTokenVersion =
+      await devicesRepository.getDeviceSessionTokenExpDate(deviceId);
+    if (userRefreshTokenVersion === undefined) {
+      return {
+        status: DomainStatusCode.InternalServerError,
+        data: null,
+        extensions: [{ message: 'User not found. Something went wrong' }],
+      };
+    }
+
+    if (
+      userRefreshTokenVersion === null ||
+      userRefreshTokenVersion !== exp.toString()
+    ) {
+      return resultObject.errorResultObject('Unauthorized', {message: 'Refresh token expired or not exist.'});
+    }
     const session = await devicesRepository.findDevice(deviceId);
     if (!session) {
       return resultObject.errorResultObject('Unauthorized', {

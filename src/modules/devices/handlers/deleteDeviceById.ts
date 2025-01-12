@@ -8,7 +8,7 @@ export const deleteDeviceById = async (
   req: Request<{ deviceId: string }>,
   res: Response,
 ) => {
-  const refreshTokenPayload = req.refreshTokenPayload;
+  const refreshTokenPayload = req.userContext;
   const toDeleteDeviceId = req.params.deviceId;
 
   const deleteResult = await devicesService.deleteDeviceById(

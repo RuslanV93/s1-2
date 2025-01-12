@@ -2,6 +2,7 @@ import { UserDbType } from '../../users/types/usersTypes';
 import { ObjectId, WithId } from 'mongodb';
 import { devicesCollection, usersCollection } from '../../../db/db';
 import { DeviceDbType } from '../../devices/types/deviceTypes';
+import { Users } from '../../users/domain/usersModel';
 /** Create search filter function */
 const createFilter = (enteredField: string) => {
   const filter: any = {};
@@ -59,7 +60,7 @@ export const authRepository = {
 
   /** Find user by users email */
   async findUser(email: string) {
-    const user: UserDbType | null = await usersCollection.findOne<UserDbType>({
+    const user: UserDbType | null = await Users.findOne<UserDbType>({
       email: email,
     });
     if (!user) {
@@ -89,4 +90,18 @@ export const authRepository = {
     }
     return updatedUser as UserDbType;
   },
+  async setPasswordRecoveryInfo(email: string, recoveryCode: string, recoveryCodeExpDate: Date) {
+    try {
+      const user = await Users.findOne({email: email});
+      if(!user) {
+        return null
+      }
+      user.passwordInfo.passwordRecoveryCode = recoveryCode;
+      user.passwordInfo.passwordRecoveryCodeExpires = recoveryCodeExpDate;
+      return await user.save()
+    } catch (error) {
+      return null
+    }
+  }
+
 };

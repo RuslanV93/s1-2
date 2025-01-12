@@ -4,7 +4,7 @@ import { devicesService } from '../services/devicesService';
 import { STATUSES } from '../../../common/variables/variables';
 
 export const terminateOtherDevices = async (req: Request, res: Response) => {
-  const { userId, deviceId } = req.refreshTokenPayload;
+  const { userId, deviceId } = req.userContext;
   const terminateResult: ResultObject<null> =
     await devicesService.terminateOtherDevices(userId, deviceId);
 

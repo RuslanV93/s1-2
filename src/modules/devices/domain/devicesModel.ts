@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { DeviceDbType } from '../modules/devices/types/deviceTypes';
-import { BLOGGERS_PLATFORM, DEVICE_CONTROL } from '../common/variables/variables';
+import { DeviceDbType } from '../types/deviceTypes';
+import { DEVICE_CONTROL } from '../../../common/variables/variables';
 
 const devicesSchema = new mongoose.Schema<DeviceDbType>(
   {
@@ -17,4 +17,4 @@ const devicesSchema = new mongoose.Schema<DeviceDbType>(
     versionKey: false,
   },
 );
-export const Devices = mongoose.model('Devices', devicesSchema);
+export const Devices = mongoose.model<DeviceDbType>('Devices', devicesSchema);

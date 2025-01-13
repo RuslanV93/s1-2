@@ -3,6 +3,7 @@ import { ObjectId, WithId } from 'mongodb';
 import { devicesCollection, usersCollection } from '../../../db/db';
 import { DeviceDbType } from '../../devices/types/deviceTypes';
 import { Users } from '../../users/domain/usersModel';
+import { HydratedDocument } from 'mongoose';
 /** Create search filter function */
 const createFilter = (enteredField: string) => {
   const filter: any = {};
@@ -90,18 +91,44 @@ export const authRepository = {
     }
     return updatedUser as UserDbType;
   },
-  async setPasswordRecoveryInfo(email: string, recoveryCode: string, recoveryCodeExpDate: Date) {
+  async setPasswordRecoveryInfo(
+    email: string,
+    recoveryCode: string,
+    recoveryCodeExpDate: Date,
+  ) {
     try {
-      const user = await Users.findOne({email: email});
-      if(!user) {
-        return null
+      const user = await Users.findOne({ email });
+      console.log(user);
+      if (!user) {
+        return null;
       }
       user.passwordInfo.passwordRecoveryCode = recoveryCode;
       user.passwordInfo.passwordRecoveryCodeExpires = recoveryCodeExpDate;
-      return await user.save()
+      return await user.save();
     } catch (error) {
-      return null
+      console.log(error);
+      return null;
     }
-  }
-
+  },
+  async findUserByPasswordConfirmCode(passwordRecoveryCode: string) {
+    const user: UserDbType | null = await Users.findOne({
+      'passwordInfo.passwordRecoveryCode': passwordRecoveryCode,
+    });
+    if (!user) {
+      return null;
+    }
+    return user;
+  },
+  async saveNewPassword(email: string, newPassword: string) {
+    const user: HydratedDocument<UserDbType> | null = await Users.findOne({
+      email,
+    });
+    if (!user) {
+      return null;
+    }
+    user.passwordInfo.passwordRecoveryCode = null;
+    user.passwordInfo.passwordRecoveryCodeExpires = null;
+    user.passwordInfo.passwordHash = newPassword;
+    return await user.save();
+  },
 };

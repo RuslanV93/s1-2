@@ -2,8 +2,10 @@ import { Router } from 'express';
 import {
   confirmationCodeValidator,
   inputValidationMiddleware,
+  passwordRecoveryCodeValidator,
   userEmailValidator,
   userLoginValidator,
+  userNewPasswordValidator,
   userPasswordValidator,
 } from '../../validators/fieldsValidators';
 import { loginUser } from './handlers/loginUser';
@@ -19,6 +21,7 @@ import { refreshToken } from './handlers/refreshToken';
 import { logout } from './handlers/logout';
 import { requestControl } from '../../validators/requestControl';
 import { passwordRecovery } from './handlers/passwordRecovery';
+import { setNewPassword } from './handlers/setNewPassword';
 
 export const authRouter = Router();
 
@@ -31,6 +34,7 @@ const authController = {
   refreshToken,
   logout,
   passwordRecovery,
+  setNewPassword,
 };
 
 authRouter.post(
@@ -73,4 +77,19 @@ authRouter.post(
 );
 authRouter.get('/me', accessTokenValidator, authController.authMe);
 
-authRouter.post('/password-recovery', requestControl, userEmailValidator, authController.passwordRecovery);
+authRouter.post(
+  '/password-recovery',
+  requestControl,
+  userEmailValidator,
+  inputValidationMiddleware,
+  authController.passwordRecovery,
+);
+
+authRouter.post(
+  '/new-password',
+  requestControl,
+  userNewPasswordValidator,
+  passwordRecoveryCodeValidator,
+  inputValidationMiddleware,
+  authController.setNewPassword,
+);

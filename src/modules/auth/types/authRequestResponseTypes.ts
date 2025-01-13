@@ -11,3 +11,7 @@ export type ConfirmationTypeWithBody = {
 export type EmailResendTypeWithBody = {
   email: string;
 };
+export type NewPasswordTypeWithBody = {
+  newPassword: string,
+  recoveryCode: string
+};

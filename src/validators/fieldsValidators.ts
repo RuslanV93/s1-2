@@ -38,6 +38,8 @@ const userFields = {
   login: 'login',
   password: 'password',
   email: 'email',
+  recoveryCode: 'recoveryCode',
+  newPassword: 'newPassword',
 };
 
 const commentFields = {
@@ -153,7 +155,7 @@ export const userPasswordValidator = body(userFields.password)
   .notEmpty()
   .withMessage('Password is required!')
   .isString()
-  .withMessage('Login must be a string!')
+  .withMessage('Password must be a string!')
   .trim()
   .isLength({ min: 6, max: 20 })
   .withMessage('Password length must be between 6 and 20 symbols!');
@@ -165,6 +167,23 @@ export const userEmailValidator = body(userFields.email)
   .withMessage('Email must be a string!')
   .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/)
   .withMessage('Invalid email format!');
+
+export const passwordRecoveryCodeValidator = body(userFields.recoveryCode)
+  .notEmpty()
+  .withMessage('Code is required')
+  .isString()
+  .withMessage('Recovery code must be a string!')
+  .isLength({ min: 1 })
+  .withMessage('Recovery code length mist be more than 1 symbol!');
+
+export const userNewPasswordValidator = body(userFields.newPassword)
+  .notEmpty()
+  .withMessage('Password is required!')
+  .isString()
+  .withMessage('Password must be a string!')
+  .trim()
+  .isLength({ min: 6, max: 20 })
+  .withMessage('Password length must be between 6 and 20 symbols!');
 
 // COMMENT CONTENT FIELD VALIDATOR _____________________________________
 export const commentContentValidator = body(commentFields.content)

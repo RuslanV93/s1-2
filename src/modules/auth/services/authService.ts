@@ -16,10 +16,16 @@ import { resultObject } from '../../../common/helpers/resultObjectHelpers';
 function isSuccess(result: ResultObject<any>): result is ResultObject<string> {
   return result.status === DomainStatusCode.Success && result.data !== null;
 }
-function hasPasswordRecoveryCode(user: UserDbType): user is UserDbType & {
-  passwordInfo: { passwordRecoveryCode: string }
+function hasValidRecoveryCode(user: UserDbType | null): user is UserDbType & {
+  passwordInfo: {
+    passwordRecoveryCode: string;
+    passwordRecoveryCodeExpires: Date;
+  };
 } {
-  return !!user.passwordInfo?.passwordRecoveryCode;
+  return !!(
+    user?.passwordInfo?.passwordRecoveryCode &&
+    user?.passwordInfo?.passwordRecoveryCodeExpires
+  );
 }
 export const authService = {
   /** checking credentials */
@@ -52,7 +58,10 @@ export const authService = {
       // };
     }
     // comparing password and pass hash
-    const passwordIsMatch = await comparePassword(passwordField, user.passwordInfo.passwordHash);
+    const passwordIsMatch = await comparePassword(
+      passwordField,
+      user.passwordInfo.passwordHash,
+    );
     if (!passwordIsMatch) {
       return resultObject.errorResultObject('Unauthorized', {
         message: 'incorrect password',
@@ -119,9 +128,10 @@ export const authService = {
     const newRegisteredUser: NewUserType = {
       login,
       email,
-      passwordInfo: { passwordHash,
-      passwordRecoveryCode: null,
-      passwordRecoveryCodeExpires: null
+      passwordInfo: {
+        passwordHash,
+        passwordRecoveryCode: null,
+        passwordRecoveryCodeExpires: null,
       },
       createdAt: new Date().toISOString(),
       emailConfirmation: {
@@ -253,7 +263,6 @@ export const authService = {
     };
   },
 
-
   /** Update access and refresh tokens. Update device sessions fields */
   async updateRefreshToken(userId: string, deviceId: string) {
     const refreshToken = await jwtService.createRefreshJWT(userId, deviceId);
@@ -292,33 +301,65 @@ export const authService = {
       extensions: [],
     };
   },
- async passwordRecovery(email: string) {
+  async passwordRecovery(email: string) {
     const user: UserDbType | null = await authRepository.findUser(email);
     if (!user) {
-      return resultObject.errorResultObject('NotFound', {message: 'User Not Found'})
+      return resultObject.errorResultObject('NotFound', {
+        message: 'Incorrect recovery code.',
+      });
     }
-    const recoveryCode = randomUUID()
+    const recoveryCode = randomUUID();
     const recoveryCodeExpDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const passwordRecoveryInfoUpdateResult = await authRepository.setPasswordRecoveryInfo(email, recoveryCode, recoveryCodeExpDate);
+    const passwordRecoveryInfoUpdateResult =
+      await authRepository.setPasswordRecoveryInfo(
+        email,
+        recoveryCode,
+        recoveryCodeExpDate,
+      );
     if (!passwordRecoveryInfoUpdateResult) {
-      return resultObject.errorResultObject('InternalServerError', {message: 'Something went wrong.'})
+      return resultObject.errorResultObject('InternalServerError', {
+        message: 'Something went wrong.',
+      });
     }
-    const passwordSendResult = await nodemailerService.sendPasswordResetAdapter(email, user.login, recoveryCode)
+    const passwordSendResult = await nodemailerService.sendPasswordResetAdapter(
+      email,
+      user.login,
+      recoveryCode,
+    );
     if (!passwordSendResult.success) {
-      return resultObject.errorResultObject('InternalServerError', {message: 'Email sent error. Something went wrong.'})
+      return resultObject.errorResultObject('InternalServerError', {
+        message: 'Email sent error. Something went wrong.',
+      });
     }
 
-   return resultObject.successResultObject()
+    return resultObject.successResultObject();
   },
-  async confirmPasswordRecovery(email: string, recoveryCode: string) {
-    const user: UserDbType | null = await authRepository.findUser(email);
-    if (!user) {
-      return resultObject.errorResultObject('NotFound', {message: 'User Not Found'})
+  async confirmPasswordRecovery(newPassword: string, recoveryCode: string) {
+    const user: UserDbType | null =
+      await authRepository.findUserByPasswordConfirmCode(recoveryCode);
+    if (!user || !hasValidRecoveryCode(user)) {
+      return resultObject.badRequestResultObject({
+        message: 'Recovery Code is invalid.',
+        field: 'recoveryCode',
+      });
     }
-    if (recoveryCode !== user.passwordInfo.passwordRecoveryCode) {
-      return resultObject.errorResultObject('BadRequest', {message: 'Recovery Code does not match.'})
+    const confirmDate = Date.now();
+    if (
+      recoveryCode !== user.passwordInfo.passwordRecoveryCode ||
+      confirmDate > user.passwordInfo.passwordRecoveryCodeExpires.getTime()
+    ) {
+      return resultObject.errorResultObject('BadRequest', {
+        message: 'Recovery Code does not match.',
+      });
     }
-    return resultObject.successResultObject()
-  }
-
+    const { passwordHash } = await genHashFunction(newPassword);
+    const passwordSaveResult = await authRepository.saveNewPassword(
+      user.email,
+      passwordHash,
+    );
+    if (!passwordSaveResult) {
+      return resultObject.internalErrorResultObject();
+    }
+    return resultObject.successResultObject();
+  },
 };

@@ -1,19 +1,19 @@
 import { Request, Response } from 'express';
-import { STATUSES } from '../../../common/variables/variables';
+import { NewPasswordTypeWithBody } from '../types/authRequestResponseTypes';
 import { authService } from '../services/authService';
 import { DomainStatusCode } from '../../../common/types/types';
 import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHttpFunction';
+import { STATUSES } from '../../../common/variables/variables';
 
-export const passwordRecovery = async (
-  req: Request<{}, {}, { email: string }>,
+export const setNewPassword = async (
+  req: Request<{}, {}, NewPasswordTypeWithBody>,
   res: Response,
 ) => {
-  const userEmail = req.body.email;
-  const result = await authService.passwordRecovery(userEmail);
-  if (
-    result.status !== DomainStatusCode.Success &&
-    result.status !== DomainStatusCode.NotFound
-  ) {
+  const result = await authService.confirmPasswordRecovery(
+    req.body.newPassword,
+    req.body.recoveryCode,
+  );
+  if (result.status !== DomainStatusCode.Success) {
     res
       .status(resultCodeToHttpFunction(result.status))
       .send({ errorsMessages: result.extensions });

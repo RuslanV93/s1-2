@@ -1,4 +1,4 @@
-import { UserDbType } from '../../modules/users/types/usersTypes';
+import { UserDbType } from '../../features/users/types/usersTypes';
 import settings from '../../settings';
 let jwt = require('jsonwebtoken');
 
@@ -6,7 +6,7 @@ export const jwtService = {
   /** Creating JWT token for acc access */
   async createJWT(userId: string) {
     return jwt.sign({ userId: userId }, settings.JWT_SECRET, {
-      expiresIn: '10s',
+      expiresIn: '1h',
     });
   },
 
@@ -16,7 +16,7 @@ export const jwtService = {
       { userId: userId, deviceId: deviceId },
       settings.JWT_REFRESH_SECRET,
       {
-        expiresIn: '20s',
+        expiresIn: '1h',
       },
     );
   },

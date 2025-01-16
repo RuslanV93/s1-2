@@ -2,7 +2,7 @@ import { describe } from 'node:test';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
-import { BlogViewType } from '../../src/modules/blogs/types/blogsTypes';
+import { BlogViewType } from '../../src/features/blogs/types/blogsTypes';
 import { runDb, stopDb } from '../../src/db/db';
 
 //@ts-ignore

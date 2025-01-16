@@ -1,9 +1,9 @@
 import { describe } from 'node:test';
-import { nodemailerService } from '../../src/modules/auth/adapters/sendEmailAdapter';
+import { nodemailerService } from '../../src/features/auth/adapters/sendEmailAdapter';
 import { newTestUserForSelfRegistration } from '../testData/data';
-import { authService } from '../../src/modules/auth/services/authService';
+import { authService } from '../../src/features/auth/services/authService';
 import { DomainStatusCode } from '../../src/common/types/types';
-import { authRepository } from '../../src/modules/auth/repositories/authRepository';
+import { authRepository } from '../../src/features/auth/repositories/authRepository';
 import { req } from '../e2e-tests/default.e2e.test';
 import { runDb, stopDb } from '../../src/db/db';
 import SETTINGS from '../../src/settings';

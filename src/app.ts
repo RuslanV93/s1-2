@@ -1,15 +1,15 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { blogsRouter } from './modules/blogs/blogsController';
+import { blogsRouter } from './features/blogs/blogsController';
 import SETTINGS from './settings';
-import { postsRouter } from './modules/posts/postsController';
-import { allDataRouter } from './modules/testing/deleteAllData';
+import { postsRouter } from './features/posts/postsController';
+import { allDataRouter } from './features/testing/deleteAllData';
 import { STATUSES } from './common/variables/variables';
-import { usersRouter } from './modules/users/usersController';
-import { authRouter } from './modules/auth/authController';
-import { commentsRouter } from './modules/comments/commentsController';
+import { usersRouter } from './features/users/usersController';
+import { authRouter } from './features/auth/authController';
+import { commentsRouter } from './features/comments/commentsRouter';
 import cookieParser from 'cookie-parser';
 import useragent from 'express-useragent';
-import { securityRouter } from './modules/devices/securityController';
+import { securityRouter } from './features/devices/securityController';
 
 export const app = express();
 app.use(express.json());

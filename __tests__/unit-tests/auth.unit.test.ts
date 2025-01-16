@@ -1,7 +1,7 @@
-import { authRepository } from '../../src/modules/auth/repositories/authRepository';
+import { authRepository } from '../../src/features/auth/repositories/authRepository';
 import { DomainStatusCode } from '../../src/common/types/types';
-import { authService } from '../../src/modules/auth/services/authService';
-import { devicesRepository } from '../../src/modules/devices/repositories/devicesRepository';
+import { authService } from '../../src/features/auth/services/authService';
+import { devicesRepository } from '../../src/features/devices/repositories/devicesRepository';
 
 describe('/auth', () => {
   devicesRepository.updateDeviceSession = jest

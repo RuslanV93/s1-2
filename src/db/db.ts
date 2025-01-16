@@ -1,17 +1,17 @@
 import { Collection, MongoClient, ObjectId } from 'mongodb';
-import { NewUserType, UserDbType } from '../modules/users/types/usersTypes';
-import { BlogDbType, NewBlogType } from '../modules/blogs/types/blogsTypes';
-import { NewPostType, PostDbType } from '../modules/posts/types/postsTypes';
+import { NewUserType, UserDbType } from '../features/users/types/usersTypes';
+import { BlogDbType, NewBlogType } from '../features/blogs/types/blogsTypes';
+import { NewPostType, PostDbType } from '../features/posts/types/postsTypes';
 import {
   CommentDbType,
   NewCommentType,
-} from '../modules/comments/types/commentsTypes';
+} from '../features/comments/types/commentsTypes';
 import { BLOGGERS_PLATFORM, DEVICE_CONTROL } from '../common/variables/variables';
 import {
   ApiRequestControlDbType,
   NewApiRequestControlType,
-} from '../modules/devices/types/apiRequestControlTypes';
-import { DeviceDbType, NewDeviceType } from '../modules/devices/types/deviceTypes';
+} from '../features/devices/types/apiRequestControlTypes';
+import { DeviceDbType, NewDeviceType } from '../features/devices/types/deviceTypes';
 import mongoose from 'mongoose';
 import SETTINGS from '../settings';
 

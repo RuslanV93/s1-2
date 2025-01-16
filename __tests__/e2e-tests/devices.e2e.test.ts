@@ -1,7 +1,7 @@
 import { getTestUserData, userAgentData } from '../testData/data';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
-import { usersService } from '../../src/modules/users/services/usersService';
+import { usersService } from '../../src/features/users/services/usersService';
 import { runDb, stopDb } from '../../src/db/db';
 import { jwtService } from '../../src/common/crypto/jwtService';
 const correctAuthData: string = 'admin:qwerty';

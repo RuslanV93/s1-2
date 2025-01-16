@@ -1,4 +1,4 @@
-import { blogsRepository } from '../modules/blogs/repositories/blogsRepository';
+import { blogsRepository } from '../features/blogs/repositories/blogsRepository';
 
 import { body } from 'express-validator';
 import { ObjectId } from 'mongodb';

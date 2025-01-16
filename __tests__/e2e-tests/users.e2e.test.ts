@@ -2,7 +2,7 @@ import { describe } from 'node:test';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
-import { UserViewType } from '../../src/modules/users/types/usersTypes';
+import { UserViewType } from '../../src/features/users/types/usersTypes';
 import { runDb, stopDb } from '../../src/db/db';
 
 //@ts-ignore

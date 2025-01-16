@@ -2,7 +2,7 @@ import { describe } from 'node:test';
 import { req } from './default.e2e.test';
 import SETTINGS from '../../src/settings';
 import { STATUSES } from '../../src/common/variables/variables';
-import { PostViewType } from '../../src/modules/posts/types/postsTypes';
+import { PostViewType } from '../../src/features/posts/types/postsTypes';
 import { runDb, stopDb } from '../../src/db/db';
 
 let postId: string;

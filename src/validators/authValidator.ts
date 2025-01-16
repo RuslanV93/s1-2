@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { STATUSES } from '../common/variables/variables';
-import { authService } from '../modules/auth/services/authService';
-import { usersQueryRepository } from '../modules/users/repositories/usersQueryRepository';
+import { authService } from '../features/auth/services/authService';
+import { usersQueryRepository } from '../features/users/repositories/usersQueryRepository';
 import { jwtService } from '../common/crypto/jwtService';
-import { devicesService } from '../modules/devices/services/devicesService';
+import { devicesService } from '../features/devices/services/devicesService';
 import { DomainStatusCode } from '../common/types/types';
 import { resultCodeToHttpFunction } from '../common/helpers/resultCodeToHttpFunction';
 
@@ -15,6 +15,7 @@ export const authValidatorMiddleware = (
   next: NextFunction,
 ) => {
   const authData = process.env.AUTH;
+
   const auth: string = req.headers['authorization'] as string;
   if (!auth) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
@@ -76,8 +77,10 @@ export const refreshTokenValidator = async (
     return;
   }
 
-
-  const session = await devicesService.findSessionAndVerify(tokenPayload.deviceId,tokenPayload.exp);
+  const session = await devicesService.findSessionAndVerify(
+    tokenPayload.deviceId,
+    tokenPayload.exp,
+  );
   if (session.status !== DomainStatusCode.Success) {
     res.sendStatus(resultCodeToHttpFunction(session.status));
     return;

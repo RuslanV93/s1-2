@@ -7,9 +7,9 @@ import {
 } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import { STATUSES } from '../common/variables/variables';
-import { blogsRepository } from '../modules/blogs/repositories/blogsRepository';
+import { blogsRepository } from '../features/blogs/repositories/blogsRepository';
 import { blogByIdExists } from './blogExistsCustomValidator';
-import { BlogDbType } from '../modules/blogs/types/blogsTypes';
+import { BlogDbType } from '../features/blogs/types/blogsTypes';
 import { ObjectId } from 'mongodb';
 
 // validation error types

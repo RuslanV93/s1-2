@@ -7,7 +7,7 @@ export const resultCodeToHttpFunction = (statusCode: DomainStatusCode) => {
       return STATUSES.UNAUTHORIZED_401;
     }
     case DomainStatusCode.NotFound: {
-      return STATUSES.NOT_FOUNT_404;
+      return STATUSES.NOT_FOUND_404;
     }
     case DomainStatusCode.Forbidden: {
       return STATUSES.FORBIDDEN_403;

@@ -9,12 +9,17 @@ export const updateBlog = async (
   req: Request<BlogRequestTypeWithBodyAndParams>,
   res: Response,
 ) => {
-  const blogForUpdate = await blogsRepository.getBlogById(new ObjectId(req.params.id));
+  const blogForUpdate = await blogsRepository.getBlogById(
+    new ObjectId(req.params.id),
+  );
   if (!blogForUpdate) {
-    res.status(STATUSES.NOT_FOUNT_404).send('Blog not found. Incorrect blog id');
+    res.status(STATUSES.NOT_FOUND_404).send('Blog not found. Incorrect blog id');
     return;
   }
-  const result = await blogsService.updateBlog(new ObjectId(req.params.id), req.body);
+  const result = await blogsService.updateBlog(
+    new ObjectId(req.params.id),
+    req.body,
+  );
   if (!result) {
     res.status(500).send('Something went wrong.');
 

@@ -61,6 +61,6 @@ describe('/users', () => {
     req
       .delete(`${SETTINGS.PATH.USERS}/${userId}`)
       .set('authorization', authData)
-      .expect(STATUSES.NOT_FOUNT_404);
+      .expect(STATUSES.NOT_FOUND_404);
   });
 });

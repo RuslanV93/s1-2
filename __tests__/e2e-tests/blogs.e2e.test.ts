@@ -137,7 +137,7 @@ describe('/blogs', () => {
     });
     await req
       .get(`${SETTINGS.PATH.BLOGS}/6745ab1f9dcdf183ecf73778/posts`)
-      .expect(STATUSES.NOT_FOUNT_404);
+      .expect(STATUSES.NOT_FOUND_404);
   });
   it('should delete blog by id', async () => {
     await req
@@ -147,6 +147,6 @@ describe('/blogs', () => {
 
     await req
       .get(`${SETTINGS.PATH.BLOGS}/${newBlogForTestId}`)
-      .expect(STATUSES.NOT_FOUNT_404);
+      .expect(STATUSES.NOT_FOUND_404);
   });
 });

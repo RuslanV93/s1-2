@@ -11,7 +11,7 @@ export const getCommentsByPostId = async (req: Request, res: Response) => {
   const existingPost = await commentsRepository.findPost(req.params.id);
 
   if (!existingPost) {
-    res.status(STATUSES.NOT_FOUNT_404).send('Post not found.');
+    res.status(STATUSES.NOT_FOUND_404).send('Post not found.');
     return;
   }
   req.query.search = req.params.id;

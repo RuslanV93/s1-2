@@ -18,7 +18,7 @@ export const getPostsByBlogId = async (
   const blog = await blogsRepository.getBlogById(new ObjectId(req.params.id));
 
   if (!blog) {
-    res.status(STATUSES.NOT_FOUNT_404).send('Blog not found. Incorrect Blog Id.');
+    res.status(STATUSES.NOT_FOUND_404).send('Blog not found. Incorrect Blog Id.');
     return;
   }
   const postsByBlogId = await postsQueryRepository.getPosts(

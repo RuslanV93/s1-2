@@ -13,7 +13,7 @@ export const getPostById = async (
   const post: PostViewType | null = await postsQueryRepository.getPostById(id);
 
   if (!post) {
-    res.sendStatus(STATUSES.NOT_FOUNT_404);
+    res.sendStatus(STATUSES.NOT_FOUND_404);
     return;
   }
   res.status(STATUSES.OK_200).send(post);

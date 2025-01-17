@@ -13,13 +13,15 @@ export const deleteUser = async (
     new ObjectId(req.params.id),
   );
   if (!userForDeleteId) {
-    res.status(STATUSES.NOT_FOUNT_404).send('User not Found!');
+    res.status(STATUSES.NOT_FOUND_404).send('User not Found!');
     return;
   }
   const deleteResult = await usersService.deleteUser(userForDeleteId);
 
   if (!deleteResult) {
-    res.status(STATUSES.BAD_REQUEST_400).send('Something went wrong. User not deleted.');
+    res
+      .status(STATUSES.BAD_REQUEST_400)
+      .send('Something went wrong. User not deleted.');
     return;
   }
   res.sendStatus(STATUSES.NO_CONTENT_204);

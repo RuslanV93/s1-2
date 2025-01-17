@@ -113,6 +113,6 @@ describe('/comments', () => {
       .expect(STATUSES.NO_CONTENT_204);
     await req
       .get(`${SETTINGS.PATH.COMMENTS}/${commentId}`)
-      .expect(STATUSES.NOT_FOUNT_404);
+      .expect(STATUSES.NOT_FOUND_404);
   });
 });

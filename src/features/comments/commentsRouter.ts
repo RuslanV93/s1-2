@@ -30,3 +30,8 @@ commentsRouter.delete(
   inputValidationMiddleware,
   commentsController.deleteComment.bind(commentsController),
 );
+commentsRouter.get(
+  '/:id/like-status',
+  accessTokenValidator,
+  commentsController.updateLikeStatus.bind(commentsController),
+);

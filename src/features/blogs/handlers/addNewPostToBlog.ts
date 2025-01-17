@@ -21,7 +21,7 @@ export const addNewPostToBlog = async (
   );
 
   if (!blogToAddPost) {
-    res.sendStatus(STATUSES.NOT_FOUNT_404);
+    res.sendStatus(STATUSES.NOT_FOUND_404);
     return;
   }
   // Getting new post id after adding to DB
@@ -36,7 +36,7 @@ export const addNewPostToBlog = async (
   // Getting new post to response him
   const newPost = await postsQueryRepository.getPostById(newPostId);
   if (!newPost) {
-    res.status(STATUSES.NOT_FOUNT_404).send('Post not found.');
+    res.status(STATUSES.NOT_FOUND_404).send('Post not found.');
   }
   res.status(STATUSES.CREATED_201).send(newPost);
 };

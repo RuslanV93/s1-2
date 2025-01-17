@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-export enum myLikesStatus {
+export enum MyLikesStatus {
   none = 'none',
   like = 'like',
   dislike = 'dislike',
@@ -13,7 +13,7 @@ export type CommentatorInfoType = {
 export type LikesInfoType = {
   likesCount: number;
   dislikesCount: number;
-  myStatus: myLikesStatus;
+  myStatus: MyLikesStatus;
 };
 
 export type NewCommentType = {

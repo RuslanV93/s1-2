@@ -2,7 +2,7 @@ import {
   AllCommentsViewType,
   CommentDbType,
   CommentViewType,
-  myLikesStatus,
+  MyLikesStatus,
 } from '../types/commentsTypes';
 import { CommentsRequestWithQueryType } from '../types/commentsResponseRequestTypes';
 
@@ -22,7 +22,7 @@ export const commentsMappers = {
         likesInfo: {
           likesCount: 0,
           dislikesCount: 0,
-          myStatus: myLikesStatus.none,
+          myStatus: MyLikesStatus.none,
         },
       };
     });

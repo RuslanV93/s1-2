@@ -5,11 +5,16 @@ import { STATUSES } from '../../../common/variables/variables';
 import { blogsService } from '../services/blogsService';
 import { ObjectId } from 'mongodb';
 
-export const deleteBlog = async (req: Request<BlogRequestTypeParams>, res: Response) => {
+export const deleteBlog = async (
+  req: Request<BlogRequestTypeParams>,
+  res: Response,
+) => {
   // checking is blog exists
-  const existingBlog = await blogsRepository.getBlogById(new ObjectId(req.params.id));
+  const existingBlog = await blogsRepository.getBlogById(
+    new ObjectId(req.params.id),
+  );
   if (!existingBlog) {
-    res.sendStatus(STATUSES.NOT_FOUNT_404);
+    res.sendStatus(STATUSES.NOT_FOUND_404);
     return;
   }
   // getting delete result (success or not)

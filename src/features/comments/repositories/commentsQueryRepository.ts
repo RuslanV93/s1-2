@@ -4,7 +4,7 @@ import {
   AllCommentsViewType,
   CommentDbType,
   CommentViewType,
-  myLikesStatus,
+  MyLikesStatus,
 } from '../types/commentsTypes';
 import { ObjectId } from 'mongodb';
 import { Comments } from '../domain/comments.entity';
@@ -63,7 +63,7 @@ export class CommentsQueryRepository {
       likesInfo: {
         likesCount: dbComment.likesInfo.likesCount,
         dislikesCount: dbComment.likesInfo.dislikesCount,
-        myStatus: myLikesStatus.none,
+        myStatus: MyLikesStatus.none,
       },
     };
   }

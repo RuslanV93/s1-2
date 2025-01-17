@@ -19,7 +19,7 @@ export const addNewBlog = async (
   const newAddedBlog = await blogsQueryRepository.getBlogById(addedBlogId);
 
   if (!newAddedBlog) {
-    res.status(STATUSES.NOT_FOUNT_404).send('Blog not found.');
+    res.status(STATUSES.NOT_FOUND_404).send('Blog not found.');
     return;
   }
 

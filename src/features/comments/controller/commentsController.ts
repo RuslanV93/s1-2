@@ -1,27 +1,41 @@
 import { Request, Response } from 'express';
 import { CommentsRequestWithParamsType } from '../types/commentsResponseRequestTypes';
-import { CommentViewType } from '../types/commentsTypes';
+import { CommentViewType, MyLikesStatus } from '../types/commentsTypes';
 import { STATUSES } from '../../../common/variables/variables';
 import { DomainStatusCode } from '../../../common/types/types';
 import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHttpFunction';
 import { CommentsQueryRepository } from '../repositories/commentsQueryRepository';
 import { CommentsService } from '../services/commentsService';
+import { LikesQueryRepository } from '../../likes/repositories/likesQueryRepository';
+import { LikesRepoResultType } from '../../likes/types/likesTypes';
+import {
+  LikeResponseWithBodyType,
+  LikeResponseWithParamsType,
+} from '../../likes/types/likesRequestResponseTypes';
+import { likesService } from '../../../infrastructure/compositionRoot';
+import { LikesService } from '../../likes/services/likesService';
 
 export class CommentsController {
   constructor(
     private commentsQueryRepository: CommentsQueryRepository,
     private commentsService: CommentsService,
+    private likesQueryRepository: LikesQueryRepository,
+    private likesService: LikesService,
   ) {}
+
+  /** Getting comments by comment ID */
   async getCommentById(req: Request<CommentsRequestWithParamsType>, res: Response) {
     const commentId: string = req.params.id;
     const comment: CommentViewType | null =
       await this.commentsQueryRepository.getCommentById(commentId);
     if (!comment) {
-      res.status(STATUSES.NOT_FOUNT_404).send('Commentary not found. Incorrect ID.');
+      res.status(STATUSES.NOT_FOUND_404).send('Commentary not found. Incorrect ID.');
       return;
     }
     res.status(STATUSES.OK_200).send(comment);
   }
+
+  /** Update existing comment */
   async updateComment(req: Request, res: Response) {
     const userId: string = req.user.id;
     const commentId: string = req.params.id;
@@ -41,6 +55,8 @@ export class CommentsController {
     res.sendStatus(STATUSES.NO_CONTENT_204);
     return;
   }
+
+  /** Delete existing comment*/
   async deleteComment(req: Request<CommentsRequestWithParamsType>, res: Response) {
     const commentId: string = req.params.id;
     const userId: string = req.user.id;
@@ -55,5 +71,30 @@ export class CommentsController {
       return;
     }
     res.sendStatus(STATUSES.NO_CONTENT_204);
+  }
+
+  /** Update Like status (none, like, dislike) */
+  async updateLikeStatus(
+    req: Request<LikeResponseWithParamsType, {}, LikeResponseWithBodyType>,
+    res: Response,
+  ) {
+    try {
+      const newLikeStatus = req.body.likeStatus as MyLikesStatus;
+      const commentId: string = req.params.id;
+      const userId: string = req.user.id;
+      const existingLikeStatus: LikesRepoResultType =
+        await this.likesQueryRepository.getLikeStatus(commentId, userId);
+      if (!existingLikeStatus.status) {
+        return;
+      }
+      const updateResult = await this.likesService.updateLikeStatus(
+        commentId,
+        userId,
+        existingLikeStatus.status,
+        newLikeStatus,
+      );
+    } catch (error) {
+      res.status(STATUSES.INTERNAL_ERROR_500).send(error);
+    }
   }
 }

@@ -12,11 +12,12 @@ import {
   LikeResponseWithBodyType,
   LikeResponseWithParamsType,
 } from '../../likes/types/likesRequestResponseTypes';
-import { likesService } from '../../../infrastructure/compositionRoot';
 import { LikesService } from '../../likes/services/likesService';
+import { CommentsRepository } from '../repositories/commentsRepository';
 
 export class CommentsController {
   constructor(
+    private commentsRepository: CommentsRepository,
     private commentsQueryRepository: CommentsQueryRepository,
     private commentsService: CommentsService,
     private likesQueryRepository: LikesQueryRepository,
@@ -25,13 +26,16 @@ export class CommentsController {
 
   /** Getting comments by comment ID */
   async getCommentById(req: Request<CommentsRequestWithParamsType>, res: Response) {
+    const userId = req.user.id;
     const commentId: string = req.params.id;
+    // getting comment entity from db. likes info already included.
     const comment: CommentViewType | null =
-      await this.commentsQueryRepository.getCommentById(commentId);
+      await this.commentsQueryRepository.getCommentById(commentId, userId);
     if (!comment) {
       res.status(STATUSES.NOT_FOUND_404).send('Commentary not found. Incorrect ID.');
       return;
     }
+
     res.status(STATUSES.OK_200).send(comment);
   }
 
@@ -82,9 +86,11 @@ export class CommentsController {
       const newLikeStatus = req.body.likeStatus as MyLikesStatus;
       const commentId: string = req.params.id;
       const userId: string = req.user.id;
+
       const existingLikeStatus: LikesRepoResultType =
-        await this.likesQueryRepository.getLikeStatus(commentId, userId);
+        await this.likesQueryRepository.getLikeStatusFromDb(commentId, userId);
       if (!existingLikeStatus.status) {
+        res.status(STATUSES.INTERNAL_ERROR_500).send('Something went wrong.');
         return;
       }
       const updateResult = await this.likesService.updateLikeStatus(
@@ -93,8 +99,16 @@ export class CommentsController {
         existingLikeStatus.status,
         newLikeStatus,
       );
+      if (updateResult.status !== DomainStatusCode.Success) {
+        res
+          .status(resultCodeToHttpFunction(updateResult.status))
+          .send(updateResult.extensions);
+        return;
+      }
+      res.sendStatus(STATUSES.NO_CONTENT_204);
     } catch (error) {
       res.status(STATUSES.INTERNAL_ERROR_500).send(error);
+      return;
     }
   }
 }

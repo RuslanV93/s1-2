@@ -1,5 +1,5 @@
 import { CommentsRequestWithQueryType } from '../types/commentsResponseRequestTypes';
-import { commentsMappers } from '../features/commentsMappers';
+import { commentsMappers } from './commentsMappers';
 import {
   AllCommentsViewType,
   CommentDbType,
@@ -8,6 +8,8 @@ import {
 } from '../types/commentsTypes';
 import { ObjectId } from 'mongodb';
 import { Comments } from '../domain/comments.entity';
+import { LikesQueryRepository } from '../../likes/repositories/likesQueryRepository';
+import { likesQueryRepository } from '../../../infrastructure/compositionRoot';
 
 const createFilter = (params: CommentsRequestWithQueryType) => {
   const filter: any = {};
@@ -17,6 +19,7 @@ const createFilter = (params: CommentsRequestWithQueryType) => {
   return filter;
 };
 export class CommentsQueryRepository {
+  constructor(protected likesQueryRepository: LikesQueryRepository) {}
   // getting commentaries total count
   async getCommentsTotalCount(params: CommentsRequestWithQueryType) {
     const filter = createFilter(params);
@@ -26,32 +29,47 @@ export class CommentsQueryRepository {
   // getting all comments
   async getComments(
     paginationAndSearchParams: CommentsRequestWithQueryType,
-  ): Promise<AllCommentsViewType> {
-    const filter = createFilter(paginationAndSearchParams);
-
-    const totalCount = await this.getCommentsTotalCount(paginationAndSearchParams);
-    const { pageNumber, pageSize, sortBy, sortDirection } =
-      paginationAndSearchParams;
-    const dbComments = await Comments.find<CommentDbType>(filter)
-      .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
-      .skip(pageSize * (pageNumber - 1))
-      .limit(pageSize)
-      .lean();
-
-    return commentsMappers.commentsToViewTypeWithPageParamsMapper(
-      dbComments,
-      totalCount,
-      paginationAndSearchParams,
-    );
+    userId: string,
+  ): Promise<AllCommentsViewType | null> {
+    try {
+      const filter = createFilter(paginationAndSearchParams);
+      const totalCount = await this.getCommentsTotalCount(paginationAndSearchParams);
+      const { pageNumber, pageSize, sortBy, sortDirection } =
+        paginationAndSearchParams;
+      const dbComments = await Comments.find<CommentDbType>(filter)
+        .sort({ [sortBy]: sortDirection === 'asc' ? 1 : -1 })
+        .skip(pageSize * (pageNumber - 1))
+        .limit(pageSize)
+        .lean();
+      const commentsIds = dbComments.map((comment) => comment._id);
+      const likes = await likesQueryRepository.getLikesStatuses(userId, commentsIds);
+      return commentsMappers.commentsToViewTypeWithPageParamsMapper(
+        dbComments,
+        likes,
+        totalCount,
+        paginationAndSearchParams,
+      );
+    } catch (error) {
+      return null;
+    }
   }
 
   // get 1 commentary by comment id
-  async getCommentById(id: string): Promise<CommentViewType | null> {
-    const dbComment = await Comments.findOne({ _id: new ObjectId(id) }).lean();
+  async getCommentById(
+    commentId: string,
+    userId: string,
+  ): Promise<CommentViewType | null> {
+    const dbComment: CommentDbType | null = await Comments.findOne({
+      _id: new ObjectId(commentId),
+    }).lean();
 
     if (!dbComment) {
       return null;
     }
+    const getLikeResult = await this.likesQueryRepository.getLikeStatusFromDb(
+      commentId,
+      userId,
+    );
     return {
       id: dbComment._id.toString(),
       content: dbComment.content,
@@ -63,7 +81,7 @@ export class CommentsQueryRepository {
       likesInfo: {
         likesCount: dbComment.likesInfo.likesCount,
         dislikesCount: dbComment.likesInfo.dislikesCount,
-        myStatus: MyLikesStatus.none,
+        myStatus: getLikeResult.status ? getLikeResult.status : MyLikesStatus.none,
       },
     };
   }

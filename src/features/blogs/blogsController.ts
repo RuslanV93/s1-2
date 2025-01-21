@@ -1,9 +1,4 @@
 import { Router } from 'express';
-import { getBlogs } from './handlers/getBlogs';
-import { getBlogById } from './handlers/getBlogById';
-import { addNewBlog } from './handlers/addNewBlog';
-import { deleteBlog } from './handlers/deleteBlog';
-import { updateBlog } from './handlers/updateBlog';
 import {
   blogIdValidator,
   contentValidator,
@@ -16,38 +11,26 @@ import {
   webSiteUrlValidator,
 } from '../../validators/fieldsValidators';
 import { authValidatorMiddleware } from '../../validators/authValidator';
-import { getPostsByBlogId } from './handlers/getPostsByBlogId';
-import { addNewPostToBlog } from './handlers/addNewPostToBlog';
 import {
   queryFieldsValidatorMiddleware,
   sortValidator,
 } from '../../validators/queryValidators';
+import { blogsController } from '../../infrastructure/compositionRoot';
 
 // blogs router
 export const blogsRouter = Router();
-
-// blogs CRUD methods controller
-const blogsController = {
-  getBlogs: getBlogs,
-  getBlogsById: getBlogById,
-  addNewBlog: addNewBlog,
-  deleteBlog: deleteBlog,
-  updateBlog: updateBlog,
-  getPostsByBlogId: getPostsByBlogId,
-  addNewPostToBlog: addNewPostToBlog,
-};
 
 blogsRouter.get(
   '/',
   sortValidator,
   queryFieldsValidatorMiddleware,
-  blogsController.getBlogs,
+  blogsController.getBlogs.bind(blogsController),
 );
 blogsRouter.get(
   '/:id',
   validateObjectId,
   inputValidationMiddleware,
-  blogsController.getBlogsById,
+  blogsController.getBlogsById.bind(blogsController),
 );
 blogsRouter.post(
   '/',
@@ -56,14 +39,14 @@ blogsRouter.post(
   descriptionValidator,
   webSiteUrlValidator,
   inputValidationMiddleware,
-  blogsController.addNewBlog,
+  blogsController.addNewBlog.bind(blogsController),
 );
 blogsRouter.delete(
   '/:id',
   authValidatorMiddleware,
   validateObjectId,
   inputValidationMiddleware,
-  blogsController.deleteBlog,
+  blogsController.deleteBlog.bind(blogsController),
 );
 blogsRouter.put(
   '/:id',
@@ -73,7 +56,7 @@ blogsRouter.put(
   webSiteUrlValidator,
   validateObjectId,
   inputValidationMiddleware,
-  blogsController.updateBlog,
+  blogsController.updateBlog.bind(blogsController),
 );
 blogsRouter.get(
   '/:id/posts',
@@ -81,7 +64,7 @@ blogsRouter.get(
   sortValidator,
   queryFieldsValidatorMiddleware,
   inputValidationMiddleware,
-  blogsController.getPostsByBlogId,
+  blogsController.getPostsByBlogId.bind(blogsController),
 );
 blogsRouter.post(
   '/:id/posts',
@@ -92,5 +75,5 @@ blogsRouter.post(
   shortDescriptionValidator,
   contentValidator,
   inputValidationMiddleware,
-  blogsController.addNewPostToBlog,
+  blogsController.addNewPostToBlog.bind(blogsController),
 );

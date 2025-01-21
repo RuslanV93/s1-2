@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
 
 export enum MyLikesStatus {
-  none = 'none',
-  like = 'like',
-  dislike = 'dislike',
+  none = 'None',
+  like = 'Like',
+  dislike = 'Dislike',
 }
 export type CommentatorInfoType = {
   userId: ObjectId | string;

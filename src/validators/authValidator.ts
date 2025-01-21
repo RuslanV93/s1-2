@@ -47,7 +47,7 @@ export const accessTokenValidator = async (
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
   }
-  const payload = await jwtService.getUserByToken(token);
+  const payload = await jwtService.verifyAccessToken(token);
   if (!payload) {
     res.sendStatus(STATUSES.UNAUTHORIZED_401);
     return;
@@ -87,5 +87,22 @@ export const refreshTokenValidator = async (
   }
 
   req.userContext = tokenPayload;
+  next();
+};
+
+export const softAuthMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.headers.authorization) {
+    req.user = { id: 'none' };
+    return next();
+  }
+  const [authType, token] = req.headers?.authorization.split(' ');
+
+  const { userId } = await jwtService.getUserIdFromAccessToken(token);
+
+  req.user = { id: userId };
   next();
 };

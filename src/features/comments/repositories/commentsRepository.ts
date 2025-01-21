@@ -52,4 +52,27 @@ export class CommentsRepository {
 
     return deleteResult.deletedCount || null;
   }
+  async changeLikesCount(
+    commentId: string,
+    counters: { like: number; dislike: number },
+  ) {
+    try {
+      const comment = await Comments.findByIdAndUpdate(
+        commentId,
+        {
+          $inc: {
+            'likesInfo.likesCount': counters.like,
+            'likesInfo.dislikesCount': counters.dislike,
+          },
+        },
+        { new: true },
+      );
+      if (!comment) {
+        return null;
+      }
+      return comment;
+    } catch (error) {
+      throw Error(error instanceof Error ? error.message : 'Unknown error.');
+    }
+  }
 }

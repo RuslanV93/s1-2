@@ -18,7 +18,6 @@ export const addNewUser = async (
     );
 
     if (!newAddedUserId) {
-      console.log('not new user');
       res.sendStatus(STATUSES.BAD_REQUEST_400);
       return;
     }

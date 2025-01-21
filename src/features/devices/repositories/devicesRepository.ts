@@ -21,12 +21,6 @@ export const devicesRepository = {
     } catch (error) {
       return null;
     }
-
-    // const result = await devicesCollection.insertOne(device);
-    // if (!result) {
-    //   return null;
-    // }
-    // return result.insertedId.toString();
   },
 
   /** Update refresh token in database */
@@ -39,19 +33,6 @@ export const devicesRepository = {
       },
       { new: true }, // вернет обновленный документ
     ).exec();
-    // const result = await devicesCollection.findOneAndUpdate(
-    //   { deviceId: deviceId },
-    //   {
-    //     $set: { lastActiveDate: issuedAt, expiryDate: expiryDate },
-    //   },
-    //   {
-    //     returnDocument: 'after',
-    //   },
-    // );
-    // if (!result) {
-    //   return null;
-    // }
-    // return result;
   },
 
   /** Getting token exp date for verifying is token expired */

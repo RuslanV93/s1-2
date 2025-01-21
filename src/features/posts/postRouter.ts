@@ -1,12 +1,8 @@
 import { Router } from 'express';
-import { getPosts } from './handlers/getPosts';
-import { getPostById } from './handlers/getPostById';
-import { addNewPost } from './handlers/addNewPost';
-import { deletePost } from './handlers/deletePost';
-import { updatePost } from './handlers/updatePost';
 import {
   accessTokenValidator,
   authValidatorMiddleware,
+  softAuthMiddleware,
 } from '../../validators/authValidator';
 import {
   blogIdValidator,
@@ -21,29 +17,17 @@ import {
   queryFieldsValidatorMiddleware,
   sortValidator,
 } from '../../validators/queryValidators';
-import { addNewCommentToPost } from './handlers/addNewCommentToPost';
-import { getCommentsByPostId } from './handlers/getCommentsByPostId';
+import { postsController } from '../../infrastructure/compositionRoot';
 
 // Router
 export const postsRouter = Router();
-
-// Controller methods
-export const postsController = {
-  getPosts,
-  getPostById,
-  addNewPost,
-  deletePost,
-  updatePost,
-  getCommentsByPostId,
-  addNewCommentToPost,
-};
 
 // get all posts
 postsRouter.get(
   '/',
   sortValidator,
   queryFieldsValidatorMiddleware,
-  postsController.getPosts,
+  postsController.getPosts.bind(postsController),
 );
 
 //get post by id
@@ -51,7 +35,7 @@ postsRouter.get(
   '/:id',
   validateObjectId,
   inputValidationMiddleware,
-  postsController.getPostById,
+  postsController.getPostById.bind(postsController),
 );
 
 // add new post
@@ -63,7 +47,7 @@ postsRouter.post(
   contentValidator,
   ...blogIdValidator,
   inputValidationMiddleware,
-  postsController.addNewPost,
+  postsController.addNewPost.bind(postsController),
 );
 
 // delete existing post
@@ -72,7 +56,7 @@ postsRouter.delete(
   authValidatorMiddleware,
   validateObjectId,
   inputValidationMiddleware,
-  postsController.deletePost,
+  postsController.deletePost.bind(postsController),
 );
 
 //update post fields
@@ -85,15 +69,16 @@ postsRouter.put(
   contentValidator,
   ...blogIdValidator,
   inputValidationMiddleware,
-  postsController.updatePost,
+  postsController.updatePost.bind(postsController),
 );
 
 // getting all comments by post id
 postsRouter.get(
   '/:id/comments',
+  softAuthMiddleware,
   validateObjectId,
   inputValidationMiddleware,
-  postsController.getCommentsByPostId,
+  postsController.getCommentsByPostId.bind(postsController),
 );
 
 // add new comment to post
@@ -103,5 +88,5 @@ postsRouter.post(
   validateObjectId,
   commentContentValidator,
   inputValidationMiddleware,
-  postsController.addNewCommentToPost,
+  postsController.addNewCommentToPost.bind(postsController),
 );

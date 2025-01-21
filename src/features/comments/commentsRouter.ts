@@ -1,8 +1,13 @@
 import { Router } from 'express';
-import { accessTokenValidator } from '../../validators/authValidator';
+import {
+  accessTokenValidator,
+  authValidatorMiddleware,
+  softAuthMiddleware,
+} from '../../validators/authValidator';
 import {
   commentContentValidator,
   inputValidationMiddleware,
+  likesStatusValidator,
   validateObjectId,
 } from '../../validators/fieldsValidators';
 import { commentsController } from '../../infrastructure/compositionRoot';
@@ -11,6 +16,7 @@ export const commentsRouter = Router();
 
 commentsRouter.get(
   '/:id',
+  softAuthMiddleware,
   validateObjectId,
   inputValidationMiddleware,
   commentsController.getCommentById.bind(commentsController),
@@ -30,8 +36,12 @@ commentsRouter.delete(
   inputValidationMiddleware,
   commentsController.deleteComment.bind(commentsController),
 );
-commentsRouter.get(
+commentsRouter.put(
   '/:id/like-status',
   accessTokenValidator,
+  validateObjectId,
+  softAuthMiddleware,
+  likesStatusValidator,
+  inputValidationMiddleware,
   commentsController.updateLikeStatus.bind(commentsController),
 );

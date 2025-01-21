@@ -1,6 +1,6 @@
 import { PostRequestTypeQuery } from '../types/postsRequestResponseTypes';
 import { ObjectId, WithId } from 'mongodb';
-import { postsMappers } from '../features/postsViewModelMapper';
+import { postsMappers } from './postsViewModelMapper';
 import { AllPostsViewType, PostDbType, PostViewType } from '../types/postsTypes';
 import { postsCollection } from '../../../db/db';
 
@@ -26,7 +26,7 @@ const createFilter = (
 
 // query repo posts **********
 
-export const postsQueryRepository = {
+export class PostsQueryRepository {
   // getting posts total count method **********
 
   //getting posts total count
@@ -38,7 +38,7 @@ export const postsQueryRepository = {
       ? createFilter(paginationAndSearchParams, blogId)
       : createFilter(paginationAndSearchParams);
     return await postsCollection.countDocuments(filter);
-  },
+  }
 
   // getting posts by blog id (blogs existing posts) and getting all posts*************
 
@@ -69,7 +69,7 @@ export const postsQueryRepository = {
       paginationAndSearchParams,
       postsTotalCount,
     );
-  },
+  }
 
   //get post by id method **********
 
@@ -89,5 +89,5 @@ export const postsQueryRepository = {
       blogName: dbPost.blogName,
       createdAt: dbPost.createdAt,
     };
-  },
-};
+  }
+}

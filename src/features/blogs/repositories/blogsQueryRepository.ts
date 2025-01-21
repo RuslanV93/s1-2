@@ -1,6 +1,6 @@
 import { BlogRequestTypeQuery } from '../types/blogsRequestResponseTypes';
 import { ObjectId } from 'mongodb';
-import { blogsMappers } from '../features/blogsViewModelMapper';
+import { blogsMappers } from './blogsViewModelMapper';
 import { AllBlogsViewType, BlogDbType, BlogViewType } from '../types/blogsTypes';
 import { blogsCollection } from '../../../db/db';
 
@@ -20,7 +20,7 @@ const createFilter = (paginationAndSearchParams: any, blogId?: ObjectId) => {
   return filter;
 };
 
-export const blogsQueryRepository = {
+export class BlogsQueryRepository {
   //getting blogs total count method *****
   async getBlogsTotalCount(
     paginationAndSearchParams: BlogRequestTypeQuery,
@@ -28,7 +28,7 @@ export const blogsQueryRepository = {
     const filter: any = createFilter(paginationAndSearchParams);
 
     return await blogsCollection.countDocuments(filter);
-  },
+  }
 
   // get all blogs method *******************
 
@@ -51,7 +51,7 @@ export const blogsQueryRepository = {
       paginationAndSearchParams,
       blogsTotalCount,
     );
-  },
+  }
 
   // getting blog bi blog id *******************
   async getBlogById(id: string): Promise<BlogViewType | null> {
@@ -69,5 +69,5 @@ export const blogsQueryRepository = {
       createdAt: dbBlog.createdAt,
       isMembership: dbBlog.isMembership,
     };
-  },
-};
+  }
+}

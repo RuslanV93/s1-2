@@ -5,11 +5,16 @@ import {
   MyLikesStatus,
 } from '../types/commentsTypes';
 import { CommentsRequestWithQueryType } from '../types/commentsResponseRequestTypes';
+import { LikesDbType } from '../../likes/types/likesTypes';
 
 export const commentsMappers = {
   commentsToViewModelMapper(
     dbComments: Array<CommentDbType>,
+    likes: LikesDbType[] | null,
   ): Array<CommentViewType> {
+    const likesMap = new Map(
+      likes?.map((like) => [like.parentId.toString(), like.status]) ?? [],
+    );
     const comments: CommentViewType[] = dbComments.map((comment) => {
       return {
         id: comment._id.toString(),
@@ -20,9 +25,9 @@ export const commentsMappers = {
         },
         createdAt: comment.createdAt,
         likesInfo: {
-          likesCount: 0,
-          dislikesCount: 0,
-          myStatus: MyLikesStatus.none,
+          likesCount: comment.likesInfo.likesCount || 0,
+          dislikesCount: comment.likesInfo.dislikesCount || 0,
+          myStatus: likesMap.get(comment._id.toString()) ?? MyLikesStatus.none,
         },
       };
     });
@@ -30,10 +35,14 @@ export const commentsMappers = {
   },
   commentsToViewTypeWithPageParamsMapper(
     dbComments: Array<CommentDbType>,
+    likes: Array<LikesDbType> | null,
     totalCount: number,
     params: CommentsRequestWithQueryType,
   ): AllCommentsViewType {
-    const comments: CommentViewType[] = this.commentsToViewModelMapper(dbComments);
+    const comments: CommentViewType[] = this.commentsToViewModelMapper(
+      dbComments,
+      likes,
+    );
 
     return {
       pagesCount: Math.ceil(totalCount / params.pageSize),

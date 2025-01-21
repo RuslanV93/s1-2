@@ -128,7 +128,6 @@ describe('multi-devices tests', () => {
     const refreshToken2Payload: any =
       await jwtService.getRefreshTokenPayload(refreshToken2);
     const login2DeviceId = refreshToken2Payload.deviceId;
-    console.log(login2DeviceId);
     await req
       .delete(`${SETTINGS.PATH.SECURITY}/devices/${login2DeviceId}`)
       .set('Cookie', `refreshToken=${refreshToken1}`)

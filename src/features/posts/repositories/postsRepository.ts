@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { NewPostType, PostDbType, PostForUpdateType } from '../types/postsTypes';
 import { postsCollection } from '../../../db/db';
 
-export const postsRepository = {
+export class PostsRepository {
   // getting post by post id
   async getPostById(id: ObjectId): Promise<PostDbType | null> {
     const [postById] = await postsCollection.find<PostDbType>({ _id: id }).toArray();
@@ -10,7 +10,7 @@ export const postsRepository = {
       return postById;
     }
     return null;
-  },
+  }
   //add new post
   async addNewPost(newPost: NewPostType): Promise<string | null> {
     const result = await postsCollection.insertOne(newPost);
@@ -18,7 +18,7 @@ export const postsRepository = {
       return result.insertedId.toString();
     }
     return null;
-  },
+  }
   // delete existing post by id
   async deletePostById(id: ObjectId): Promise<boolean> {
     const result = await postsCollection.deleteOne({
@@ -26,7 +26,7 @@ export const postsRepository = {
     });
 
     return result.deletedCount === 1;
-  },
+  }
 
   // update existing post by id
   async updatePostById(
@@ -39,5 +39,5 @@ export const postsRepository = {
     );
 
     return result.modifiedCount === 1;
-  },
-};
+  }
+}

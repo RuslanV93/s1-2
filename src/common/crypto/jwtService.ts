@@ -1,5 +1,6 @@
 import { UserDbType } from '../../features/users/types/usersTypes';
 import settings from '../../settings';
+import SETTINGS from '../../settings';
 let jwt = require('jsonwebtoken');
 
 export const jwtService = {
@@ -22,12 +23,15 @@ export const jwtService = {
   },
 
   /** getting user id by token from request headers */
-  async getUserByToken(token: string) {
+  async verifyAccessToken(token: string) {
     try {
       return jwt.verify(token, settings.JWT_SECRET);
     } catch (error) {
       return null;
     }
+  },
+  async getUserIdFromAccessToken(accessToken: string) {
+    return jwt.decode(accessToken, SETTINGS.JWT_SECRET);
   },
   async getRefreshTokenPayload(refreshToken: string) {
     try {

@@ -98,7 +98,6 @@ export const authRepository = {
   ) {
     try {
       const user = await Users.findOne({ email });
-      console.log(user);
       if (!user) {
         return null;
       }
@@ -106,7 +105,6 @@ export const authRepository = {
       user.passwordInfo.passwordRecoveryCodeExpires = recoveryCodeExpDate;
       return await user.save();
     } catch (error) {
-      console.log(error);
       return null;
     }
   },

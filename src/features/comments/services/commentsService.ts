@@ -3,9 +3,13 @@ import { CommentatorInfoType, NewCommentType } from '../types/commentsTypes';
 import { ObjectId } from 'mongodb';
 import { DomainStatusCode, ResultObject } from '../../../common/types/types';
 import { CommentsRepository } from '../repositories/commentsRepository';
+import { LikesRepository } from '../../likes/repositories/likesRepository';
 
 export class CommentsService {
-  constructor(protected commentsRepository: CommentsRepository) {}
+  constructor(
+    protected commentsRepository: CommentsRepository,
+    protected likesRepository: LikesRepository,
+  ) {}
   // adding new comment
   async addNewComment(
     postId: string,
@@ -85,35 +89,47 @@ export class CommentsService {
   }
 
   // delete comment by ID
-  async deleteComment(commentID: string, userId: string) {
-    const commentToDelete = await this.commentsRepository.findComment(commentID);
-    if (!commentToDelete) {
+  async deleteComment(commentId: string, userId: string) {
+    try {
+      const commentToDelete = await this.commentsRepository.findComment(commentId);
+      if (!commentToDelete) {
+        return {
+          status: DomainStatusCode.NotFound,
+          data: null,
+          extensions: [{ message: 'Commentary not found.' }],
+        };
+      }
+      if (userId !== commentToDelete.commentatorInfo.userId.toString()) {
+        return {
+          status: DomainStatusCode.Forbidden,
+          data: null,
+          extensions: [{ message: 'Not owner of this comment' }],
+        };
+      }
+      /** Delete commentary */
+      const commentDeleteResult =
+        await this.commentsRepository.deleteComment(commentId);
+      if (commentDeleteResult !== 1) {
+        return {
+          status: DomainStatusCode.InternalServerError,
+          data: null,
+          extensions: [{ message: 'Something went wrong.' }],
+        };
+      }
+      /** Delete likes when comment has been deleted */
+      await this.likesRepository.deleteLikeEntity(commentId);
+
       return {
-        status: DomainStatusCode.NotFound,
+        status: DomainStatusCode.Success,
         data: null,
-        extensions: [{ message: 'Commentary not found.' }],
+        extensions: [],
       };
-    }
-    if (userId !== commentToDelete.commentatorInfo.userId.toString()) {
-      return {
-        status: DomainStatusCode.Forbidden,
-        data: null,
-        extensions: [{ message: 'Not owner of this comment' }],
-      };
-    }
-    const commentDeleteResult =
-      await this.commentsRepository.deleteComment(commentID);
-    if (commentDeleteResult !== 1) {
+    } catch (error) {
       return {
         status: DomainStatusCode.InternalServerError,
         data: null,
         extensions: [{ message: 'Something went wrong.' }],
       };
     }
-    return {
-      status: DomainStatusCode.Success,
-      data: null,
-      extensions: [{ message: 'Comment deleted.' }],
-    };
   }
 }

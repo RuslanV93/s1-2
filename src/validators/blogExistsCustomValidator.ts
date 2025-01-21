@@ -1,7 +1,6 @@
-import { blogsRepository } from '../features/blogs/repositories/blogsRepository';
-
 import { body } from 'express-validator';
 import { ObjectId } from 'mongodb';
+import { blogsRepository } from '../infrastructure/compositionRoot';
 
 export const blogByIdExists = () => {
   return body('blogId').custom(async (value, { req }) => {

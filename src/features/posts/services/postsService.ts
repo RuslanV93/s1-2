@@ -1,13 +1,15 @@
-import { postsRepository } from '../repositories/postsRepository';
 import { PostRequestTypeWithBody } from '../types/postsRequestResponseTypes';
 import { ObjectId } from 'mongodb';
 import { NewPostType, PostForUpdateType, PostViewType } from '../types/postsTypes';
 import { PostByBlogRequestTypeBody } from '../../blogs/types/blogsRequestResponseTypes';
 import { BlogDbType } from '../../blogs/types/blogsTypes';
+import { PostsRepository } from '../repositories/postsRepository';
+import { postsRepository } from '../../../infrastructure/compositionRoot';
 
 // posts bll service methods
 
-export const postsService = {
+export class PostsService {
+  constructor(protected postsRepository: PostsRepository) {}
   // add new post to DB method
   async addNewPost(
     newPostBody: PostRequestTypeWithBody,
@@ -22,13 +24,13 @@ export const postsService = {
       createdAt: new Date().toISOString(),
     };
 
-    const newPostId = await postsRepository.addNewPost(newPost);
+    const newPostId = await this.postsRepository.addNewPost(newPost);
     if (!newPostId) {
       return null;
     }
 
     return newPostId;
-  },
+  }
 
   // add new post to existing blog
   async addNewPostToBlog(
@@ -43,8 +45,8 @@ export const postsService = {
       blogName: blogToAddPost.name,
       createdAt: new Date().toISOString(),
     };
-    return await postsRepository.addNewPost(newPost);
-  },
+    return await this.postsRepository.addNewPost(newPost);
+  }
 
   // update post fields
   async updatePost(
@@ -60,11 +62,11 @@ export const postsService = {
       blogName: blogName,
     };
 
-    return await postsRepository.updatePostById(postId, updatedPost);
-  },
+    return await this.postsRepository.updatePostById(postId, updatedPost);
+  }
 
   // delete existing post by id
   async deletePostById(id: ObjectId): Promise<boolean> {
-    return await postsRepository.deletePostById(id);
-  },
-};
+    return await this.postsRepository.deletePostById(id);
+  }
+}

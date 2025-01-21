@@ -7,10 +7,10 @@ import {
 } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import { STATUSES } from '../common/variables/variables';
-import { blogsRepository } from '../features/blogs/repositories/blogsRepository';
 import { blogByIdExists } from './blogExistsCustomValidator';
 import { BlogDbType } from '../features/blogs/types/blogsTypes';
 import { ObjectId } from 'mongodb';
+import { MyLikesStatus } from '../features/comments/types/commentsTypes';
 
 // validation error types
 type ValidationErrorCustom = {
@@ -44,6 +44,7 @@ const userFields = {
 
 const commentFields = {
   content: 'content',
+  likeStatus: 'likeStatus',
 };
 // ***************************** VALIDATORS **************************** /
 
@@ -192,6 +193,12 @@ export const commentContentValidator = body(commentFields.content)
   .trim()
   .isLength({ min: 20, max: 300 })
   .withMessage('Content field length must be between 20 and 100 symbols.');
+
+export const likesStatusValidator = body(commentFields.likeStatus)
+  .notEmpty()
+  .withMessage('Like status is required')
+  .isIn(Object.values(MyLikesStatus))
+  .withMessage('Like status is invalid!');
 
 // INPUT VALIDATION RESULT MIDDLEWARE ______________________________________
 

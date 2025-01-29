@@ -2,7 +2,9 @@ import { ObjectId } from 'mongodb';
 import { CommentDbType, NewCommentType } from '../types/commentsTypes';
 import { postsCollection } from '../../../db/db';
 import { Comments } from '../domain/comments.entity';
+import { injectable } from 'inversify';
 
+@injectable()
 export class CommentsRepository {
   // finding existing post
   async findPost(postId: string): Promise<ObjectId | null> {

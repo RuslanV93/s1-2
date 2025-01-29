@@ -13,15 +13,16 @@ import {
   LikeResponseWithParamsType,
 } from '../../likes/types/likesRequestResponseTypes';
 import { LikesService } from '../../likes/services/likesService';
-import { CommentsRepository } from '../repositories/commentsRepository';
+import { inject } from 'inversify';
 
 export class CommentsController {
   constructor(
-    private commentsRepository: CommentsRepository,
+    @inject(CommentsQueryRepository)
     private commentsQueryRepository: CommentsQueryRepository,
-    private commentsService: CommentsService,
-    private likesQueryRepository: LikesQueryRepository,
-    private likesService: LikesService,
+    @inject(CommentsService) protected commentsService: CommentsService,
+    @inject(LikesQueryRepository)
+    protected likesQueryRepository: LikesQueryRepository,
+    @inject(LikesService) protected likesService: LikesService,
   ) {}
 
   /** Getting comments by comment ID */
@@ -88,12 +89,15 @@ export class CommentsController {
       const userId: string = req.user.id;
 
       const existingLikeStatus: LikesRepoResultType =
-        await this.likesQueryRepository.getLikeStatusFromDb(commentId, userId);
+        await this.likesQueryRepository.getCommentLikeStatusFromDb(
+          commentId,
+          userId,
+        );
       if (!existingLikeStatus.status) {
         res.status(STATUSES.INTERNAL_ERROR_500).send('Something went wrong.');
         return;
       }
-      const updateResult = await this.likesService.updateLikeStatus(
+      const updateResult = await this.likesService.updateCommentLikeStatus(
         commentId,
         userId,
         existingLikeStatus.status,

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
   accessTokenValidator,
-  authValidatorMiddleware,
   softAuthMiddleware,
 } from '../../validators/authValidator';
 import {
@@ -10,7 +9,7 @@ import {
   likesStatusValidator,
   validateObjectId,
 } from '../../validators/fieldsValidators';
-import { commentsController } from '../../infrastructure/compositionRoot';
+import { commentsController } from '../../ioc/compositionRoot';
 
 export const commentsRouter = Router();
 

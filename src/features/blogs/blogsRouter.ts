@@ -10,12 +10,15 @@ import {
   validateObjectId,
   webSiteUrlValidator,
 } from '../../validators/fieldsValidators';
-import { authValidatorMiddleware } from '../../validators/authValidator';
+import {
+  authValidatorMiddleware,
+  softAuthMiddleware,
+} from '../../validators/authValidator';
 import {
   queryFieldsValidatorMiddleware,
   sortValidator,
 } from '../../validators/queryValidators';
-import { blogsController } from '../../infrastructure/compositionRoot';
+import { blogsController } from '../../ioc/compositionRoot';
 
 // blogs router
 export const blogsRouter = Router();
@@ -61,6 +64,7 @@ blogsRouter.put(
 blogsRouter.get(
   '/:id/posts',
   validateObjectId,
+  softAuthMiddleware,
   sortValidator,
   queryFieldsValidatorMiddleware,
   inputValidationMiddleware,
@@ -69,6 +73,7 @@ blogsRouter.get(
 blogsRouter.post(
   '/:id/posts',
   authValidatorMiddleware,
+  softAuthMiddleware,
   validateObjectId,
   ...blogIdValidator,
   titleValidator,

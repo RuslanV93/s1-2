@@ -1,17 +1,20 @@
-import { usersRepository } from '../repositories/usersRepository';
 import { ObjectId } from 'mongodb';
 import { NewUserType } from '../types/usersTypes';
 import { genHashFunction } from '../../../common/crypto/getHash';
 import { randomUUID } from 'node:crypto';
+import { inject, injectable } from 'inversify';
+import { UsersRepository } from '../repositories/usersRepository';
 
-export const usersService = {
+@injectable()
+export class UsersService {
+  constructor(@inject(UsersRepository) private usersRepository: UsersRepository) {}
   // add new user to DB and return
   async addNewUser(
     login: string,
     email: string,
     password: string,
   ): Promise<string | null> {
-    const isLoginOrEmailTaken = await usersRepository.isLoginOrEmailTaken(
+    const isLoginOrEmailTaken = await this.usersRepository.isLoginOrEmailTaken(
       email,
       login,
     );
@@ -53,7 +56,7 @@ export const usersService = {
         emailConfirmationCooldown: null,
       },
     };
-    const newUserId: string | null = await usersRepository.addNewUser(newUser);
+    const newUserId: string | null = await this.usersRepository.addNewUser(newUser);
 
     // new user add result check
     if (!newUserId) {
@@ -61,10 +64,10 @@ export const usersService = {
     }
 
     return newUserId;
-  },
+  }
 
   // delete existing user
   async deleteUser(id: ObjectId): Promise<boolean | null> {
-    return await usersRepository.deleteUser(id);
-  },
-};
+    return await this.usersRepository.deleteUser(id);
+  }
+}

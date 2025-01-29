@@ -1,10 +1,10 @@
 import express, { Request, Response, NextFunction } from 'express';
-import { blogsRouter } from './features/blogs/blogsController';
+import { blogsRouter } from './features/blogs/blogsRouter';
 import SETTINGS from './settings';
 import { postsRouter } from './features/posts/postRouter';
 import { allDataRouter } from './features/testing/deleteAllData';
 import { STATUSES } from './common/variables/variables';
-import { usersRouter } from './features/users/usersController';
+import { usersRouter } from './features/users/usersRouter';
 import { authRouter } from './features/auth/authController';
 import { commentsRouter } from './features/comments/commentsRouter';
 import cookieParser from 'cookie-parser';

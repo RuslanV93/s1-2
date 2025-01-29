@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 
 import { STATUSES } from '../common/variables/variables';
-import { authService } from '../features/auth/services/authService';
-import { usersQueryRepository } from '../features/users/repositories/usersQueryRepository';
 import { jwtService } from '../common/crypto/jwtService';
 import { devicesService } from '../features/devices/services/devicesService';
 import { DomainStatusCode } from '../common/types/types';
 import { resultCodeToHttpFunction } from '../common/helpers/resultCodeToHttpFunction';
+import { usersQueryRepository } from '../ioc/compositionRoot';
 
 /** BASIC auth validation */
 export const authValidatorMiddleware = (
@@ -54,6 +53,7 @@ export const accessTokenValidator = async (
   }
   if (payload) {
     const { userId } = payload;
+
     const user = await usersQueryRepository.getUserById(userId);
     if (!user) {
       res.sendStatus(STATUSES.UNAUTHORIZED_401);
@@ -100,6 +100,10 @@ export const softAuthMiddleware = async (
     return next();
   }
   const [authType, token] = req.headers?.authorization.split(' ');
+  if (authType !== 'Bearer' || !token) {
+    req.user = { id: 'none' };
+    return next();
+  }
 
   const { userId } = await jwtService.getUserIdFromAccessToken(token);
 

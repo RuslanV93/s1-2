@@ -1,7 +1,10 @@
 import { ObjectId } from 'mongodb';
 import { BlogDbType, BlogForUpdateType, NewBlogType } from '../types/blogsTypes';
 import { blogsCollection } from '../../../db/db';
+import { injectable } from 'inversify';
+import { HydratedDocument } from 'mongoose';
 
+@injectable()
 export class BlogsRepository {
   async getBlogById(_id: ObjectId): Promise<BlogDbType | null> {
     const [blogById] = await blogsCollection
@@ -36,5 +39,9 @@ export class BlogsRepository {
       { $set: updatedBlog },
     );
     return result.modifiedCount === 1;
+  }
+  async saveBlog(blog: HydratedDocument<BlogDbType>): Promise<string> {
+    await blog.save();
+    return blog._id.toString();
   }
 }

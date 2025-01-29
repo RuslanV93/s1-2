@@ -4,6 +4,7 @@ import { AllUsersViewType, UserDbType, UserViewType } from '../types/usersTypes'
 import { ObjectId } from 'mongodb';
 import { AuthMeViewType } from '../../auth/types/authTypes';
 import { usersCollection } from '../../../db/db';
+import { injectable } from 'inversify';
 
 // creating filter for search
 const createFilter = (searchAndPaginationParams: UsersSearchAndPaginationType) => {
@@ -21,11 +22,12 @@ const createFilter = (searchAndPaginationParams: UsersSearchAndPaginationType) =
   return filter;
 };
 
-export const usersQueryRepository = {
+@injectable()
+export class UsersQueryRepository {
   async getUsersTotalCount(searchAndPaginationParams: UsersSearchAndPaginationType) {
     const filter = createFilter(searchAndPaginationParams);
     return await usersCollection.countDocuments(filter);
-  },
+  }
   async getUserById(id: string): Promise<UserViewType | null> {
     const [user] = await usersCollection.find({ _id: new ObjectId(id) }).toArray();
     if (user) {
@@ -37,7 +39,7 @@ export const usersQueryRepository = {
       };
     }
     return null;
-  },
+  }
 
   async findMe(userId: string): Promise<AuthMeViewType | null> {
     const [me] = await usersCollection
@@ -51,7 +53,7 @@ export const usersQueryRepository = {
       login: me.login,
       userId: me._id.toString(),
     };
-  },
+  }
 
   // getting all users from db
   async getUsers(
@@ -72,5 +74,5 @@ export const usersQueryRepository = {
       searchAndPaginationParams,
       usersTotalCount,
     );
-  },
-};
+  }
+}

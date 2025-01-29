@@ -1,11 +1,8 @@
 import { Router } from 'express';
-import { getUsers } from './handlers/getUsers';
 import {
   queryFieldsValidatorMiddleware,
   sortValidator,
 } from '../../validators/queryValidators';
-import { addNewUser } from './handlers/addNewUser';
-import { deleteUser } from './handlers/deleteUser';
 import { authValidatorMiddleware } from '../../validators/authValidator';
 import {
   inputValidationMiddleware,
@@ -14,21 +11,16 @@ import {
   userPasswordValidator,
   validateObjectId,
 } from '../../validators/fieldsValidators';
+import { usersController } from '../../ioc/compositionRoot';
 
 export const usersRouter = Router();
-
-export const usersController = {
-  getUsers,
-  addNewUser,
-  deleteUser,
-};
 
 usersRouter.get(
   '/',
   authValidatorMiddleware,
   sortValidator,
   queryFieldsValidatorMiddleware,
-  usersController.getUsers,
+  usersController.getUsers.bind(usersController),
 );
 usersRouter.post(
   '/',
@@ -37,7 +29,7 @@ usersRouter.post(
   userPasswordValidator,
   userEmailValidator,
   inputValidationMiddleware,
-  usersController.addNewUser,
+  usersController.addNewUser.bind(usersController),
 );
 
 usersRouter.delete(
@@ -45,5 +37,5 @@ usersRouter.delete(
   authValidatorMiddleware,
   validateObjectId,
   inputValidationMiddleware,
-  usersController.deleteUser,
+  usersController.deleteUser.bind(usersController),
 );

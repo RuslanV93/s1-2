@@ -9,7 +9,7 @@ import {
 import { ObjectId } from 'mongodb';
 import { Comments } from '../domain/comments.entity';
 import { LikesQueryRepository } from '../../likes/repositories/likesQueryRepository';
-import { likesQueryRepository } from '../../../infrastructure/compositionRoot';
+import { inject, injectable } from 'inversify';
 
 const createFilter = (params: CommentsRequestWithQueryType) => {
   const filter: any = {};
@@ -18,8 +18,13 @@ const createFilter = (params: CommentsRequestWithQueryType) => {
   }
   return filter;
 };
+
+@injectable()
 export class CommentsQueryRepository {
-  constructor(protected likesQueryRepository: LikesQueryRepository) {}
+  constructor(
+    @inject(LikesQueryRepository)
+    protected likesQueryRepository: LikesQueryRepository,
+  ) {}
   // getting commentaries total count
   async getCommentsTotalCount(params: CommentsRequestWithQueryType) {
     const filter = createFilter(params);
@@ -42,7 +47,11 @@ export class CommentsQueryRepository {
         .limit(pageSize)
         .lean();
       const commentsIds = dbComments.map((comment) => comment._id);
-      const likes = await likesQueryRepository.getLikesStatuses(userId, commentsIds);
+
+      const likes = await this.likesQueryRepository.getCommentLikesStatuses(
+        userId,
+        commentsIds,
+      );
       return commentsMappers.commentsToViewTypeWithPageParamsMapper(
         dbComments,
         likes,
@@ -66,7 +75,7 @@ export class CommentsQueryRepository {
     if (!dbComment) {
       return null;
     }
-    const getLikeResult = await this.likesQueryRepository.getLikeStatusFromDb(
+    const getLikeResult = await this.likesQueryRepository.getCommentLikeStatusFromDb(
       commentId,
       userId,
     );

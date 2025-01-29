@@ -9,6 +9,7 @@ import {
   commentContentValidator,
   contentValidator,
   inputValidationMiddleware,
+  likesStatusValidator,
   shortDescriptionValidator,
   titleValidator,
   validateObjectId,
@@ -17,7 +18,7 @@ import {
   queryFieldsValidatorMiddleware,
   sortValidator,
 } from '../../validators/queryValidators';
-import { postsController } from '../../infrastructure/compositionRoot';
+import { postsController } from '../../ioc/compositionRoot';
 
 // Router
 export const postsRouter = Router();
@@ -26,6 +27,7 @@ export const postsRouter = Router();
 postsRouter.get(
   '/',
   sortValidator,
+  softAuthMiddleware,
   queryFieldsValidatorMiddleware,
   postsController.getPosts.bind(postsController),
 );
@@ -34,6 +36,7 @@ postsRouter.get(
 postsRouter.get(
   '/:id',
   validateObjectId,
+  softAuthMiddleware,
   inputValidationMiddleware,
   postsController.getPostById.bind(postsController),
 );
@@ -42,6 +45,7 @@ postsRouter.get(
 postsRouter.post(
   '/',
   authValidatorMiddleware,
+  softAuthMiddleware,
   titleValidator,
   shortDescriptionValidator,
   contentValidator,
@@ -75,8 +79,8 @@ postsRouter.put(
 // getting all comments by post id
 postsRouter.get(
   '/:id/comments',
-  softAuthMiddleware,
   validateObjectId,
+  softAuthMiddleware,
   inputValidationMiddleware,
   postsController.getCommentsByPostId.bind(postsController),
 );
@@ -89,4 +93,14 @@ postsRouter.post(
   commentContentValidator,
   inputValidationMiddleware,
   postsController.addNewCommentToPost.bind(postsController),
+);
+
+postsRouter.post(
+  '/:id/like-status',
+  accessTokenValidator,
+  validateObjectId,
+  softAuthMiddleware,
+  likesStatusValidator,
+  inputValidationMiddleware,
+  postsController.updateLikeStatus.bind(postsController),
 );

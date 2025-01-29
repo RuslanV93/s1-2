@@ -6,7 +6,7 @@ import {
 } from '../types/postsRequestResponseTypes';
 import { getQueryFromRequest } from '../../../common/helpers/getQueryFromRequest';
 import { STATUSES } from '../../../common/variables/variables';
-import { PostDbType, PostViewType } from '../types/postsTypes';
+import { PostViewType } from '../types/postsTypes';
 import { ObjectId } from 'mongodb';
 
 import {
@@ -14,7 +14,6 @@ import {
   CommentsRequestWithParamsType,
 } from '../../comments/types/commentsResponseRequestTypes';
 import { UserViewType } from '../../users/types/usersTypes';
-import { usersQueryRepository } from '../../users/repositories/usersQueryRepository';
 import { DomainStatusCode } from '../../../common/types/types';
 import { resultCodeToHttpFunction } from '../../../common/helpers/resultCodeToHttpFunction';
 import { PostsService } from '../services/postsService';
@@ -23,31 +22,53 @@ import { PostsQueryRepository } from '../repositories/postsQueryRepository';
 import { CommentsRepository } from '../../comments/repositories/commentsRepository';
 import { CommentsQueryRepository } from '../../comments/repositories/commentsQueryRepository';
 import { CommentsService } from '../../comments/services/commentsService';
-import { AllCommentsViewType } from '../../comments/types/commentsTypes';
+import {
+  AllCommentsViewType,
+  MyLikesStatus,
+} from '../../comments/types/commentsTypes';
 import { BlogsRepository } from '../../blogs/repositories/blogsRepository';
+import { inject } from 'inversify';
+import {
+  LikeResponseWithBodyType,
+  LikeResponseWithParamsType,
+} from '../../likes/types/likesRequestResponseTypes';
+import { LikesQueryRepository } from '../../likes/repositories/likesQueryRepository';
+import { UsersQueryRepository } from '../../users/repositories/usersQueryRepository';
+import { LikesService } from '../../likes/services/likesService';
 
 export class PostsController {
   constructor(
-    protected postsService: PostsService,
-    protected postsRepository: PostsRepository,
+    @inject(PostsService) protected postsService: PostsService,
+    @inject(LikesService) protected likesService: LikesService,
+    @inject(PostsRepository) protected postsRepository: PostsRepository,
+    @inject(PostsQueryRepository)
     protected postsQueryRepository: PostsQueryRepository,
-    protected commentsService: CommentsService,
-    protected commentsRepository: CommentsRepository,
+    @inject(CommentsService) protected commentsService: CommentsService,
+    @inject(CommentsRepository) protected commentsRepository: CommentsRepository,
+    @inject(CommentsQueryRepository)
     protected commentsQueryRepository: CommentsQueryRepository,
-    protected blogsRepository: BlogsRepository,
+    @inject(BlogsRepository) protected blogsRepository: BlogsRepository,
+    @inject(LikesQueryRepository)
+    protected likesQueryRepository: LikesQueryRepository,
+    @inject(UsersQueryRepository)
+    protected usersQueryRepository: UsersQueryRepository,
   ) {}
   async getPosts(req: Request<{}, PostRequestTypeQuery>, res: Response) {
+    const userId = req.user.id;
     const paginationParams: PostRequestTypeQuery =
       getQueryFromRequest.getQueryFromRequest(req);
-    const posts = await this.postsQueryRepository.getPosts(paginationParams);
+    const posts = await this.postsQueryRepository.getPosts(paginationParams, userId);
     res.status(STATUSES.OK_200).send(posts);
   }
 
   /** getting post by post id */
   async getPostById(req: Request<PostRequestTypeWithParams>, res: Response) {
     const id = req.params.id;
-    const post: PostViewType | null =
-      await this.postsQueryRepository.getPostById(id);
+    const userId = req.user.id;
+    const post: PostViewType | null = await this.postsQueryRepository.getPostById(
+      id,
+      userId,
+    );
 
     if (!post) {
       res.sendStatus(STATUSES.NOT_FOUND_404);
@@ -61,6 +82,7 @@ export class PostsController {
     const existingBlogToAddNewPost = await this.blogsRepository.getBlogById(
       new ObjectId(req.body.blogId),
     );
+    const userId = req.user.id;
     if (!existingBlogToAddNewPost) {
       res.status(STATUSES.BAD_REQUEST_400).send('Blog not found. Incorrect blog ID');
       return;
@@ -74,7 +96,10 @@ export class PostsController {
       res.sendStatus(STATUSES.BAD_REQUEST_400);
       return;
     }
-    const newAddedPost = await this.postsQueryRepository.getPostById(newAddedPostId);
+    const newAddedPost = await this.postsQueryRepository.getPostById(
+      newAddedPostId,
+      userId,
+    );
     if (!newAddedPost) {
       res.sendStatus(STATUSES.BAD_REQUEST_400);
       return;
@@ -163,6 +188,7 @@ export class PostsController {
       res
         .status(STATUSES.INTERNAL_ERROR_500)
         .send({ message: 'something went wrong' });
+      return;
     }
     res.status(STATUSES.OK_200).send(comments);
   }
@@ -179,7 +205,7 @@ export class PostsController {
     }
 
     const commentator: UserViewType | null =
-      await usersQueryRepository.getUserById(userId);
+      await this.usersQueryRepository.getUserById(userId);
 
     const commentatorInfo = {
       userId: new ObjectId(userId),
@@ -201,5 +227,43 @@ export class PostsController {
       userId,
     );
     res.status(STATUSES.CREATED_201).send(newAddedComment);
+  }
+
+  /** New like/dislike status, update existing like/dislike status */
+  async updateLikeStatus(
+    req: Request<LikeResponseWithParamsType, {}, LikeResponseWithBodyType>,
+    res: Response,
+  ) {
+    const userId = req.user.id;
+    const postId = req.params.id;
+    const newLikeStatus = req.body.likeStatus as MyLikesStatus;
+
+    try {
+      const existingLikeStatus = await this.likesQueryRepository.getPostLikesStatus(
+        postId,
+        userId,
+      );
+      if (!existingLikeStatus.status) {
+        res.status(STATUSES.INTERNAL_ERROR_500).send('Something went wrong');
+        return;
+      }
+      const updateResult = await this.likesService.updatePostLikeStatus(
+        postId,
+        userId,
+        existingLikeStatus.status,
+        newLikeStatus,
+      );
+      if (updateResult.status !== DomainStatusCode.Success) {
+        res
+          .status(resultCodeToHttpFunction(updateResult.status))
+          .send(updateResult.extensions);
+        return;
+      }
+      res.sendStatus(STATUSES.NO_CONTENT_204);
+    } catch (error) {
+      console.error(error);
+      res.status(STATUSES.INTERNAL_ERROR_500).send(error);
+      return;
+    }
   }
 }

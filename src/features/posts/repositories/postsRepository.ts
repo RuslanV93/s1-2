@@ -1,11 +1,14 @@
 import { ObjectId } from 'mongodb';
 import { NewPostType, PostDbType, PostForUpdateType } from '../types/postsTypes';
-import { postsCollection } from '../../../db/db';
+import { injectable } from 'inversify';
+import { HydratedDocument } from 'mongoose';
+import { PostModel } from '../domain/posts.entity';
 
+@injectable()
 export class PostsRepository {
   // getting post by post id
-  async getPostById(id: ObjectId): Promise<PostDbType | null> {
-    const [postById] = await postsCollection.find<PostDbType>({ _id: id }).toArray();
+  async getPostById(id: ObjectId) {
+    const postById = await PostModel.findOne({ _id: id });
     if (postById) {
       return postById;
     }
@@ -13,15 +16,15 @@ export class PostsRepository {
   }
   //add new post
   async addNewPost(newPost: NewPostType): Promise<string | null> {
-    const result = await postsCollection.insertOne(newPost);
-    if (result.insertedId) {
-      return result.insertedId.toString();
+    const result = await PostModel.create(newPost);
+    if (result._id) {
+      return result._id.toString();
     }
     return null;
   }
   // delete existing post by id
   async deletePostById(id: ObjectId): Promise<boolean> {
-    const result = await postsCollection.deleteOne({
+    const result = await PostModel.deleteOne({
       _id: id,
     });
 
@@ -33,11 +36,15 @@ export class PostsRepository {
     postId: string,
     updatedPost: PostForUpdateType,
   ): Promise<boolean> {
-    const result = await postsCollection.updateOne(
+    const result = await PostModel.updateOne(
       { _id: new ObjectId(postId) },
       { $set: updatedPost },
     );
 
     return result.modifiedCount === 1;
+  }
+  async postSave(post: HydratedDocument<PostDbType>): Promise<string> {
+    await post.save();
+    return post._id.toString();
   }
 }

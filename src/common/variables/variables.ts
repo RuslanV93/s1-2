@@ -16,7 +16,8 @@ export const BLOGGERS_PLATFORM = {
   blogs: 'blogs',
   users: 'users',
   comments: 'comments',
-  likes: 'likes',
+  commentLikes: 'commentLikes',
+  postLikes: 'postLikes',
 };
 export const DEVICE_CONTROL = {
   devices: 'devices',

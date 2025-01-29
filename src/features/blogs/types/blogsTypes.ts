@@ -1,4 +1,13 @@
 import { ObjectId } from 'mongodb';
+import { HydratedDocument, Model } from 'mongoose';
+
+export type BlogsModelType = Model<BlogDbType> & {
+  makeInstance(
+    name: string,
+    description: string,
+    websiteUrl: string,
+  ): HydratedDocument<BlogDbType>;
+};
 
 export type BlogDbType = {
   _id: ObjectId;
@@ -8,13 +17,8 @@ export type BlogDbType = {
   createdAt: string;
   isMembership: boolean;
 };
-export type NewBlogType = {
-  name: string;
-  description: string;
-  websiteUrl: string;
-  createdAt: string;
-  isMembership: boolean;
-};
+export type NewBlogType = Omit<BlogDbType, '_id'>;
+
 export type BlogForUpdateType = {
   name: string;
   description: string;

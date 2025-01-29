@@ -1,20 +1,28 @@
 import { BlogRequestTypeBody } from '../types/blogsRequestResponseTypes';
 import { ObjectId } from 'mongodb';
-import { BlogForUpdateType, NewBlogType } from '../types/blogsTypes';
-import { blogsRepository } from '../../../infrastructure/compositionRoot';
+import {
+  BlogDbType,
+  BlogForUpdateType,
+  BlogsModelType,
+  NewBlogType,
+} from '../types/blogsTypes';
 import { BlogsRepository } from '../repositories/blogsRepository';
+import { inject, injectable } from 'inversify';
+import { BlogModel } from '../domain/blogs.entity';
 
+@injectable()
 export class BlogsService {
-  constructor(protected blogsRepository: BlogsRepository) {}
+  constructor(
+    @inject(BlogsRepository) protected blogsRepository: BlogsRepository,
+    @inject(BlogModel) protected blogModel: BlogsModelType,
+  ) {}
   async addNewBlog(body: BlogRequestTypeBody): Promise<string | null> {
-    const newBlog: NewBlogType = {
-      name: body.name,
-      description: body.description,
-      websiteUrl: body.websiteUrl,
-      createdAt: new Date().toISOString(),
-      isMembership: false,
-    };
-    return await blogsRepository.addNewBlog(newBlog);
+    const newBlog = this.blogModel.makeInstance(
+      body.name,
+      body.description,
+      body.websiteUrl,
+    );
+    return await this.blogsRepository.saveBlog(newBlog);
   }
   async updateBlog(id: ObjectId, newBody: BlogForUpdateType) {
     const updatedBlog: BlogForUpdateType = {
@@ -22,9 +30,9 @@ export class BlogsService {
       description: newBody.description,
       websiteUrl: newBody.websiteUrl,
     };
-    return await blogsRepository.updateBlogById(id, updatedBlog);
+    return await this.blogsRepository.updateBlogById(id, updatedBlog);
   }
   async deleteBlogById(id: ObjectId): Promise<boolean> {
-    return await blogsRepository.deleteBlogById(id);
+    return await this.blogsRepository.deleteBlogById(id);
   }
 }

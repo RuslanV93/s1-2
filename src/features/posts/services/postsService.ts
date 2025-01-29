@@ -1,30 +1,36 @@
 import { PostRequestTypeWithBody } from '../types/postsRequestResponseTypes';
 import { ObjectId } from 'mongodb';
-import { NewPostType, PostForUpdateType, PostViewType } from '../types/postsTypes';
+import { PostForUpdateType } from '../types/postsTypes';
 import { PostByBlogRequestTypeBody } from '../../blogs/types/blogsRequestResponseTypes';
 import { BlogDbType } from '../../blogs/types/blogsTypes';
 import { PostsRepository } from '../repositories/postsRepository';
-import { postsRepository } from '../../../infrastructure/compositionRoot';
+import { inject, injectable } from 'inversify';
+import { PostModel } from '../domain/posts.entity';
+import { LikesRepository } from '../../likes/repositories/likesRepository';
 
 // posts bll service methods
 
+@injectable()
 export class PostsService {
-  constructor(protected postsRepository: PostsRepository) {}
+  constructor(
+    @inject(PostsRepository) protected postsRepository: PostsRepository,
+    @inject(LikesRepository) protected likesRepository: LikesRepository,
+    @inject(PostModel) protected postModel: typeof PostModel,
+  ) {}
   // add new post to DB method
   async addNewPost(
     newPostBody: PostRequestTypeWithBody,
     blogName: string,
   ): Promise<string | null> {
-    const newPost: NewPostType = {
-      title: newPostBody.title,
-      shortDescription: newPostBody.shortDescription,
-      content: newPostBody.content,
-      blogId: new ObjectId(newPostBody.blogId),
-      blogName: blogName,
-      createdAt: new Date().toISOString(),
-    };
+    const newPost = this.postModel.makeInstance(
+      newPostBody.title,
+      newPostBody.shortDescription,
+      newPostBody.content,
+      newPostBody.blogId,
+      blogName,
+    );
 
-    const newPostId = await this.postsRepository.addNewPost(newPost);
+    const newPostId = await this.postsRepository.postSave(newPost);
     if (!newPostId) {
       return null;
     }
@@ -37,14 +43,13 @@ export class PostsService {
     body: PostByBlogRequestTypeBody,
     blogToAddPost: BlogDbType,
   ): Promise<string | null> {
-    const newPost: NewPostType = {
-      title: body.title,
-      shortDescription: body.shortDescription,
-      content: body.content,
-      blogId: blogToAddPost._id,
-      blogName: blogToAddPost.name,
-      createdAt: new Date().toISOString(),
-    };
+    const newPost = this.postModel.makeInstance(
+      body.title,
+      body.shortDescription,
+      body.content,
+      blogToAddPost._id.toString(),
+      blogToAddPost.name,
+    );
     return await this.postsRepository.addNewPost(newPost);
   }
 
@@ -67,6 +72,7 @@ export class PostsService {
 
   // delete existing post by id
   async deletePostById(id: ObjectId): Promise<boolean> {
+    await this.likesRepository.deletePostLikeEntity(id);
     return await this.postsRepository.deletePostById(id);
   }
 }

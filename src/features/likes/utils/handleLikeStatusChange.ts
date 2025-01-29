@@ -1,9 +1,9 @@
 import { MyLikesStatus } from '../../comments/types/commentsTypes';
-import { likesRepository } from '../../../infrastructure/compositionRoot';
-import { LikesRepository } from '../repositories/likesRepository';
+import { injectable } from 'inversify';
 
+@injectable()
 export class LikeStatusChange {
-  constructor(private likesRepository: LikesRepository) {}
+  constructor() {}
   calculateLikeCounterChange(
     oldLikeStatus: MyLikesStatus,
     newLikeStatus: MyLikesStatus,
@@ -45,6 +45,3 @@ export class LikeStatusChange {
     return { like: 0, dislike: 0 };
   }
 }
-export const likeStatusChange: LikeStatusChange = new LikeStatusChange(
-  likesRepository,
-);

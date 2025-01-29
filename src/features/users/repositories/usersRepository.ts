@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { NewUserType, UserDbType } from '../types/usersTypes';
 import { usersCollection } from '../../../db/db';
+import { injectable } from 'inversify';
 
 const createFilter = (email: string, login: string) => {
   const filter: any = {};
@@ -15,7 +16,9 @@ const createFilter = (email: string, login: string) => {
   }
   return filter;
 };
-export const usersRepository = {
+
+@injectable()
+export class UsersRepository {
   async isLoginOrEmailTaken(email: string, login: string) {
     const loginCount = await usersCollection.countDocuments({
       login: login,
@@ -24,7 +27,7 @@ export const usersRepository = {
       email: email,
     });
     return { loginCount, emailCount };
-  },
+  }
   // getting existing user
   async getUserById(id: ObjectId) {
     const [user]: Array<UserDbType> = await usersCollection
@@ -32,10 +35,10 @@ export const usersRepository = {
       .toArray();
 
     if (user) {
-      return user._id;
+      return user;
     }
     return null;
-  },
+  }
 
   // add new user to db and return inserted id
   async addNewUser(newUser: NewUserType): Promise<string | null> {
@@ -44,7 +47,7 @@ export const usersRepository = {
       return result.insertedId.toString();
     }
     return null;
-  },
+  }
 
   //delete existing user by id
   async deleteUser(id: ObjectId): Promise<boolean> {
@@ -52,5 +55,5 @@ export const usersRepository = {
       _id: id,
     });
     return deleteResult.deletedCount === 1;
-  },
-};
+  }
+}

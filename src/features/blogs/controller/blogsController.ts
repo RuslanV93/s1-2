@@ -16,14 +16,18 @@ import { BlogsQueryRepository } from '../repositories/blogsQueryRepository';
 import { BlogsService } from '../services/blogsService';
 import { PostsQueryRepository } from '../../posts/repositories/postsQueryRepository';
 import { PostsService } from '../../posts/services/postsService';
+import { inject, injectable } from 'inversify';
 
+@injectable()
 export class BlogsController {
   constructor(
-    protected blogsRepository: BlogsRepository,
+    @inject(BlogsRepository) protected blogsRepository: BlogsRepository,
+    @inject(BlogsQueryRepository)
     protected blogsQueryRepository: BlogsQueryRepository,
-    protected blogsService: BlogsService,
+    @inject(BlogsService) protected blogsService: BlogsService,
+    @inject(PostsQueryRepository)
     protected postsQueryRepository: PostsQueryRepository,
-    protected postsService: PostsService,
+    @inject(PostsService) protected postsService: PostsService,
   ) {}
   async getBlogs(req: Request<{}, BlogRequestTypeQuery>, res: Response) {
     const paginationAndSearchParams: BlogRequestTypeQuery =
@@ -99,6 +103,7 @@ export class BlogsController {
     res.sendStatus(STATUSES.NO_CONTENT_204);
   }
   async getPostsByBlogId(req: Request<PostRequestTypeWithParams>, res: Response) {
+    const userId = req.user.id;
     const paginationAndSearchParams: BlogRequestTypeQuery =
       getQueryFromRequest.getQueryFromRequest(req);
     const blog = await this.blogsRepository.getBlogById(new ObjectId(req.params.id));
@@ -109,6 +114,7 @@ export class BlogsController {
     }
     const postsByBlogId = await this.postsQueryRepository.getPosts(
       paginationAndSearchParams,
+      userId,
       req.params.id,
     );
 
@@ -118,6 +124,7 @@ export class BlogsController {
     req: Request<BlogRequestTypeParams, {}, PostByBlogRequestTypeBody>,
     res: Response,
   ) {
+    const userId = req.user.id;
     const blogToAddPost: BlogDbType | null = await this.blogsRepository.getBlogById(
       new ObjectId(req.params.id),
     );
@@ -136,7 +143,7 @@ export class BlogsController {
       return;
     }
     // Getting new post to response him
-    const newPost = await this.postsQueryRepository.getPostById(newPostId);
+    const newPost = await this.postsQueryRepository.getPostById(newPostId, userId);
     if (!newPost) {
       res.status(STATUSES.NOT_FOUND_404).send('Post not found.');
     }

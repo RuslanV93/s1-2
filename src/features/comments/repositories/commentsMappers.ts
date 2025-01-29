@@ -5,12 +5,12 @@ import {
   MyLikesStatus,
 } from '../types/commentsTypes';
 import { CommentsRequestWithQueryType } from '../types/commentsResponseRequestTypes';
-import { LikesDbType } from '../../likes/types/likesTypes';
+import { CommentLikesDbType } from '../../likes/types/likesTypes';
 
 export const commentsMappers = {
   commentsToViewModelMapper(
     dbComments: Array<CommentDbType>,
-    likes: LikesDbType[] | null,
+    likes: CommentLikesDbType[] | null,
   ): Array<CommentViewType> {
     const likesMap = new Map(
       likes?.map((like) => [like.parentId.toString(), like.status]) ?? [],
@@ -35,7 +35,7 @@ export const commentsMappers = {
   },
   commentsToViewTypeWithPageParamsMapper(
     dbComments: Array<CommentDbType>,
-    likes: Array<LikesDbType> | null,
+    likes: Array<CommentLikesDbType> | null,
     totalCount: number,
     params: CommentsRequestWithQueryType,
   ): AllCommentsViewType {

@@ -2,7 +2,6 @@ import { comparePassword } from '../../../common/crypto/verifyPassword';
 import { authRepository } from '../repositories/authRepository';
 import { NewUserType, UserDbType } from '../../users/types/usersTypes';
 import { WithId } from 'mongodb';
-import { usersRepository } from '../../users/repositories/usersRepository';
 import { DomainStatusCode, ResultObject } from '../../../common/types/types';
 import { genHashFunction } from '../../../common/crypto/getHash';
 import { randomUUID } from 'node:crypto';
@@ -12,6 +11,7 @@ import { jwtService } from '../../../common/crypto/jwtService';
 import { devicesService } from '../../devices/services/devicesService';
 import { devicesRepository } from '../../devices/repositories/devicesRepository';
 import { resultObject } from '../../../common/helpers/resultObjectHelpers';
+import { usersRepository } from '../../../ioc/compositionRoot';
 
 function isSuccess(result: ResultObject<any>): result is ResultObject<string> {
   return result.status === DomainStatusCode.Success && result.data !== null;

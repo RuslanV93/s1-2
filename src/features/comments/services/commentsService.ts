@@ -4,11 +4,13 @@ import { ObjectId } from 'mongodb';
 import { DomainStatusCode, ResultObject } from '../../../common/types/types';
 import { CommentsRepository } from '../repositories/commentsRepository';
 import { LikesRepository } from '../../likes/repositories/likesRepository';
+import { inject, injectable } from 'inversify';
 
+@injectable()
 export class CommentsService {
   constructor(
-    protected commentsRepository: CommentsRepository,
-    protected likesRepository: LikesRepository,
+    @inject(CommentsRepository) protected commentsRepository: CommentsRepository,
+    @inject(LikesRepository) protected likesRepository: LikesRepository,
   ) {}
   // adding new comment
   async addNewComment(
@@ -117,7 +119,7 @@ export class CommentsService {
         };
       }
       /** Delete likes when comment has been deleted */
-      await this.likesRepository.deleteLikeEntity(commentId);
+      await this.likesRepository.deleteCommentLikeEntity(commentId);
 
       return {
         status: DomainStatusCode.Success,

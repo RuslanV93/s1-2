@@ -95,11 +95,10 @@ postsRouter.post(
   postsController.addNewCommentToPost.bind(postsController),
 );
 
-postsRouter.post(
+postsRouter.put(
   '/:id/like-status',
   accessTokenValidator,
   validateObjectId,
-  softAuthMiddleware,
   likesStatusValidator,
   inputValidationMiddleware,
   postsController.updateLikeStatus.bind(postsController),

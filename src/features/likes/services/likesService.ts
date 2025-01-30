@@ -82,6 +82,7 @@ export class LikesService {
     );
 
     if (!existingPost) {
+      console.log(postId === '679be7f86832f71ac4363bb1');
       return resultObject.notFoundResultObject({
         message: 'Post not found!',
         field: 'postId',

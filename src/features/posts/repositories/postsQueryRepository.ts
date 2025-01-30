@@ -101,7 +101,6 @@ export class PostsQueryRepository {
     const newestLikesMap = await this.likesQueryRepository.getPostNewestLike([
       new ObjectId(id),
     ]);
-    console.log(newestLikesMap);
     const postNewestLikes = newestLikesMap.get(id) || [];
     return {
       id: dbPost._id.toString(),

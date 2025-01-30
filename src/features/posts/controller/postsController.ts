@@ -82,7 +82,7 @@ export class PostsController {
     const existingBlogToAddNewPost = await this.blogsRepository.getBlogById(
       new ObjectId(req.body.blogId),
     );
-    const userId = req.user.id;
+    const userId = req.user.id ? req.user.id : 'none';
     if (!existingBlogToAddNewPost) {
       res.status(STATUSES.BAD_REQUEST_400).send('Blog not found. Incorrect blog ID');
       return;

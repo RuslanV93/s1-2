@@ -62,6 +62,7 @@ export class LikesQueryRepository {
       {
         $match: {
           parentId: { $in: postIds },
+          status: 'Like',
         },
       },
       {
